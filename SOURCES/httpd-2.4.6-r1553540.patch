@@ -1,0 +1,28 @@
+# ./pullrev.sh 1553540
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1040447
+
+http://svn.apache.org/viewvc?view=revision&revision=1553540
+
+--- httpd-2.4.6/modules/proxy/mod_proxy_http.c
++++ httpd-2.4.6/modules/proxy/mod_proxy_http.c
+@@ -710,7 +710,7 @@
+         force10 = 0;
+     }
+ 
+-    header_brigade = apr_brigade_create(p, origin->bucket_alloc);
++    header_brigade = apr_brigade_create(p, bucket_alloc);
+     rv = ap_proxy_create_hdrbrgd(p, header_brigade, r, p_conn,
+                                  worker, conf, uri, url, server_portstr,
+                                  &old_cl_val, &old_te_val);
+@@ -1813,6 +1813,10 @@
+         }
+     } while (interim_response && (interim_response < AP_MAX_INTERIM_RESPONSES));
+ 
++    /* We have to cleanup bb brigade, because buckets inserted to it could be
++     * created from scpool and this pool can be freed before this brigade. */
++    apr_brigade_cleanup(bb);
++
+     /* See define of AP_MAX_INTERIM_RESPONSES for why */
+     if (interim_response >= AP_MAX_INTERIM_RESPONSES) {
+         return ap_proxyerror(r, HTTP_BAD_GATEWAY,
