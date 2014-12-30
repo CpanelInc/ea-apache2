@@ -21,11 +21,11 @@ Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: centos-noindex.tar.gz
 Source2: httpd.logrotate
 Source3: httpd.sysconf
-Source4: httpd-ssl-pass-dialog
-Source5: httpd.tmpfiles
-Source6: httpd.service
-Source7: action-graceful.sh
-Source8: action-configtest.sh
+
+
+Source6: httpd.init
+
+
 Source10: httpd.conf
 Source11: 00-base.conf
 Source12: 00-mpm.conf
@@ -40,18 +40,18 @@ Source20: userdir.conf
 Source21: ssl.conf
 Source22: welcome.conf
 Source23: manual.conf
-Source24: 00-systemd.conf
+
 Source25: 01-session.conf
 # Documentation
 Source30: README.confd
-Source40: htcacheclean.service
+Source40: htcacheclean.init
 Source41: htcacheclean.sysconf
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.3-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
-Patch6: httpd-2.4.3-apctl-systemd.patch
+
 # Features/functional changes
 Patch21: httpd-2.4.6-full-release.patch
 Patch23: httpd-2.4.4-export.patch
@@ -60,7 +60,7 @@ Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch28: httpd-2.4.6-r1332643+.patch
-Patch29: httpd-2.4.3-mod_systemd.patch
+
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch32: httpd-2.4.6-r1537535.patch
@@ -82,7 +82,6 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.4.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
-BuildRequires: systemd-devel
 Requires: /etc/mime.types, system-logos >= 7.92.1-1
 Obsoletes: httpd-suexec
 Provides: webserver
@@ -90,9 +89,7 @@ Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}, httpd-mmn = %{oldmmnisa}
 Requires: httpd-tools = %{version}-%{release}
 Requires(pre): /usr/sbin/useradd
-Requires(preun): systemd-units
-Requires(postun): systemd-units
-Requires(post): systemd-units
+Requires(post): chkconfig
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -186,7 +183,6 @@ interface for storing and accessing per-user session data.
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
-%patch6 -p1 -b .apctlsystemd
 
 %patch21 -p1 -b .fullrelease
 %patch23 -p1 -b .export
@@ -195,7 +191,7 @@ interface for storing and accessing per-user session data.
 %patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
 %patch28 -p1 -b .r1332643+
-%patch29 -p1 -b .systemd
+
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
 %patch32 -p1 -b .r1537535
@@ -294,11 +290,11 @@ rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=$RPM_BUILD_ROOT install
 
-# Install systemd service files
-mkdir -p $RPM_BUILD_ROOT%{_unitdir}
+# install SYSV init stuff
+mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 for s in httpd htcacheclean; do
-  install -p -m 644 $RPM_SOURCE_DIR/${s}.service \
-                    $RPM_BUILD_ROOT%{_unitdir}/${s}.service
+	install -p -m 755 $RPM_SOURCE_DIR/${s}.init \
+		$RPM_BUILD_ROOT%{_initrddir}/${s}
 done
 
 # install conf file/directory
@@ -308,7 +304,7 @@ install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 00-systemd.conf 01-session.conf; do
+         01-ldap.conf 01-session.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -336,11 +332,6 @@ for s in httpd htcacheclean; do
   install -m 644 -p $RPM_SOURCE_DIR/${s}.sysconf \
                     $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/${s}
 done
-
-# tmpfiles.d configuration
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d 
-install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
-   $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/httpd.conf
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
@@ -399,18 +390,6 @@ ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
 ln -s /run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
-# install http-ssl-pass-dialog
-mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
-install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
-	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-pass-dialog
-
-# Install action scripts
-mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd
-for f in graceful configtest; do
-    install -p -m 755 $RPM_SOURCE_DIR/action-${f}.sh \
-            $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd/${f}
-done
-
 # Install logrotate config
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
@@ -450,32 +429,28 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
 %pre
 # Add the "apache" user
-/usr/sbin/useradd -c "Apache" -u 48 \
-	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
+getent group apache >/dev/null || groupadd -g 48 -r apache
+getent passwd apache >/dev/null || \
+  useradd -r -u 48 -g apache -s /sbin/nologin \
+    -d %{contentdir} -c "Apache" apache
+exit 0
 
 %post
-%systemd_post httpd.service htcacheclean.service
+# Register the httpd service
+/sbin/chkconfig --add httpd
+/sbin/chkconfig --add htcacheclean
 
 %preun
-%systemd_preun httpd.service htcacheclean.service
-
-%postun
-%systemd_postun
-
-# Trigger for conversion from SysV, per guidelines at:
-# https://fedoraproject.org/wiki/Packaging:ScriptletSnippets#Systemd
-%triggerun -- httpd < 2.2.21-5
-# Save the current service runlevel info
-# User must manually run systemd-sysv-convert --apply httpd
-# to migrate them to systemd targets
-/usr/bin/systemd-sysv-convert --save httpd.service >/dev/null 2>&1 ||:
-
-# Run these because the SysV package being removed won't do them
-/sbin/chkconfig --del httpd >/dev/null 2>&1 || :
+if [ $1 = 0 ]; then
+        /sbin/service httpd stop > /dev/null 2>&1
+        /sbin/chkconfig --del httpd
+        /sbin/service htcacheclean stop > /dev/null 2>&1
+        /sbin/chkconfig --del htcacheclean
+fi
 
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
-  /bin/systemctl try-restart httpd.service htcacheclean.service >/dev/null 2>&1 || :
+ /sbin/service httpd condrestart >/dev/null 2>&1 || :
 
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
@@ -487,13 +462,16 @@ if [ -f %{sslkey} -o -f %{sslcert} ]; then
    exit 0
 fi
 
+if [ ! -f %{sslkey} ] ; then
 %{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 2048 > %{sslkey} 2> /dev/null
+fi
 
 FQDN=`hostname`
 if [ "x${FQDN}" = "x" ]; then
    FQDN=localhost.localdomain
 fi
 
+if [ ! -f %{sslcert} ] ; then
 cat << EOF | %{_bindir}/openssl req -new -key %{sslkey} \
          -x509 -sha256 -days 365 -set_serial $RANDOM -extensions v3_req \
          -out %{sslcert} 2>/dev/null
@@ -505,6 +483,7 @@ SomeOrganizationalUnit
 ${FQDN}
 root@${FQDN}
 EOF
+fi
 
 %check
 # Check the built modules are all PIC
@@ -531,6 +510,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf/magic
 
 %config(noreplace) %{_sysconfdir}/logrotate.d/httpd
+%{_initrddir}/httpd
+%{_initrddir}/htcacheclean
 
 %dir %{_sysconfdir}/httpd/conf.d
 %{_sysconfdir}/httpd/conf.d/README
@@ -546,10 +527,6 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
-%{_prefix}/lib/tmpfiles.d/httpd.conf
-
-%dir %{_libexecdir}/initscripts/legacy-actions/httpd
-%{_libexecdir}/initscripts/legacy-actions/httpd/*
 
 %{_sbindir}/ht*
 %{_sbindir}/fcgistarter
@@ -591,8 +568,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_mandir}/man8/*
 
-%{_unitdir}/*.service
-
 %files tools
 %defattr(-,root,root)
 %{_bindir}/*
@@ -612,7 +587,6 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
-%{_libexecdir}/httpd-ssl-pass-dialog
 
 %files -n mod_proxy_html
 %defattr(-,root,root)
@@ -642,6 +616,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Dec 30 2014 Kurt Newman <kurt.newman@cpanel.net> - 2.4.6-17.el6.centos.1
+- Converted from CentOS 7, to CentOS 6
+
 * Tue Jun 17 2014 Jim Perrin <jperrin@centos.org> - 2.4.6-17.el7.centos.1
 - Remove index.html, add centos-noindex.tar.gz
 - update welcome.conf with proper aliases
