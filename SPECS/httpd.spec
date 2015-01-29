@@ -1,6 +1,6 @@
 %define contentdir %{_datadir}/httpd
 %define docroot /var/www
-%define suexec_caller apache
+%define suexec_caller nobody
 %define mmn 20120211
 %define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 17%{?dist}.centos.1
+Release: 17%{?dist}.cpanel.2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: centos-noindex.tar.gz
@@ -76,6 +76,12 @@ Patch60: httpd-2.4.6-r1553540.patch
 # Security fixes
 Patch200: httpd-2.4.6-CVE-2013-6438.patch
 Patch201: httpd-2.4.6-CVE-2014-0098.patch
+# cPanel-specific patches
+Patch301: 2.2_cpanel_whmserverstatus.patch
+Patch302: 2.2.17_cpanel_suexec_script_share.patch
+Patch303: 2.2.17_cpanel_mailman_suexec.patch
+Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
+
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -121,14 +127,14 @@ BuildArch: noarch
 %description manual
 The httpd-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
-also be found at http://httpd.apache.org/docs/2.2/.
+also be found at http://httpd.apache.org/docs/2.4/.
 
 %package tools
 Group: System Environment/Daemons
 Summary: Tools for use with the Apache HTTP Server
 
 %description tools
-The httpd-tools package contains tools which can be used with 
+The httpd-tools package contains tools which can be used with
 the Apache HTTP Server.
 
 %package -n mod_ssl
@@ -208,6 +214,11 @@ rm modules/ssl/ssl_engine_dh.c
 
 %patch200 -p1 -b .cve6438
 %patch201 -p1 -b .cve0098
+
+%patch301 -p1 -b .cpWHM
+%patch302 -p1 -b .cpsuexec1
+%patch303 -p1 -b .cpsuexec2
+%patch304 -p1 -b .cpsuexec3
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -335,7 +346,7 @@ done
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
-         $RPM_BUILD_ROOT/run/httpd/htcacheclean
+         $RPM_BUILD_ROOT%{_localstatedir}/run/httpd/htcacheclean
 
 # Create cache directory
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
@@ -387,7 +398,7 @@ ln -s ../noindex/images/poweredby.png \
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s /run/httpd $RPM_BUILD_ROOT/etc/httpd/run
+ln -s ../..%{_localstatedir}/run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
 # Install logrotate config
@@ -401,7 +412,7 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/magic|/etc/httpd/conf/magic|" \
     -e "s|/usr/local/apache2/logs/error_log|/var/log/httpd/error_log|" \
     -e "s|/usr/local/apache2/logs/access_log|/var/log/httpd/access_log|" \
-    -e "s|/usr/local/apache2/logs/httpd.pid|/run/httpd/httpd.pid|" \
+    -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/httpd/httpd.pid|" \
     -e "s|/usr/local/apache2|/etc/httpd|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
 
@@ -427,18 +438,11 @@ rm -vf \
 
 rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
-%pre
-# Add the "apache" user
-getent group apache >/dev/null || groupadd -g 48 -r apache
-getent passwd apache >/dev/null || \
-  useradd -r -u 48 -g apache -s /sbin/nologin \
-    -d %{contentdir} -c "Apache" apache
-exit 0
-
 %post
 # Register the httpd service
 /sbin/chkconfig --add httpd
 /sbin/chkconfig --add htcacheclean
+/sbin/service httpd start > /dev/null 2>&1
 
 %preun
 if [ $1 = 0 ]; then
@@ -559,12 +563,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{docroot}/cgi-bin
 %dir %{docroot}/html
 
-%attr(0710,root,apache) %dir /run/httpd
-%attr(0700,apache,apache) %dir /run/httpd/htcacheclean
+%attr(0710,root,nobody) %dir %{_localstatedir}/run/httpd
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/run/httpd/htcacheclean
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
-%attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
-%attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd
-%attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd/proxy
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/httpd
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/httpd/proxy
 
 %{_mandir}/man8/*
 
@@ -586,7 +590,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
-%attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
+%attr(0700,nobody,root) %dir %{_localstatedir}/cache/httpd/ssl
 
 %files -n mod_proxy_html
 %defattr(-,root,root)
@@ -616,6 +620,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Jan 29 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.6-17.el6.cpanel.1
+- Added cPanel-specific patches
+- Removed apache user creation, configured to run as nobody
+- Repaired incorrect run directories
+
 * Tue Dec 30 2014 Kurt Newman <kurt.newman@cpanel.net> - 2.4.6-17.el6.centos.1
 - Converted from CentOS 7, to CentOS 6
 

@@ -1,0 +1,11 @@
+--- httpd-2.4.6/support/apachectl.in.orig	2015-01-29 14:46:50.305002411 -0600
++++ httpd-2.4.6/support/apachectl.in	2015-01-29 14:47:18.157001248 -0600
+@@ -56,7 +56,7 @@
+ #
+ # the URL to your server's mod_status status page.  If you do not
+ # have one, then status and fullstatus will not work.
+-STATUSURL="http://localhost:@PORT@/server-status"
++STATUSURL="http://localhost/whm-server-status"
+ 
+ # Source /etc/sysconfig/httpd for $HTTPD setting, etc.
+ if [ -r /etc/sysconfig/httpd ]; then
