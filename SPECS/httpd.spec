@@ -15,7 +15,8 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 17%{?dist}.cpanel.2
+Release: 18%{?dist}.cpanel.2
+Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: centos-noindex.tar.gz

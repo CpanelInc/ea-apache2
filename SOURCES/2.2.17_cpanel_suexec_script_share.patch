@@ -1,7 +1,7 @@
-From 644d0e38dee48aad8f5e0776063cc7f20020e223 Mon Sep 17 00:00:00 2001
+From 092b0f0cf557158a8cbfb8ea5023acccc2572152 Mon Sep 17 00:00:00 2001
 From: Kevin Shaum <kevin.shaum@cpanel.net>
 Date: Mon, 22 Jul 2013 13:22:05 -0500
-Subject: [PATCH 1/3] 2.2.17_cpanel_suexec_script_share
+Subject: [PATCH] 2.2.17_cpanel_suexec_script_share
 
 cpanel-specific patch that adds a feature which makes it possible to run
 "shared" scripts. Suppose you are a systems admin for large hosting
@@ -15,14 +15,29 @@ to define the user/group ID.
 The most specific use of this script is, cgi-sys/universal-redirect.cgi
 in cPanel/WHM.
 ---
- support/suexec.c | 33 +++++++++++++++++++++++++++------
- support/suexec.h | 25 ++++++++++++++++++++++++-
- 2 files changed, 51 insertions(+), 7 deletions(-)
+ support/suexec.c | 39 ++++++++++++++++++++++++++++++---------
+ support/suexec.h | 23 +++++++++++++++++++++++
+ 2 files changed, 53 insertions(+), 9 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index 2817125..3bdda96 100644
+index 2817125..78a2741 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
+@@ -128,11 +128,11 @@ static const char *const safe_env_lst[] =
+     NULL
+ };
+ 
+-static void log_err(const char *fmt,...) 
++static void log_err(const char *fmt,...)
+     __attribute__((format(printf,1,2)));
+-static void log_no_err(const char *fmt,...)  
++static void log_no_err(const char *fmt,...)
+     __attribute__((format(printf,1,2)));
+-static void err_output(int is_error, const char *fmt, va_list ap) 
++static void err_output(int is_error, const char *fmt, va_list ap)
+     __attribute__((format(printf,2,0)));
+ 
+ static void err_output(int is_error, const char *fmt, va_list ap)
 @@ -573,12 +573,33 @@ int main(int argc, char *argv[])
          (gid != dir_info.st_gid) ||
          (uid != prg_info.st_uid) ||
@@ -38,9 +53,9 @@ index 2817125..3bdda96 100644
 +            * This patch adds a possibility to use "shared" scripts on a
 +            * shared webhosting box.
 +            */
-+#ifdef TRUSTED_USERS_SCRIPTS       
-+       if ((atoi(SUEXEC_TRUSTED_USER) != prg_info.st_uid) || 
-+           (atoi(SUEXEC_TRUSTED_GROUP) != prg_info.st_gid) || ((strncmp(cwd, "/usr/local/cpanel/cgi-sys", 25) != 0) && ((strncmp(cwd, "/usr/local/bandmin/", 19)) != 0) && (strncmp(cwd, "/usr/local/frontpage/version5.0/apache-fp/_vti_bin", 50) != 0))) { 
++#ifdef TRUSTED_USERS_SCRIPTS
++       if ((atoi(SUEXEC_TRUSTED_USER) != prg_info.st_uid) ||
++           (atoi(SUEXEC_TRUSTED_GROUP) != prg_info.st_gid) || ((strncmp(cwd, "/usr/local/cpanel/cgi-sys/", 26) != 0) && (strncmp(cwd, "/usr/local/bandmin/", 19) != 0) )) {
 +
 +          log_err("error: target uid/gid (%ld/%ld) mismatch "
 +                  "with directory (%ld/%ld) or program (%ld/%ld) or trusted user (%d/%d)\n",
@@ -64,23 +79,20 @@ index 2817125..3bdda96 100644
      /*
       * Error out if the program is not executable for the user.
 diff --git a/support/suexec.h b/support/suexec.h
-index 07bb7bb..20a76ce 100644
+index 07bb7bb..14d21e0 100644
 --- a/support/suexec.h
 +++ b/support/suexec.h
-@@ -38,7 +38,30 @@
- #ifndef AP_HTTPD_USER
- #define AP_HTTPD_USER "www"
+@@ -40,6 +40,29 @@
  #endif
--
-+ 
-+/*
+ 
+ /*
 + * READ THIS BEFORE CONTINUING!!
 + *
-+ * The patch below adds a feature which makes it possible to run "shared" 
++ * The patch below adds a feature which makes it possible to run "shared"
 + * scripts. Suppose you are a systems admin for $large hosting provider and
 + * you want to offer your customers some standard scripts. These scripts would
 + * cause a security violation based on the uid owner of the script.
-+ * 
++ *
 + * This patch makes it possible to "trust" a certain user/group. Look below to
 + * define the user/group ID.
 + *
@@ -88,17 +100,18 @@ index 07bb7bb..20a76ce 100644
 + *
 + * patch added as ap1 suexec_standard.patch clone
 + */
-+ 
++
 +#define TRUSTED_USERS_SCRIPTS
-+ 
++
 +#ifdef TRUSTED_USERS_SCRIPTS
-+#define SUEXEC_TRUSTED_USER "0" 
-+#define SUEXEC_TRUSTED_GROUP "10" 
++#define SUEXEC_TRUSTED_USER "0"
++#define SUEXEC_TRUSTED_GROUP "10"
 +#endif
-+ 
- /*
++
++/*
   * UID_MIN -- Define this as the lowest UID allowed to be a target user
   *            for suEXEC.  For most systems, 500 or 100 is common.
+  */
 -- 
-1.7.11.3
+2.2.0
 
