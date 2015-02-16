@@ -27,7 +27,7 @@ Add layout for Fedora.
 +    cgidir:        /var/www/cgi-bin
 +    includedir:    ${prefix}/include/httpd
 +    localstatedir: /var
-+    runtimedir:    /run/httpd
++    runtimedir:    /var/run/httpd
 +    logfiledir:    ${localstatedir}/log/httpd
 +    proxycachedir: ${localstatedir}/cache/httpd/proxy
 +</Layout>     
