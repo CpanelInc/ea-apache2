@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 19%{?dist}.cpanel.2
+Release: 18%{?dist}.cpanel.2
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -347,7 +347,7 @@ done
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
-         $RPM_BUILD_ROOT%{_localstatedir}/var/run/httpd/htcacheclean
+         $RPM_BUILD_ROOT%{_localstatedir}/run/httpd/htcacheclean
 
 # Create cache directory
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
@@ -399,7 +399,7 @@ ln -s ../noindex/images/poweredby.png \
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s ../..%{_localstatedir}/var/run/httpd $RPM_BUILD_ROOT/etc/httpd/run
+ln -s ../..%{_localstatedir}/run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
 # Install logrotate config
@@ -564,8 +564,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{docroot}/cgi-bin
 %dir %{docroot}/html
 
-%attr(0710,root,nobody) %dir %{_localstatedir}/var/run/httpd
-%attr(0700,nobody,nobody) %dir %{_localstatedir}/var/run/httpd/htcacheclean
+%attr(0710,root,nobody) %dir %{_localstatedir}/run/httpd
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/run/httpd/htcacheclean
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/httpd
@@ -621,9 +621,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
-* Mon Feb 16 2015 Matt Dees <matt.dees@cpanel.net - 2.4.6-19.el6.cpanel.1
-- Adjust to use /var/run on centos6
-
 * Thu Jan 29 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.6-17.el6.cpanel.1
 - Added cPanel-specific patches
 - Removed apache user creation, configured to run as nobody
