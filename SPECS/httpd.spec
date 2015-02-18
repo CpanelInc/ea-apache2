@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 18%{?dist}.cpanel.2
+Release: 19%{?dist}.cpanel.2
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -439,11 +439,16 @@ rm -vf \
 
 rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
+%pre
+# Make sure /etc/httpd is not already there, as a symlink
+if [ -L /etc/httpd ] ; then
+  rm -f /etc/httpd
+fi
+
 %post
 # Register the httpd service
 /sbin/chkconfig --add httpd
 /sbin/chkconfig --add htcacheclean
-/sbin/service httpd start > /dev/null 2>&1
 
 %preun
 if [ $1 = 0 ]; then
