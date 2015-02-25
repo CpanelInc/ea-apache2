@@ -51,7 +51,7 @@ endif
 CACHE := /var/cache/mock/$(CFG)/root_cache/cache.tar.gz
 MOCK_CFG := /etc/mock/$(CFG).cfg
 
-OBS_USERNAME := $(shell grep -A5 [build.dev.cpanel.net] ~/.oscrc | awk -F= '/user=/ {print $$2}')
+OBS_USERNAME := $(shell grep -A5 '[build.dev.cpanel.net]' ~/.oscrc | awk -F= '/user=/ {print $$2}')
 GIT_BRANCH := $(shell git branch | awk '/^*/ { print $$2 }')
 BUILD_TARGET := home:$(OBS_USERNAME):$(OBS_PROJECT):$(GIT_BRANCH)
 OBS_WORKDIR := OBS/$(BUILD_TARGET)/$(OBS_PACKAGE)
