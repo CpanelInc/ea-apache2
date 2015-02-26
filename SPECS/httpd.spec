@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 20%{?dist}.cpanel.1
+Release: 21%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -127,6 +127,37 @@ Summary: Tools for use with the Apache HTTP Server
 %description tools
 The httpd-tools package contains tools which can be used with
 the Apache HTTP Server.
+
+%package -n mod_mpm_event
+Group: System Environment/Daemons
+Summary: Threaded event Multi-Processing Module for Apache HTTP Server
+Requires: httpd = %{version}-%{release}
+Provides: httpd-mpm = threaded
+Conflicts: mod_mpm_prefork, mod_mpm_worker, mod_mpm_itk
+
+%description -n mod_mpm_event
+The Event MPM provides a threaded model for workers, with the additional
+feature that all keepalive connections are handled by a single thread.
+
+%package -n mod_mpm_prefork
+Group: System Environment/Daemons
+Summary: Prefork Multi-Processing Module for Apache HTTP Server
+Requires: httpd = %{version}-%{release}
+Provides: httpd-mpm = forked
+Conflicts: mod_mpm_event, mod_mpm_worker, mod_mpm_itk
+
+%description -n mod_mpm_prefork
+The traditional forked worker model.
+
+%package -n mod_mpm_worker
+Group: System Environment/Daemons
+Summary: Threaded worker Multi-Processing Module for Apache HTTP Server
+Requires: httpd = %{version}-%{release}
+Provides: httpd-mpm = threaded
+Conflicts: mod_mpm_event, mod_mpm_prefork, mod_mpm_itk
+
+%description -n mod_mpm_worker
+The Worker MPM provides a threaded worker model.
 
 %package -n mod_ssl
 Group: System Environment/Daemons
@@ -304,7 +335,7 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d \
       $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
-for f in 00-mpm.conf 01-cgi.conf ; do
+for f in 01-cgi.conf ; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -416,11 +447,24 @@ sed -i '/instdso/s,top_srcdir,top_builddir,' \
 # Make individual module package files
 # We'll number the conf.modules.d files, so we can force load order,
 # and since there's a lot of them, we'll use 3 digits
-modnum=0
+
+for mod in mpm_event mpm_prefork mpm_worker
+do
+    printf -v modname "000_mod_%s.conf" $mod
+    cat > $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/${modname} <<EOF
+# Enable mod_${mod}
+LoadModule ${mod}_module modules/mod_${mod}.so
+EOF
+    cat > files.${mod} <<EOF
+%attr(755,root,root) %{_libdir}/httpd/modules/mod_${mod}.so
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/httpd/conf.modules.d/${modname}
+EOF
+done
 
 # Modules we're not splitting out... yet
   #cgi cgid \
-  #mpm_event mpm_prefork mpm_worker \
+
+modnum=5
 
 for mod in \
   access_compat actions alias allowmethods asis auth_basic auth_digest \
@@ -428,7 +472,7 @@ for mod in \
   authz_core authz_dbd authz_dbm authz_groupfile authz_host authz_owner \
   authz_user autoindex buffer cache cache_disk cache_socache \
   charset_lite data dav dav_fs dav_lock dbd deflate dialup dir dumpio \
-  echo env expires ext_filter file_cache filter headers heartbeat \
+  echo env expires ext_filter file_cache filter headers \
   heartmonitor include info log_config log_debug log_forensic logio lua \
   macro mime mime_magic negotiation \
   proxy lbmethod_bybusyness lbmethod_byrequests lbmethod_bytraffic \
@@ -437,7 +481,7 @@ for mod in \
   proxy_wstunnel ratelimit reflector remoteip reqtimeout request rewrite \
   sed setenvif slotmem_plain slotmem_shm socache_dbm socache_memcache \
   socache_shmcb speling status substitute suexec unique_id unixd userdir \
-  usertrack version vhost_alias watchdog \
+  usertrack version vhost_alias watchdog heartbeat \
   ssl \
   proxy_html xml2enc \
   ldap authnz_ldap \
@@ -599,7 +643,6 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.d/manual.conf
 
 %dir %{_sysconfdir}/httpd/conf.modules.d
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-cgi.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
@@ -612,7 +655,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
-%{_libdir}/httpd/modules/mod_mpm*.so
 %{_libdir}/httpd/modules/mod_cgi*.so
 
 %dir %{contentdir}
@@ -652,6 +694,10 @@ rm -rf $RPM_BUILD_ROOT
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
 
+%files -n mod_mpm_event -f files.mpm_event
+%files -n mod_mpm_prefork -f files.mpm_prefork
+%files -n mod_mpm_worker -f files.mpm_worker
+
 %files -n mod_ssl -f files.ssl
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/httpd/ssl
@@ -673,6 +719,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Feb 26 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.6-21.el6.cpanel.1
+- Split the MPMs into their own packages
+- mod_heartbeat needs to be loaded after mod_status and mod_watchdog
+
 * Wed Feb 25 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.6-20.el6.cpanel.1
 - Each module now has its own conf.modules.d file
 - conf.modules.d files are created programmatically
