@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 19%{?dist}.cpanel.2
+Release: 20%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -23,26 +23,16 @@ Source1: centos-noindex.tar.gz
 Source2: httpd.logrotate
 Source3: httpd.sysconf
 
-
 Source6: httpd.init
 
-
 Source10: httpd.conf
-Source11: 00-base.conf
 Source12: 00-mpm.conf
-Source13: 00-lua.conf
 Source14: 01-cgi.conf
-Source15: 00-dav.conf
-Source16: 00-proxy.conf
-Source17: 00-ssl.conf
-Source18: 01-ldap.conf
-Source19: 00-proxyhtml.conf
 Source20: userdir.conf
 Source21: ssl.conf
 Source22: welcome.conf
 Source23: manual.conf
 
-Source25: 01-session.conf
 # Documentation
 Source30: README.confd
 Source40: htcacheclean.init
@@ -314,9 +304,7 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d \
       $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
-for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
-         00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 01-session.conf; do
+for f in 00-mpm.conf 01-cgi.conf ; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -425,6 +413,87 @@ sed -i '/.*DEFAULT_..._LIBEXECDIR/d;/DEFAULT_..._INSTALLBUILDDIR/d' \
 sed -i '/instdso/s,top_srcdir,top_builddir,' \
     $RPM_BUILD_ROOT%{_libdir}/httpd/build/special.mk
 
+# Make individual module package files
+# We'll number the conf.modules.d files, so we can force load order,
+# and since there's a lot of them, we'll use 3 digits
+modnum=0
+
+# Modules we're not splitting out... yet
+  #cgi cgid \
+  #mpm_event mpm_prefork mpm_worker \
+
+for mod in \
+  access_compat actions alias allowmethods asis auth_basic auth_digest \
+  authn_anon authn_core authn_dbd authn_dbm authn_file authn_socache \
+  authz_core authz_dbd authz_dbm authz_groupfile authz_host authz_owner \
+  authz_user autoindex buffer cache cache_disk cache_socache \
+  charset_lite data dav dav_fs dav_lock dbd deflate dialup dir dumpio \
+  echo env expires ext_filter file_cache filter headers heartbeat \
+  heartmonitor include info log_config log_debug log_forensic logio lua \
+  macro mime mime_magic negotiation \
+  proxy lbmethod_bybusyness lbmethod_byrequests lbmethod_bytraffic \
+  lbmethod_heartbeat proxy_ajp proxy_balancer proxy_connect \
+  proxy_express proxy_fcgi proxy_fdpass proxy_ftp proxy_http proxy_scgi \
+  proxy_wstunnel ratelimit reflector remoteip reqtimeout request rewrite \
+  sed setenvif slotmem_plain slotmem_shm socache_dbm socache_memcache \
+  socache_shmcb speling status substitute suexec unique_id unixd userdir \
+  usertrack version vhost_alias watchdog \
+  ssl \
+  proxy_html xml2enc \
+  ldap authnz_ldap \
+  session session_cookie session_dbd auth_form session_crypto
+do
+    printf -v modname "%03d_mod_%s.conf" $modnum $mod
+    cat > $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/${modname} <<EOF
+# Enable mod_${mod}
+LoadModule ${mod}_module modules/mod_${mod}.so
+EOF
+    cat > files.${mod} <<EOF
+%attr(755,root,root) %{_libdir}/httpd/modules/mod_${mod}.so
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/httpd/conf.modules.d/${modname}
+EOF
+    # Let's stride by 5, in case there is need to insert things
+    # between two modules
+    modnum=$(($modnum+5))
+done
+
+# proxy_html package needs xml2enc
+cat files.xml2enc >> files.proxy_html
+
+# ldap and authnz_ldap belong in the same package
+cat files.authnz_ldap >> files.ldap
+
+# Session-related modules
+cat files.session_cookie files.session_dbd files.auth_form \
+  files.session_crypto >> files.session
+
+# The rest of the modules, into the main list
+cat files.access_compat files.actions files.alias files.allowmethods \
+  files.asis files.auth_basic files.auth_digest files.authn_anon \
+  files.authn_core files.authn_dbd files.authn_dbm files.authn_file \
+  files.authn_socache files.authz_core files.authz_dbd files.authz_dbm \
+  files.authz_groupfile files.authz_host files.authz_owner \
+  files.authz_user files.autoindex files.buffer files.cache \
+  files.cache_disk files.cache_socache \
+  files.charset_lite files.data files.dav files.dav_fs files.dav_lock \
+  files.dbd files.deflate files.dialup files.dir files.dumpio files.echo \
+  files.env files.expires files.ext_filter files.file_cache files.filter \
+  files.headers files.heartbeat files.heartmonitor files.include \
+  files.info files.log_config files.log_debug files.log_forensic \
+  files.logio files.lua files.macro files.mime files.mime_magic \
+  files.negotiation \
+  files.proxy files.lbmethod_bybusyness files.lbmethod_byrequests \
+  files.lbmethod_bytraffic files.lbmethod_heartbeat files.proxy_ajp \
+  files.proxy_balancer files.proxy_connect files.proxy_express \
+  files.proxy_fcgi files.proxy_fdpass files.proxy_ftp files.proxy_http \
+  files.proxy_scgi files.proxy_wstunnel files.ratelimit files.reflector \
+  files.remoteip files.reqtimeout files.request files.rewrite files.sed \
+  files.setenvif files.slotmem_plain files.slotmem_shm files.socache_dbm \
+  files.socache_memcache files.socache_shmcb files.speling files.status \
+  files.substitute files.suexec files.unique_id files.unixd \
+  files.userdir files.usertrack files.version files.vhost_alias \
+  files.watchdog > files.httpd
+
 # Remove unpackaged files
 rm -vf \
       $RPM_BUILD_ROOT%{_libdir}/*.exp \
@@ -505,7 +574,7 @@ fi
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files
+%files -f files.httpd
 %defattr(-,root,root)
 
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
@@ -530,11 +599,8 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.d/manual.conf
 
 %dir %{_sysconfdir}/httpd/conf.modules.d
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/*.conf
-%exclude %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
-%exclude %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
-%exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
-%exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-cgi.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
 
@@ -546,13 +612,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
-%{_libdir}/httpd/modules/mod*.so
-%exclude %{_libdir}/httpd/modules/mod_auth_form.so
-%exclude %{_libdir}/httpd/modules/mod_ssl.so
-%exclude %{_libdir}/httpd/modules/mod_*ldap.so
-%exclude %{_libdir}/httpd/modules/mod_proxy_html.so
-%exclude %{_libdir}/httpd/modules/mod_xml2enc.so
-%exclude %{_libdir}/httpd/modules/mod_session*.so
+%{_libdir}/httpd/modules/mod_mpm*.so
+%{_libdir}/httpd/modules/mod_cgi*.so
 
 %dir %{contentdir}
 %dir %{contentdir}/icons
@@ -591,29 +652,15 @@ rm -rf $RPM_BUILD_ROOT
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
 
-%files -n mod_ssl
-%defattr(-,root,root)
-%{_libdir}/httpd/modules/mod_ssl.so
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
+%files -n mod_ssl -f files.ssl
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/httpd/ssl
 
-%files -n mod_proxy_html
-%defattr(-,root,root)
-%{_libdir}/httpd/modules/mod_proxy_html.so
-%{_libdir}/httpd/modules/mod_xml2enc.so
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
+%files -n mod_proxy_html -f files.proxy_html
 
-%files -n mod_ldap
-%defattr(-,root,root)
-%{_libdir}/httpd/modules/mod_*ldap.so
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
+%files -n mod_ldap -f files.ldap
 
-%files -n mod_session
-%defattr(-,root,root)
-%{_libdir}/httpd/modules/mod_session*.so
-%{_libdir}/httpd/modules/mod_auth_form.so
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
+%files -n mod_session -f files.session
 
 %files devel
 %defattr(-,root,root)
@@ -626,6 +673,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed Feb 25 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.6-20.el6.cpanel.1
+- Each module now has its own conf.modules.d file
+- conf.modules.d files are created programmatically
+- Simplified ssl, proxy_html, ldap, and session package file lists
+
 * Thu Jan 29 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.6-17.el6.cpanel.1
 - Added cPanel-specific patches
 - Removed apache user creation, configured to run as nobody
