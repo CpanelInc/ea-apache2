@@ -1,5 +1,5 @@
 
-Add layout for Fedora.
+Add layout for cPanel.
 
 --- httpd-2.4.3/config.layout.layout
 +++ httpd-2.4.3/config.layout
@@ -8,8 +8,8 @@ Add layout for Fedora.
      proxycachedir:   ${localstatedir}/cache/httpd
  </Layout>
 +
-+# Fedora/RHEL layout
-+<Layout Fedora>
++# cPanel layout
++<Layout cPanel>
 +    prefix:        /usr
 +    exec_prefix:   ${prefix}
 +    bindir:        ${prefix}/bin
@@ -17,17 +17,17 @@ Add layout for Fedora.
 +    libdir:        ${prefix}/lib
 +    libexecdir:    ${prefix}/libexec
 +    mandir:        ${prefix}/man
-+    sysconfdir:    /etc/httpd/conf
-+    datadir:       ${prefix}/share/httpd
-+    installbuilddir: ${libdir}/httpd/build
++    sysconfdir:    /etc/apache2/conf
++    datadir:       ${prefix}/share/apache2
++    installbuilddir: ${libdir}/apache2/build
 +    errordir:      ${datadir}/error
 +    iconsdir:      ${datadir}/icons
 +    htdocsdir:     /var/www/html
 +    manualdir:     ${datadir}/manual
 +    cgidir:        /var/www/cgi-bin
-+    includedir:    ${prefix}/include/httpd
++    includedir:    ${prefix}/include/apache2
 +    localstatedir: /var
-+    runtimedir:    /var/run/httpd
-+    logfiledir:    ${localstatedir}/log/httpd
-+    proxycachedir: ${localstatedir}/cache/httpd/proxy
-+</Layout>     
++    runtimedir:    /var/run/apache2
++    logfiledir:    ${localstatedir}/log/apache2
++    proxycachedir: ${localstatedir}/cache/apache2/proxy
++</Layout>

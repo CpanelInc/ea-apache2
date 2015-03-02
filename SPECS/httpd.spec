@@ -1,19 +1,19 @@
-%define contentdir %{_datadir}/httpd
+%define contentdir %{_datadir}/apache2
 %define docroot /var/www
 %define suexec_caller nobody
 %define mmn 20120211
 %define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
-%define vstring CentOS
+%define vstring cPanel
 
 # Drop automatic provides for module DSOs
 %{?filter_setup:
-%filter_provides_in %{_libdir}/httpd/modules/.*\.so$
+%filter_provides_in %{_libdir}/apache2/modules/.*\.so$
 %filter_setup
 }
 
 Summary: Apache HTTP Server
-Name: httpd
+Name: ea-apache2
 Version: 2.4.12
 Release: 1%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
@@ -68,10 +68,11 @@ BuildRequires: apr-devel >= 1.4.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 Requires: /etc/mime.types, system-logos >= 7.92.1-1
 Obsoletes: httpd-suexec
 Provides: webserver
-Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
-Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}, httpd-mmn = %{oldmmnisa}
-Requires: httpd-tools = %{version}-%{release}
-Requires(pre): /usr/sbin/useradd
+Provides: ea-mod_dav = %{version}-%{release}
+Provides: ea-apache2-suexec = %{version}-%{release}
+Provides: ea-apache2-mmn = %{mmn}, ea-apache2-mmn = %{mmnisa}
+Provides: ea-apache2-mmn = %{oldmmnisa}
+Requires: ea-apache2-tools = %{version}-%{release}
 Requires(post): chkconfig
 
 %description
@@ -81,12 +82,12 @@ web server.
 %package devel
 Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
-Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
+Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel, httpd-devel
 Requires: apr-devel, apr-util-devel, pkgconfig
-Requires: httpd = %{version}-%{release}
+Requires: ea-apache2 = %{version}-%{release}
 
 %description devel
-The httpd-devel package contains the APXS binary and other files
+The ea-apache2-devel package contains the APXS binary and other files
 that you need to build Dynamic Shared Objects (DSOs) for the
 Apache HTTP Server.
 
@@ -97,12 +98,12 @@ to install this package.
 %package manual
 Group: Documentation
 Summary: Documentation for the Apache HTTP server
-Requires: httpd = %{version}-%{release}
-Obsoletes: secureweb-manual, apache-manual
+Requires: ea-apache2 = %{version}-%{release}
+Obsoletes: secureweb-manual, apache-manual, httpd-manual
 BuildArch: noarch
 
 %description manual
-The httpd-manual package contains the complete manual and
+The ea-apache2-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
 also be found at http://httpd.apache.org/docs/2.4/.
 
@@ -111,88 +112,88 @@ Group: System Environment/Daemons
 Summary: Tools for use with the Apache HTTP Server
 
 %description tools
-The httpd-tools package contains tools which can be used with
+The ea-apache2-tools package contains tools which can be used with
 the Apache HTTP Server.
 
-%package -n mod_mpm_event
+%package -n ea-mod_mpm_event
 Group: System Environment/Daemons
 Summary: Threaded event Multi-Processing Module for Apache HTTP Server
-Requires: httpd = %{version}-%{release}
-Provides: httpd-mpm = threaded
-Conflicts: mod_mpm_prefork, mod_mpm_worker, mod_mpm_itk
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Provides: ea-apache2-mpm = threaded
+Conflicts: ea-mod_mpm_prefork, ea-mod_mpm_worker, ea-mod_mpm_itk
 
-%description -n mod_mpm_event
+%description -n ea-mod_mpm_event
 The Event MPM provides a threaded model for workers, with the additional
 feature that all keepalive connections are handled by a single thread.
 
-%package -n mod_mpm_prefork
+%package -n ea-mod_mpm_prefork
 Group: System Environment/Daemons
 Summary: Prefork Multi-Processing Module for Apache HTTP Server
-Requires: httpd = %{version}-%{release}
-Provides: httpd-mpm = forked
-Conflicts: mod_mpm_event, mod_mpm_worker, mod_mpm_itk
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Provides: ea-apache2-mpm = forked
+Conflicts: ea-mod_mpm_event, ea-mod_mpm_worker, ea-mod_mpm_itk
 
-%description -n mod_mpm_prefork
+%description -n ea-mod_mpm_prefork
 The traditional forked worker model.
 
-%package -n mod_mpm_worker
+%package -n ea-mod_mpm_worker
 Group: System Environment/Daemons
 Summary: Threaded worker Multi-Processing Module for Apache HTTP Server
-Requires: httpd = %{version}-%{release}
-Provides: httpd-mpm = threaded
-Conflicts: mod_mpm_event, mod_mpm_prefork, mod_mpm_itk
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Provides: ea-apache2-mpm = threaded
+Conflicts: ea-mod_mpm_event, ea-mod_mpm_prefork, ea-mod_mpm_itk
 
-%description -n mod_mpm_worker
+%description -n ea-mod_mpm_worker
 The Worker MPM provides a threaded worker model.
 
-%package -n mod_ssl
+%package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
 Requires(post): openssl, /bin/cat
-Requires(pre): httpd
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-Obsoletes: stronghold-mod_ssl
+Requires(pre): ea-apache2
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Obsoletes: stronghold-mod_ssl, mod_ssl
 
-%description -n mod_ssl
+%description -n ea-mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
-%package -n mod_proxy_html
+%package -n ea-mod_proxy_html
 Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 BuildRequires: libxml2-devel
 Epoch: 1
 Obsoletes: mod_proxy_html < 1:2.4.1-2
 
-%description -n mod_proxy_html
+%description -n ea-mod_proxy_html
 The mod_proxy_html and mod_xml2enc modules provide filters which can
 transform and modify HTML and XML content.
 
-%package -n mod_ldap
+%package -n ea-mod_ldap
 Group: System Environment/Daemons
 Summary: LDAP authentication modules for the Apache HTTP Server
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 Requires: apr-util-ldap
 
-%description -n mod_ldap
+%description -n ea-mod_ldap
 The mod_ldap and mod_authnz_ldap modules add support for LDAP
 authentication to the Apache HTTP Server.
 
-%package -n mod_session
+%package -n ea-mod_session
 Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 
-%description -n mod_session
+%description -n ea-mod_session
 The mod_session module and associated backends provide an abstract
 interface for storing and accessing per-user session data.
 
 %prep
-%setup -q
+%setup -q -n httpd-%{version}
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
@@ -239,7 +240,7 @@ rm -rf srclib/{apr,apr-util,pcre}
 autoheader && autoconf || exit 1
 
 # Before configure; fix location of build dir in generated apxs
-%{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
+%{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache2/build:g" \
 	support/apxs.in
 
 export CFLAGS=$RPM_OPT_FLAGS
@@ -254,18 +255,18 @@ export LYNX_PATH=/usr/bin/links
 
 # Build the daemon
 ./configure \
- 	--prefix=%{_sysconfdir}/httpd \
+ 	--prefix=%{_sysconfdir}/apache2 \
  	--exec-prefix=%{_prefix} \
  	--bindir=%{_bindir} \
  	--sbindir=%{_sbindir} \
  	--mandir=%{_mandir} \
 	--libdir=%{_libdir} \
-	--sysconfdir=%{_sysconfdir}/httpd/conf \
-	--includedir=%{_includedir}/httpd \
-	--libexecdir=%{_libdir}/httpd/modules \
+	--sysconfdir=%{_sysconfdir}/apache2/conf \
+	--includedir=%{_includedir}/apache2 \
+	--libexecdir=%{_libdir}/apache2/modules \
 	--datadir=%{contentdir} \
-        --enable-layout=Fedora \
-        --with-installbuilddir=%{_libdir}/httpd/build \
+        --enable-layout=cPanel \
+        --with-installbuilddir=%{_libdir}/apache2/build \
         --enable-mpms-shared=all \
         --with-apr=%{_prefix} --with-apr-util=%{_prefix} \
 	--enable-suexec --with-suexec \
@@ -303,32 +304,32 @@ for s in httpd htcacheclean; do
 done
 
 # install conf file/directory
-mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d \
-      $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d
+mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
+      $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
-    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
+    $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 for f in 01-cgi.conf ; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
-        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
+        $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/$f
 done
 
 for f in welcome.conf ssl.conf manual.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
-        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
+        $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
 
 # Split-out extra config shipped as default in conf.d:
 for f in autoindex; do
   mv docs/conf/extra/httpd-${f}.conf \
-        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/${f}.conf
+        $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/${f}.conf
 done
 
 # Extra config trimmed:
 rm -v docs/conf/extra/httpd-{ssl,userdir}.conf
 
-rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/*.conf
+rm $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf/*.conf
 install -m 644 -p $RPM_SOURCE_DIR/httpd.conf \
-   $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/httpd.conf
+   $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf/httpd.conf
 
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 for s in httpd htcacheclean; do
@@ -338,23 +339,23 @@ done
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
-         $RPM_BUILD_ROOT%{_localstatedir}/run/httpd/htcacheclean
+         $RPM_BUILD_ROOT%{_localstatedir}/run/apache2/htcacheclean
 
 # Create cache directory
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
-         $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/proxy \
-         $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/ssl
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/apache2 \
+         $RPM_BUILD_ROOT%{_localstatedir}/cache/apache2/proxy \
+         $RPM_BUILD_ROOT%{_localstatedir}/cache/apache2/ssl
 
 # Make the MMN accessible to module packages
-echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
+echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/apache2/.mmn
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rpm
-cat > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.httpd <<EOF
+cat > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.apache2 <<EOF
 %%_httpd_mmn %{mmnisa}
 %%_httpd_apxs %{_bindir}/apxs
-%%_httpd_modconfdir %{_sysconfdir}/httpd/conf.modules.d
-%%_httpd_confdir %{_sysconfdir}/httpd/conf.d
+%%_httpd_modconfdir %{_sysconfdir}/apache2/conf.modules.d
+%%_httpd_confdir %{_sysconfdir}/apache2/conf.d
 %%_httpd_contentdir %{contentdir}
-%%_httpd_moddir %{_libdir}/httpd/modules
+%%_httpd_moddir %{_libdir}/apache2/modules
 EOF
 
 # Handle contentdir
@@ -389,32 +390,32 @@ ln -s ../noindex/images/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
 
 # symlinks for /etc/httpd
-ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s ../..%{_localstatedir}/run/httpd $RPM_BUILD_ROOT/etc/httpd/run
-ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
+ln -s ../..%{_localstatedir}/log/apache2 $RPM_BUILD_ROOT/etc/apache2/logs
+ln -s ../..%{_localstatedir}/run/apache2 $RPM_BUILD_ROOT/etc/apache2/run
+ln -s ../..%{_libdir}/apache2/modules $RPM_BUILD_ROOT/etc/apache2/modules
 
 # Install logrotate config
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
-	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
+	$RPM_BUILD_ROOT/etc/logrotate.d/apache2
 
 # fix man page paths
-sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
+sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/apache2/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/mime.types|/etc/mime.types|" \
-    -e "s|/usr/local/apache2/conf/magic|/etc/httpd/conf/magic|" \
-    -e "s|/usr/local/apache2/logs/error_log|/var/log/httpd/error_log|" \
-    -e "s|/usr/local/apache2/logs/access_log|/var/log/httpd/access_log|" \
-    -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/httpd/httpd.pid|" \
-    -e "s|/usr/local/apache2|/etc/httpd|" < docs/man/httpd.8 \
+    -e "s|/usr/local/apache2/conf/magic|/etc/apache2/conf/magic|" \
+    -e "s|/usr/local/apache2/logs/error_log|/var/log/apache2/error_log|" \
+    -e "s|/usr/local/apache2/logs/access_log|/var/log/apache2/access_log|" \
+    -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/apache2/httpd.pid|" \
+    -e "s|/usr/local/apache2|/etc/apache2|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
 
 # Make ap_config_layout.h libdir-agnostic
 sed -i '/.*DEFAULT_..._LIBEXECDIR/d;/DEFAULT_..._INSTALLBUILDDIR/d' \
-    $RPM_BUILD_ROOT%{_includedir}/httpd/ap_config_layout.h
+    $RPM_BUILD_ROOT%{_includedir}/apache2/ap_config_layout.h
 
 # Fix path to instdso in special.mk
 sed -i '/instdso/s,top_srcdir,top_builddir,' \
-    $RPM_BUILD_ROOT%{_libdir}/httpd/build/special.mk
+    $RPM_BUILD_ROOT%{_libdir}/apache2/build/special.mk
 
 # Make individual module package files
 # We'll number the conf.modules.d files, so we can force load order,
@@ -423,13 +424,13 @@ sed -i '/instdso/s,top_srcdir,top_builddir,' \
 for mod in mpm_event mpm_prefork mpm_worker
 do
     printf -v modname "000_mod_%s.conf" $mod
-    cat > $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/${modname} <<EOF
+    cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
 # Enable mod_${mod}
 LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
     cat > files.${mod} <<EOF
-%attr(755,root,root) %{_libdir}/httpd/modules/mod_${mod}.so
-%config(noreplace) %attr(644,root,root) %{_sysconfdir}/httpd/conf.modules.d/${modname}
+%attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
 EOF
 done
 
@@ -460,13 +461,13 @@ for mod in \
   session session_cookie session_dbd auth_form session_crypto
 do
     printf -v modname "%03d_mod_%s.conf" $modnum $mod
-    cat > $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/${modname} <<EOF
+    cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
 # Enable mod_${mod}
 LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
     cat > files.${mod} <<EOF
-%attr(755,root,root) %{_libdir}/httpd/modules/mod_${mod}.so
-%config(noreplace) %attr(644,root,root) %{_sysconfdir}/httpd/conf.modules.d/${modname}
+%attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
 EOF
     # Let's stride by 5, in case there is need to insert things
     # between two modules
@@ -513,21 +514,21 @@ cat files.access_compat files.actions files.alias files.allowmethods \
 # Remove unpackaged files
 rm -vf \
       $RPM_BUILD_ROOT%{_libdir}/*.exp \
-      $RPM_BUILD_ROOT/etc/httpd/conf/mime.types \
-      $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.exp \
-      $RPM_BUILD_ROOT%{_libdir}/httpd/build/config.nice \
+      $RPM_BUILD_ROOT/etc/apache2/conf/mime.types \
+      $RPM_BUILD_ROOT%{_libdir}/apache2/modules/*.exp \
+      $RPM_BUILD_ROOT%{_libdir}/apache2/build/config.nice \
       $RPM_BUILD_ROOT%{_bindir}/{ap?-config,dbmmanage} \
       $RPM_BUILD_ROOT%{_sbindir}/{checkgid,envvars*} \
       $RPM_BUILD_ROOT%{contentdir}/htdocs/* \
       $RPM_BUILD_ROOT%{_mandir}/man1/dbmmanage.* \
       $RPM_BUILD_ROOT%{contentdir}/cgi-bin/*
 
-rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
+rm -rf $RPM_BUILD_ROOT/etc/apache2/conf/{original,extra}
 
 %pre
-# Make sure /etc/httpd is not already there, as a symlink
-if [ -L /etc/httpd ] ; then
-  rm -f /etc/httpd
+# Make sure /etc/apache2 is not already there, as a symlink
+if [ -L /etc/apache2 ] ; then
+  rm -f /etc/apache2
 fi
 
 %post
@@ -550,7 +551,7 @@ test -f /etc/sysconfig/httpd-disable-posttrans || \
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
 
-%post -n mod_ssl
+%post -n ea-mod_ssl
 umask 077
 
 if [ -f %{sslkey} -o -f %{sslcert} ]; then
@@ -582,7 +583,7 @@ fi
 
 %check
 # Check the built modules are all PIC
-if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
+if readelf -d $RPM_BUILD_ROOT%{_libdir}/apache2/modules/*.so | grep TEXTREL; then
    : modules contain non-relocatable code
    exit 1
 fi
@@ -596,26 +597,26 @@ rm -rf $RPM_BUILD_ROOT
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
 %doc docs/conf/extra/*.conf
 
-%dir %{_sysconfdir}/httpd
-%{_sysconfdir}/httpd/modules
-%{_sysconfdir}/httpd/logs
-%{_sysconfdir}/httpd/run
-%dir %{_sysconfdir}/httpd/conf
-%config(noreplace) %{_sysconfdir}/httpd/conf/httpd.conf
-%config(noreplace) %{_sysconfdir}/httpd/conf/magic
+%dir %{_sysconfdir}/apache2
+%{_sysconfdir}/apache2/modules
+%{_sysconfdir}/apache2/logs
+%{_sysconfdir}/apache2/run
+%dir %{_sysconfdir}/apache2/conf
+%config(noreplace) %{_sysconfdir}/apache2/conf/httpd.conf
+%config(noreplace) %{_sysconfdir}/apache2/conf/magic
 
-%config(noreplace) %{_sysconfdir}/logrotate.d/httpd
+%config(noreplace) %{_sysconfdir}/logrotate.d/apache2
 %{_initrddir}/httpd
 %{_initrddir}/htcacheclean
 
-%dir %{_sysconfdir}/httpd/conf.d
-%{_sysconfdir}/httpd/conf.d/README
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
-%exclude %{_sysconfdir}/httpd/conf.d/ssl.conf
-%exclude %{_sysconfdir}/httpd/conf.d/manual.conf
+%dir %{_sysconfdir}/apache2/conf.d
+%{_sysconfdir}/apache2/conf.d/README
+%config(noreplace) %{_sysconfdir}/apache2/conf.d/*.conf
+%exclude %{_sysconfdir}/apache2/conf.d/ssl.conf
+%exclude %{_sysconfdir}/apache2/conf.d/manual.conf
 
-%dir %{_sysconfdir}/httpd/conf.modules.d
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-cgi.conf
+%dir %{_sysconfdir}/apache2/conf.modules.d
+%config(noreplace) %{_sysconfdir}/apache2/conf.modules.d/01-cgi.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
 
@@ -625,9 +626,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/rotatelogs
 %caps(cap_setuid,cap_setgid+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
 
-%dir %{_libdir}/httpd
-%dir %{_libdir}/httpd/modules
-%{_libdir}/httpd/modules/mod_cgi*.so
+%dir %{_libdir}/apache2
+%dir %{_libdir}/apache2/modules
+%{_libdir}/apache2/modules/mod_cgi*.so
 
 %dir %{contentdir}
 %dir %{contentdir}/icons
@@ -644,12 +645,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{docroot}/cgi-bin
 %dir %{docroot}/html
 
-%attr(0710,root,nobody) %dir %{_localstatedir}/run/httpd
-%attr(0700,nobody,nobody) %dir %{_localstatedir}/run/httpd/htcacheclean
-%attr(0700,root,root) %dir %{_localstatedir}/log/httpd
+%attr(0710,root,nobody) %dir %{_localstatedir}/run/apache2
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/run/apache2/htcacheclean
+%attr(0700,root,root) %dir %{_localstatedir}/log/apache2
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
-%attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/httpd
-%attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/httpd/proxy
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/apache2
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/apache2/proxy
 
 %{_mandir}/man8/*
 
@@ -664,31 +665,31 @@ rm -rf $RPM_BUILD_ROOT
 %files manual
 %defattr(-,root,root)
 %{contentdir}/manual
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
+%config(noreplace) %{_sysconfdir}/apache2/conf.d/manual.conf
 
-%files -n mod_mpm_event -f files.mpm_event
-%files -n mod_mpm_prefork -f files.mpm_prefork
-%files -n mod_mpm_worker -f files.mpm_worker
+%files -n ea-mod_mpm_event -f files.mpm_event
+%files -n ea-mod_mpm_prefork -f files.mpm_prefork
+%files -n ea-mod_mpm_worker -f files.mpm_worker
 
-%files -n mod_ssl -f files.ssl
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
-%attr(0700,nobody,root) %dir %{_localstatedir}/cache/httpd/ssl
+%files -n ea-mod_ssl -f files.ssl
+%config(noreplace) %{_sysconfdir}/apache2/conf.d/ssl.conf
+%attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
 
-%files -n mod_proxy_html -f files.proxy_html
+%files -n ea-mod_proxy_html -f files.proxy_html
 
-%files -n mod_ldap -f files.ldap
+%files -n ea-mod_ldap -f files.ldap
 
-%files -n mod_session -f files.session
+%files -n ea-mod_session -f files.session
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/httpd
+%{_includedir}/apache2
 %{_bindir}/apxs
 %{_mandir}/man1/apxs.1*
-%dir %{_libdir}/httpd/build
-%{_libdir}/httpd/build/*.mk
-%{_libdir}/httpd/build/*.sh
-%{_sysconfdir}/rpm/macros.httpd
+%dir %{_libdir}/apache2/build
+%{_libdir}/apache2/build/*.mk
+%{_libdir}/apache2/build/*.sh
+%{_sysconfdir}/rpm/macros.apache2
 
 %changelog
 * Fri Feb 27 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-1.el6.cpanel.1
