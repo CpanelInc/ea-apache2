@@ -66,8 +66,10 @@ BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.4.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 Requires: /etc/mime.types, system-logos >= 7.92.1-1
+Requires: ea-apache2-mpm
 Obsoletes: httpd-suexec
-Provides: webserver
+Conflicts: webserver
+Provides: ea-webserver
 Provides: ea-mod_dav = %{version}-%{release}
 Provides: ea-apache2-suexec = %{version}-%{release}
 Provides: ea-apache2-mmn = %{mmn}, ea-apache2-mmn = %{mmnisa}
