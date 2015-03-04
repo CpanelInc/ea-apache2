@@ -148,6 +148,16 @@ Conflicts: ea-mod_mpm_event, ea-mod_mpm_prefork, ea-mod_mpm_itk
 %description -n ea-mod_mpm_worker
 The Worker MPM provides a threaded worker model.
 
+%package -n ea-mod_asis
+Group: System Environment/Daemons
+Summary: As-is provider module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_asis
+The mod_asis module provides the handler send-as-is which causes
+Apache HTTP Server to send the document without adding most of the
+usual HTTP headers.
+
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
@@ -488,7 +498,7 @@ cat files.session_cookie files.session_dbd files.auth_form \
 
 # The rest of the modules, into the main list
 cat files.access_compat files.actions files.alias files.allowmethods \
-  files.asis files.auth_basic files.auth_digest files.authn_anon \
+  files.auth_basic files.auth_digest files.authn_anon \
   files.authn_core files.authn_dbd files.authn_dbm files.authn_file \
   files.authn_socache files.authz_core files.authz_dbd files.authz_dbm \
   files.authz_groupfile files.authz_host files.authz_owner \
@@ -672,6 +682,8 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_mpm_event -f files.mpm_event
 %files -n ea-mod_mpm_prefork -f files.mpm_prefork
 %files -n ea-mod_mpm_worker -f files.mpm_worker
+
+%files -n ea-mod_asis -f files.asis
 
 %files -n ea-mod_ssl -f files.ssl
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/ssl.conf
