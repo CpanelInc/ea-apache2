@@ -168,6 +168,28 @@ Distributed Authoring and Versioning') functionality for Apache. This
 extension to the HTTP protocol allows creating, moving, copying, and
 deleting resources and collections on a remote web server.
 
+%package -n ea-mod_dav_fs
+Group: System Environment/Daemons
+Summary: DAV filesystem provider module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_dav = 0:%{version}-%{release}
+
+%description -n ea-mod_dav_fs
+The mod_dav_fs module acts as a support module for mod_dav and
+provides access to resources located in the file system.  The formal
+name of this provider is filesystem.
+
+%package -n ea-mod_dav_lock
+Group: System Environment/Daemons
+Summary: Generic DAV locking module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_dav = 0:%{version}-%{release}
+
+%description -n ea-mod_dav_lock
+The mod_dav_lock implements a generic locking API which can be used by
+any backend provider of mod_dav.  Without a backend provider which
+makes use of it, however, it should not be loaded into the server.
+
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
@@ -514,7 +536,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.authz_groupfile files.authz_host files.authz_owner \
   files.authz_user files.autoindex files.buffer files.cache \
   files.cache_disk files.cache_socache \
-  files.charset_lite files.data files.dav_fs files.dav_lock \
+  files.charset_lite files.data \
   files.dbd files.deflate files.dialup files.dir files.dumpio files.echo \
   files.env files.expires files.ext_filter files.file_cache files.filter \
   files.headers files.heartbeat files.heartmonitor files.include \
@@ -694,18 +716,20 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n ea-mod_asis -f files.asis
 
-%files -n ea-mod_ssl -f files.ssl
-%config(noreplace) %{_sysconfdir}/apache2/conf.d/ssl.conf
-%attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
-
-%files -n ea-mod_proxy_html -f files.proxy_html
+%files -n ea-mod_dav -f files.dav
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
+%files -n ea-mod_dav_fs -f files.dav_fs
+%files -n ea-mod_dav_lock -f files.dav_lock
 
 %files -n ea-mod_ldap -f files.ldap
 
+%files -n ea-mod_proxy_html -f files.proxy_html
+
 %files -n ea-mod_session -f files.session
 
-%files -n ea-mod_dav -f files.dav
-%attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
+%files -n ea-mod_ssl -f files.ssl
+%config(noreplace) %{_sysconfdir}/apache2/conf.d/ssl.conf
+%attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
 
 %files devel
 %defattr(-,root,root)
