@@ -70,7 +70,6 @@ Requires: ea-apache2-mpm
 Obsoletes: httpd-suexec
 Conflicts: webserver
 Provides: ea-webserver
-Provides: ea-mod_dav = %{version}-%{release}
 Provides: ea-apache2-suexec = %{version}-%{release}
 Provides: ea-apache2-mmn = %{mmn}, ea-apache2-mmn = %{mmnisa}
 Provides: ea-apache2-mmn = %{oldmmnisa}
@@ -157,6 +156,17 @@ Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 The mod_asis module provides the handler send-as-is which causes
 Apache HTTP Server to send the document without adding most of the
 usual HTTP headers.
+
+%package -n ea-mod_dav
+Group: System Environment/Daemons
+Summary: DAV module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_dav
+The mod_dav module provides class 1 and class 2 WebDAV ('Web-based
+Distributed Authoring and Versioning') functionality for Apache. This
+extension to the HTTP protocol allows creating, moving, copying, and
+deleting resources and collections on a remote web server.
 
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
@@ -504,7 +514,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.authz_groupfile files.authz_host files.authz_owner \
   files.authz_user files.autoindex files.buffer files.cache \
   files.cache_disk files.cache_socache \
-  files.charset_lite files.data files.dav files.dav_fs files.dav_lock \
+  files.charset_lite files.data files.dav_fs files.dav_lock \
   files.dbd files.deflate files.dialup files.dir files.dumpio files.echo \
   files.env files.expires files.ext_filter files.file_cache files.filter \
   files.headers files.heartbeat files.heartmonitor files.include \
@@ -660,7 +670,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0710,root,nobody) %dir %{_localstatedir}/run/apache2
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/run/apache2/htcacheclean
 %attr(0700,root,root) %dir %{_localstatedir}/log/apache2
-%attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/apache2
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/apache2/proxy
 
@@ -694,6 +703,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_ldap -f files.ldap
 
 %files -n ea-mod_session -f files.session
+
+%files -n ea-mod_dav -f files.dav
+%attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
 
 %files devel
 %defattr(-,root,root)
