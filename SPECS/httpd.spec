@@ -14,8 +14,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.6
-Release: 21%{?dist}.cpanel.1
+Version: 2.4.12
+Release: 1%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -26,7 +26,6 @@ Source3: httpd.sysconf
 Source6: httpd.init
 
 Source10: httpd.conf
-Source12: 00-mpm.conf
 Source14: 01-cgi.conf
 Source20: userdir.conf
 Source21: ssl.conf
@@ -44,29 +43,16 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 
 # Features/functional changes
-Patch21: httpd-2.4.6-full-release.patch
 Patch23: httpd-2.4.4-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch28: httpd-2.4.6-r1332643+.patch
 
 Patch30: httpd-2.4.4-cachehardmax.patch
-Patch31: httpd-2.4.6-sslmultiproxy.patch
-Patch32: httpd-2.4.6-r1537535.patch
-Patch33: httpd-2.4.6-r1542327.patch
 # Bug fixes
-Patch51: httpd-2.4.3-sslsninotreq.patch
 Patch55: httpd-2.4.4-malformed-host.patch
-Patch56: httpd-2.4.4-mod_unique_id.patch
-Patch57: httpd-2.4.6-ldaprefer.patch
-Patch58: httpd-2.4.6-r1507681+.patch
 Patch59: httpd-2.4.6-r1556473.patch
-Patch60: httpd-2.4.6-r1553540.patch
-# Security fixes
-Patch200: httpd-2.4.6-CVE-2013-6438.patch
-Patch201: httpd-2.4.6-CVE-2014-0098.patch
 # cPanel-specific patches
 Patch301: 2.2_cpanel_whmserverstatus.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
@@ -212,30 +198,16 @@ interface for storing and accessing per-user session data.
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 
-%patch21 -p1 -b .fullrelease
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
-%patch28 -p1 -b .r1332643+
 
 %patch30 -p1 -b .cachehardmax
-%patch31 -p1 -b .sslmultiproxy
-%patch32 -p1 -b .r1537535
-%patch33 -p1 -b .r1542327
-rm modules/ssl/ssl_engine_dh.c
 
-%patch51 -p1 -b .sninotreq
 %patch55 -p1 -b .malformedhost
-%patch56 -p1 -b .uniqueid
-%patch57 -p1 -b .ldaprefer
-%patch58 -p1 -b .r1507681+
 %patch59 -p1 -b .r1556473
-%patch60 -p1 -b .r1553540
-
-%patch200 -p1 -b .cve6438
-%patch201 -p1 -b .cve0098
 
 %patch301 -p1 -b .cpWHM
 %patch302 -p1 -b .cpsuexec1
@@ -719,6 +691,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fri Feb 27 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-1.el6.cpanel.1
+- Upgrade to 2.4.12
+- Remove inappropriate or already-applied patches
+
 * Thu Feb 26 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.6-21.el6.cpanel.1
 - Split the MPMs into their own packages
 - mod_heartbeat needs to be loaded after mod_status and mod_watchdog

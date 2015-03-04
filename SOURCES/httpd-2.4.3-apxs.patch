@@ -53,4 +53,4 @@
 +include %LIBDIR%/httpd/build/special.mk
  
  #   the used tools
- APXS=apxs
+ APACHECTL=apachectl
