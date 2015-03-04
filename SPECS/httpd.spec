@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache2
 Version: 2.4.12
-Release: 1%{?dist}.cpanel.1
+Release: 2%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -64,8 +64,8 @@ Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: apr-devel >= 1.4.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
-Requires: /etc/mime.types, system-logos >= 7.92.1-1
+BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
+Requires: /etc/mime.types, system-logos >= 7.92.1-1, apr >= 1.5.0
 Requires: ea-apache2-mpm
 Obsoletes: httpd-suexec
 Conflicts: webserver
@@ -84,7 +84,7 @@ web server.
 Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel, httpd-devel
-Requires: apr-devel, apr-util-devel, pkgconfig
+Requires: apr-devel >= 1.5.0, apr-util-devel, pkgconfig
 Requires: ea-apache2 = %{version}-%{release}
 
 %description devel
