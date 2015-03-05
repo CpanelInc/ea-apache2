@@ -259,6 +259,18 @@ The mod_authn_file module provides authentication front-ends such as
 mod_auth_digest and mod_auth_basic to authenticate users by looking up
 users in plain text password files.
 
+%package -n ea-mod_authnz_ldap
+Group: System Environment/Daemons
+Summary: LDAP authentication/authorization module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authn_core = 0:%{version}-%{release}
+Requires: ea-mod_ldap = 0:%{version}-%{release}
+Provides: ea-apache2-authn = ldap, ea-apache2-authz = ldap
+
+%description -n ea-mod_authnz_ldap
+The mod_authnz_ldap module allows authentication front-ends such as
+mod_auth_basic to authenticate users through an LDAP directory.
+
 %package -n ea-mod_authz_core
 Group: System Environment/Daemons
 Summary: Core authorization module for the Apache HTTP Server
@@ -440,13 +452,15 @@ or SetHandler) will be processed by this module.
 
 %package -n ea-mod_ldap
 Group: System Environment/Daemons
-Summary: LDAP authentication modules for the Apache HTTP Server
+Summary: LDAP connection-handling module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 Requires: apr-util-ldap
 
 %description -n ea-mod_ldap
-The mod_ldap and mod_authnz_ldap modules add support for LDAP
-authentication to the Apache HTTP Server.
+The mod_ldap module was created to improve the performance of websites
+relying on backend connections to LDAP servers. In addition to the
+functions provided by the standard LDAP libraries, this module adds an
+LDAP connection pool and an LDAP shared memory cache.
 
 %package -n ea-mod_mime_magic
 Group: System Environment/Daemons
@@ -827,9 +841,6 @@ done
 # proxy_html package needs xml2enc
 cat files.xml2enc >> files.proxy_html
 
-# ldap and authnz_ldap belong in the same package
-cat files.authnz_ldap >> files.ldap
-
 # Session-related modules
 cat files.session_cookie files.session_dbd files.auth_form \
   files.session_crypto >> files.session
@@ -1026,6 +1037,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_authn_dbd -f files.authn_dbd
 %files -n ea-mod_authn_dbm -f files.authn_dbm
 %files -n ea-mod_authn_file -f files.authn_file
+%files -n ea-mod_authnz_ldap -f files.authnz_ldap
 %files -n ea-mod_authz_core -f files.authz_core
 %files -n ea-mod_authz_dbm -f files.authz_dbm
 %files -n ea-mod_authz_host -f files.authz_host
