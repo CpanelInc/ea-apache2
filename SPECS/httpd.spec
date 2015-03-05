@@ -199,6 +199,26 @@ The mod_authn_core module provides core authentication capabilities to
 allow or deny access to portions of the web site. mod_authn_core
 provides directives that are common to all authentication providers.
 
+%package -n ea-mod_authn_anon
+Group: System Environment/Daemons
+Summary: Anonymous-user authentication module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authn_core = 0:%{version}-%{release}
+Provides: ea-apache2-authn = anon
+
+%description -n ea-mod_authn_anon
+The mod_authn_anon module provides authentication front-ends such as
+mod_auth_basic to authenticate users similar to anonymous-ftp sites,
+i.e. have a 'magic' user id 'anonymous' and the email address as a
+password. These email addresses can be logged.
+
+Combined with other (database) access control methods, this allows for
+effective user tracking and customization according to a user profile
+while still keeping the site open for 'unregistered' users. One
+advantage of using Auth-based user tracking is that, unlike
+magic-cookies and funny URL pre/postfixes, it is completely browser
+independent and it allows users to share URLs.
+
 %package -n ea-mod_authn_file
 Group: System Environment/Daemons
 Summary: File-based authentication module for the Apache HTTP Server
@@ -775,7 +795,6 @@ cat files.session_cookie files.session_dbd files.auth_form \
 
 # The rest of the modules, into the main list
 cat files.access_compat files.actions files.alias files.allowmethods \
-  files.authn_anon \
   files.authn_dbd files.authn_dbm \
   files.authn_socache files.authz_dbd files.authz_dbm \
   files.authz_groupfile files.authz_owner \
@@ -963,6 +982,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_auth_basic -f files.auth_basic
 %files -n ea-mod_auth_digest -f files.auth_digest
 %files -n ea-mod_authn_core -f files.authn_core
+%files -n ea-mod_authn_anon -f files.authn_anon
 %files -n ea-mod_authn_file -f files.authn_file
 %files -n ea-mod_authz_core -f files.authz_core
 %files -n ea-mod_authz_host -f files.authz_host
