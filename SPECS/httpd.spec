@@ -247,6 +247,17 @@ responses. The expiration date can set to be relative to either the
 time the source file was last modified, or to the time of the client
 access.
 
+%package -n ea-mod_ext_filter
+Group: System Environment/Daemons
+Summary: Generic filter module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_ext_filter
+The mod_ext_filter module presents a simple and familiar programming
+model for filters. With this module, a program which reads from stdin
+and writes to stdout (i.e., a Unix-style filter command) can be a
+filter for Apache.
+
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
@@ -595,7 +606,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.cache_disk files.cache_socache \
   files.data \
   files.dialup files.dir files.dumpio files.echo \
-  files.ext_filter files.file_cache files.filter \
+  files.file_cache files.filter \
   files.headers files.heartbeat files.heartmonitor files.include \
   files.info files.log_config files.log_debug files.log_forensic \
   files.logio files.lua files.macro files.mime files.mime_magic \
@@ -781,6 +792,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_deflate -f files.deflate
 %files -n ea-mod_env -f files.env
 %files -n ea-mod_expires -f files.expires
+%files -n ea-mod_ext_filter -f files.ext_filter
 
 %files -n ea-mod_ldap -f files.ldap
 
