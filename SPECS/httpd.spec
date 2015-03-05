@@ -221,7 +221,7 @@ independent and it allows users to share URLs.
 
 %package -n ea-mod_authn_dbd
 Group: System Environment/Daemons
-Summary: File-based authentication module for the Apache HTTP Server
+Summary: DBD-based authentication module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 Requires: ea-mod_authn_core = 0:%{version}-%{release}
 Requires: ea-mod_dbd = 0:%{version}-%{release}
@@ -232,6 +232,20 @@ The mod_authn_dbd module provides authentication front-ends such as
 mod_auth_digest and mod_auth_basic to authenticate users by looking up
 users in SQL tables. Similar functionality is provided by, for
 example, mod_authn_file.
+
+%package -n ea-mod_authn_dbm
+Group: System Environment/Daemons
+Summary: DBM-based authentication module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authn_core = 0:%{version}-%{release}
+Requires: ea-mod_dbd = 0:%{version}-%{release}
+Provides: ea-apache2-authn = dbm
+
+%description -n ea-mod_authn_dbm
+The mod_authn_dbm module provides authentication front-ends such as
+mod_auth_digest and mod_auth_basic to authenticate users by looking up
+users in dbm password files. Similar functionality is provided by
+mod_authn_file.
 
 %package -n ea-mod_authn_file
 Group: System Environment/Daemons
@@ -809,7 +823,6 @@ cat files.session_cookie files.session_dbd files.auth_form \
 
 # The rest of the modules, into the main list
 cat files.access_compat files.actions files.alias files.allowmethods \
-  files.authn_dbm \
   files.authn_socache files.authz_dbd files.authz_dbm \
   files.authz_groupfile files.authz_owner \
   files.authz_user files.autoindex files.buffer files.cache \
@@ -998,6 +1011,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_authn_core -f files.authn_core
 %files -n ea-mod_authn_anon -f files.authn_anon
 %files -n ea-mod_authn_dbd -f files.authn_dbd
+%files -n ea-mod_authn_dbm -f files.authn_dbm
 %files -n ea-mod_authn_file -f files.authn_file
 %files -n ea-mod_authz_core -f files.authz_core
 %files -n ea-mod_authz_host -f files.authz_host
