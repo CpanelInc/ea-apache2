@@ -277,6 +277,16 @@ are served by special content handlers. It can only be used for
 regular files which are usually served by the Apache core content
 handler.
 
+%package -n ea-mod_headers
+Group: System Environment/Daemons
+Summary: Header control module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_headers
+The mod_headers module provides directives to control and modify HTTP
+request and response headers. Headers can be merged, replaced or
+removed.
+
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
@@ -626,7 +636,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.data \
   files.dialup files.dir files.dumpio files.echo \
   files.filter \
-  files.headers files.heartbeat files.heartmonitor files.include \
+  files.heartbeat files.heartmonitor files.include \
   files.info files.log_config files.log_debug files.log_forensic \
   files.logio files.lua files.macro files.mime files.mime_magic \
   files.negotiation \
@@ -813,6 +823,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_expires -f files.expires
 %files -n ea-mod_ext_filter -f files.ext_filter
 %files -n ea-mod_file_cache -f files.file_cache
+%files -n ea-mod_headers -f files.headers
 
 %files -n ea-mod_ldap -f files.ldap
 
