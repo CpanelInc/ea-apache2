@@ -156,6 +156,86 @@ The mod_asis module provides the handler send-as-is which causes
 Apache HTTP Server to send the document without adding most of the
 usual HTTP headers.
 
+%package -n ea-mod_auth_basic
+Group: System Environment/Daemons
+Summary: HTTP Basic Authentication module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-apache2-authn, ea-apache2-authz
+
+%description -n ea-mod_auth_basic
+The mod_auth_basic module allows the use of HTTP Basic Authentication
+to restrict access by looking up users in the given providers. HTTP
+Digest Authentication is provided by mod_auth_digest.
+
+mod_auth_basic requires at least one authentication provider module,
+and one authorization provider module.
+
+%package -n ea-mod_auth_digest
+Group: System Environment/Daemons
+Summary: HTTP Digest Authentication module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-apache2-authn, ea-apache2-authz
+
+%description -n ea-mod_auth_digest
+The mod_auth_digest module implements HTTP Digest Authentication
+(RFC2617), and provides an alternative to mod_auth_basic where the
+password is not transmitted as cleartext. However, this does not lead
+to a significant security advantage over basic authentication. On the
+other hand, the password storage on the server is much less secure
+with digest authentication than with basic authentication. Therefore,
+using basic auth and encrypting the whole connection using mod_ssl is
+a much better alternative.
+
+mod_auth_digest requires at least one authentication provider module,
+and one authorization provider module.
+
+%package -n ea-mod_authn_core
+Group: System Environment/Daemons
+Summary: Core authentication module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_authn_core
+The mod_authn_core module provides core authentication capabilities to
+allow or deny access to portions of the web site. mod_authn_core
+provides directives that are common to all authentication providers.
+
+%package -n ea-mod_authn_file
+Group: System Environment/Daemons
+Summary: File-based authentication module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authn_core = 0:%{version}-%{release}
+Provides: ea-apache2-authn = file
+
+%description -n ea-mod_authn_file
+The mod_authn_file module provides authentication front-ends such as
+mod_auth_digest and mod_auth_basic to authenticate users by looking up
+users in plain text password files.
+
+%package -n ea-mod_authz_core
+Group: System Environment/Daemons
+Summary: Core authorization module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_authz_core
+The mod_authz_core module provides core authorization capabilities so
+that authenticated users can be allowed or denied access to portions
+of the web site. mod_authz_core provides the functionality to register
+various authorization providers.
+
+%package -n ea-mod_authz_host
+Group: System Environment/Daemons
+Summary: Host-based authorization module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authz_core = 0:%{version}-%{release}
+Provides: ea-apache2-authz = host
+
+%description -n ea-mod_authz_host
+The mod_authz_host module registers authorization providers to the
+Require directive. The directive can be referenced within a
+<Directory>, <Files>, or <Location> section as well as .htaccess files
+to control access to particular parts of the server. Access can be
+controlled based on the client hostname or IP address.
+
 %package -n ea-mod_charset_lite
 Group: System Environment/Daemons
 Summary: Character set conversion module for the Apache HTTP Server
@@ -650,7 +730,7 @@ modnum=5
 
 for mod in \
   access_compat actions alias allowmethods asis auth_basic auth_digest \
-  authn_anon authn_core authn_dbd authn_dbm authn_file authn_socache \
+  authn_core authn_anon authn_dbd authn_dbm authn_file authn_socache \
   authz_core authz_dbd authz_dbm authz_groupfile authz_host authz_owner \
   authz_user autoindex buffer cache cache_disk cache_socache \
   charset_lite data dav dav_fs dav_lock dbd deflate dialup dir dumpio \
@@ -695,10 +775,10 @@ cat files.session_cookie files.session_dbd files.auth_form \
 
 # The rest of the modules, into the main list
 cat files.access_compat files.actions files.alias files.allowmethods \
-  files.auth_basic files.auth_digest files.authn_anon \
-  files.authn_core files.authn_dbd files.authn_dbm files.authn_file \
-  files.authn_socache files.authz_core files.authz_dbd files.authz_dbm \
-  files.authz_groupfile files.authz_host files.authz_owner \
+  files.authn_anon \
+  files.authn_dbd files.authn_dbm \
+  files.authn_socache files.authz_dbd files.authz_dbm \
+  files.authz_groupfile files.authz_owner \
   files.authz_user files.autoindex files.buffer files.cache \
   files.cache_disk files.cache_socache \
   files.data \
@@ -880,6 +960,12 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_mpm_worker -f files.mpm_worker
 
 %files -n ea-mod_asis -f files.asis
+%files -n ea-mod_auth_basic -f files.auth_basic
+%files -n ea-mod_auth_digest -f files.auth_digest
+%files -n ea-mod_authn_core -f files.authn_core
+%files -n ea-mod_authn_file -f files.authn_file
+%files -n ea-mod_authz_core -f files.authz_core
+%files -n ea-mod_authz_host -f files.authz_host
 %files -n ea-mod_charset_lite -f files.charset_lite
 %files -n ea-mod_dav -f files.dav
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
