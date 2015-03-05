@@ -382,6 +382,15 @@ conditions. The unique identifier is even unique across multiple
 machines in a properly configured cluster of machines. The environment
 variable UNIQUE_ID is set to the identifier for each request.
 
+%package -n ea-mod_usertrack
+Group: System Environment/Daemons
+Summary: Cookie tracking module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_usertrack
+The mod_usertrack module provides tracking of a users through websites
+via browser cookies.
+
 %prep
 %setup -q -n httpd-%{version}
 %patch1 -p1 -b .apctl
@@ -698,7 +707,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.setenvif files.slotmem_plain files.slotmem_shm files.socache_dbm \
   files.socache_memcache files.socache_shmcb files.status \
   files.substitute files.suexec files.unixd \
-  files.userdir files.usertrack files.version files.vhost_alias \
+  files.userdir files.version files.vhost_alias \
   files.watchdog > files.httpd
 
 # Remove unpackaged files
@@ -883,6 +892,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/ssl.conf
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
 %files -n ea-mod_unique_id -f files.unique_id
+%files -n ea-mod_usertrack -f files.usertrack
 
 %files devel
 %defattr(-,root,root)
