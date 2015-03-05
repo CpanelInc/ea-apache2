@@ -318,21 +318,6 @@ same way the Unix file(1) command works: it looks at the first few
 bytes of the file. It is intended as a "second line of defense" for
 cases that mod_mime cannot resolve.
 
-%package -n ea-mod_ssl
-Group: System Environment/Daemons
-Summary: SSL/TLS module for the Apache HTTP Server
-Epoch: 1
-BuildRequires: openssl-devel
-Requires(post): openssl, /bin/cat
-Requires(pre): ea-apache2
-Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Obsoletes: stronghold-mod_ssl, mod_ssl
-
-%description -n ea-mod_ssl
-The mod_ssl module provides strong cryptography for the Apache Web
-server via the Secure Sockets Layer (SSL) and Transport Layer
-Security (TLS) protocols.
-
 %package -n ea-mod_proxy_html
 Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
@@ -353,6 +338,37 @@ Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 %description -n ea-mod_session
 The mod_session module and associated backends provide an abstract
 interface for storing and accessing per-user session data.
+
+%package -n ea-mod_speling
+Group: System Environment/Daemons
+Summary: URL fallback module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_speling
+The mod_speling module addresses the problem that requests to
+documents sometimes cannot be served by the core apache server because
+the request was misspelled or miscapitalized.  mod_speling tries to
+find a matching document, even after all other modules gave up. It
+does its work by comparing each document name in the requested
+directory against the requested document name without regard to case,
+and allowing up to one misspelling (character insertion / omission /
+transposition or wrong character). A list is built with all document
+names which were matched using this strategy.
+
+%package -n ea-mod_ssl
+Group: System Environment/Daemons
+Summary: SSL/TLS module for the Apache HTTP Server
+Epoch: 1
+BuildRequires: openssl-devel
+Requires(post): openssl, /bin/cat
+Requires(pre): ea-apache2
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Obsoletes: stronghold-mod_ssl, mod_ssl
+
+%description -n ea-mod_ssl
+The mod_ssl module provides strong cryptography for the Apache Web
+server via the Secure Sockets Layer (SSL) and Transport Layer
+Security (TLS) protocols.
 
 %prep
 %setup -q -n httpd-%{version}
@@ -668,7 +684,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.proxy_scgi files.proxy_wstunnel files.ratelimit files.reflector \
   files.remoteip files.reqtimeout files.request files.rewrite files.sed \
   files.setenvif files.slotmem_plain files.slotmem_shm files.socache_dbm \
-  files.socache_memcache files.socache_shmcb files.speling files.status \
+  files.socache_memcache files.socache_shmcb files.status \
   files.substitute files.suexec files.unique_id files.unixd \
   files.userdir files.usertrack files.version files.vhost_alias \
   files.watchdog > files.httpd
@@ -848,11 +864,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_imagemap -f files.imagemap
 %files -n ea-mod_ldap -f files.ldap
 %files -n ea-mod_mime_magic -f files.mime_magic
-
 %files -n ea-mod_proxy_html -f files.proxy_html
-
 %files -n ea-mod_session -f files.session
-
+%files -n ea-mod_speling -f files.speling
 %files -n ea-mod_ssl -f files.ssl
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/ssl.conf
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
