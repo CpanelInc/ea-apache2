@@ -270,6 +270,19 @@ that authenticated users can be allowed or denied access to portions
 of the web site. mod_authz_core provides the functionality to register
 various authorization providers.
 
+%package -n ea-mod_authz_dbm
+Group: System Environment/Daemons
+Summary: DBM-based group authorization module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authz_core = 0:%{version}-%{release}
+Provides: ea-apache2-authz = dbm
+
+%description -n ea-mod_authz_dbm
+The mod_authz_dbm module provides authorization capabilities so that
+authenticated users can be allowed or denied access to portions of the
+web site by group membership. Similar functionality is provided by
+mod_authz_groupfile.
+
 %package -n ea-mod_authz_host
 Group: System Environment/Daemons
 Summary: Host-based authorization module for the Apache HTTP Server
@@ -823,7 +836,7 @@ cat files.session_cookie files.session_dbd files.auth_form \
 
 # The rest of the modules, into the main list
 cat files.access_compat files.actions files.alias files.allowmethods \
-  files.authn_socache files.authz_dbd files.authz_dbm \
+  files.authn_socache files.authz_dbd \
   files.authz_groupfile files.authz_owner \
   files.authz_user files.autoindex files.buffer files.cache \
   files.cache_disk files.cache_socache \
@@ -1014,6 +1027,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_authn_dbm -f files.authn_dbm
 %files -n ea-mod_authn_file -f files.authn_file
 %files -n ea-mod_authz_core -f files.authz_core
+%files -n ea-mod_authz_dbm -f files.authz_dbm
 %files -n ea-mod_authz_host -f files.authz_host
 %files -n ea-mod_charset_lite -f files.charset_lite
 %files -n ea-mod_dav -f files.dav
