@@ -29,7 +29,6 @@ Source10: httpd.conf
 Source14: 01-cgi.conf
 Source20: userdir.conf
 Source21: ssl.conf
-Source22: welcome.conf
 Source23: manual.conf
 
 # Documentation
@@ -298,6 +297,27 @@ functionality of the imagemap CGI program. Any directory or document
 type configured to use the handler imap-file (using either AddHandler
 or SetHandler) will be processed by this module.
 
+%package -n ea-mod_ldap
+Group: System Environment/Daemons
+Summary: LDAP authentication modules for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: apr-util-ldap
+
+%description -n ea-mod_ldap
+The mod_ldap and mod_authnz_ldap modules add support for LDAP
+authentication to the Apache HTTP Server.
+
+%package -n ea-mod_mime_magic
+Group: System Environment/Daemons
+Summary: Server-side imagemap module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_mime_magic
+The mod_mime_magic module determines the MIME type of files in the
+same way the Unix file(1) command works: it looks at the first few
+bytes of the file. It is intended as a "second line of defense" for
+cases that mod_mime cannot resolve.
+
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
@@ -324,16 +344,6 @@ Obsoletes: mod_proxy_html < 1:2.4.1-2
 %description -n ea-mod_proxy_html
 The mod_proxy_html and mod_xml2enc modules provide filters which can
 transform and modify HTML and XML content.
-
-%package -n ea-mod_ldap
-Group: System Environment/Daemons
-Summary: LDAP authentication modules for the Apache HTTP Server
-Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: apr-util-ldap
-
-%description -n ea-mod_ldap
-The mod_ldap and mod_authnz_ldap modules add support for LDAP
-authentication to the Apache HTTP Server.
 
 %package -n ea-mod_session
 Group: System Environment/Daemons
@@ -465,7 +475,7 @@ for f in 01-cgi.conf ; do
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/$f
 done
 
-for f in welcome.conf ssl.conf manual.conf userdir.conf; do
+for f in ssl.conf manual.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
@@ -649,7 +659,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.filter \
   files.heartbeat files.heartmonitor files.include \
   files.info files.log_config files.log_debug files.log_forensic \
-  files.logio files.lua files.macro files.mime files.mime_magic \
+  files.logio files.lua files.macro files.mime \
   files.negotiation \
   files.proxy files.lbmethod_bybusyness files.lbmethod_byrequests \
   files.lbmethod_bytraffic files.lbmethod_heartbeat files.proxy_ajp \
@@ -836,8 +846,8 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_file_cache -f files.file_cache
 %files -n ea-mod_headers -f files.headers
 %files -n ea-mod_imagemap -f files.imagemap
-
 %files -n ea-mod_ldap -f files.ldap
+%files -n ea-mod_mime_magic -f files.mime_magic
 
 %files -n ea-mod_proxy_html -f files.proxy_html
 
