@@ -195,9 +195,21 @@ Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 Requires: ea-mod_dav = 0:%{version}-%{release}
 
 %description -n ea-mod_dav_lock
-The mod_dav_lock implements a generic locking API which can be used by
-any backend provider of mod_dav.  Without a backend provider which
-makes use of it, however, it should not be loaded into the server.
+The mod_dav_lock module implements a generic locking API which can be
+used by any backend provider of mod_dav.  Without a backend provider
+which makes use of it, however, it should not be loaded into the
+server.
+
+%package -n ea-mod_dbd
+Group: System Environment/Daemons
+Summary: Database connection module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_dbd
+The mod_dbd module manages SQL database connections using APR. It
+provides database connections on request to modules requiring SQL
+database functions, and takes care of managing databases with optimal
+efficiency and scalability for both threaded and non-threaded MPMs.
 
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
@@ -546,7 +558,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.authz_user files.autoindex files.buffer files.cache \
   files.cache_disk files.cache_socache \
   files.data \
-  files.dbd files.deflate files.dialup files.dir files.dumpio files.echo \
+  files.deflate files.dialup files.dir files.dumpio files.echo \
   files.env files.expires files.ext_filter files.file_cache files.filter \
   files.headers files.heartbeat files.heartmonitor files.include \
   files.info files.log_config files.log_debug files.log_forensic \
@@ -724,13 +736,12 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_mpm_worker -f files.mpm_worker
 
 %files -n ea-mod_asis -f files.asis
-
+%files -n ea-mod_charset_lite -f files.charset_lite
 %files -n ea-mod_dav -f files.dav
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
 %files -n ea-mod_dav_fs -f files.dav_fs
 %files -n ea-mod_dav_lock -f files.dav_lock
-
-%files -n ea-mod_charset_lite -f files.charset_lite
+%files -n ea-mod_dbd -f files.dbd
 
 %files -n ea-mod_ldap -f files.ldap
 
