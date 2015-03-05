@@ -258,6 +258,25 @@ model for filters. With this module, a program which reads from stdin
 and writes to stdout (i.e., a Unix-style filter command) can be a
 filter for Apache.
 
+%package -n ea-mod_file_cache
+Group: System Environment/Daemons
+Summary: Static file caching module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_file_cache
+The mod_file_cache module provides two techniques for caching
+frequently requested static files. Through configuration directives,
+you can direct mod_file_cache to either open then mmap() a file, or to
+pre-open a file and save the open file handle. Both techniques reduce
+server load when processing requests for these files by doing part of
+the work (specifically, the file I/O) for serving the file when the
+server is started rather than during each request.
+
+This cannot be used for speeding up CGI programs or other files which
+are served by special content handlers. It can only be used for
+regular files which are usually served by the Apache core content
+handler.
+
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
@@ -606,7 +625,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.cache_disk files.cache_socache \
   files.data \
   files.dialup files.dir files.dumpio files.echo \
-  files.file_cache files.filter \
+  files.filter \
   files.headers files.heartbeat files.heartmonitor files.include \
   files.info files.log_config files.log_debug files.log_forensic \
   files.logio files.lua files.macro files.mime files.mime_magic \
@@ -793,6 +812,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_env -f files.env
 %files -n ea-mod_expires -f files.expires
 %files -n ea-mod_ext_filter -f files.ext_filter
+%files -n ea-mod_file_cache -f files.file_cache
 
 %files -n ea-mod_ldap -f files.ldap
 
