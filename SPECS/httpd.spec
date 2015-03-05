@@ -211,6 +211,16 @@ provides database connections on request to modules requiring SQL
 database functions, and takes care of managing databases with optimal
 efficiency and scalability for both threaded and non-threaded MPMs.
 
+%package -n ea-mod_deflate
+Group: System Environment/Daemons
+Summary: Compression filter module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_deflate
+The mod_deflate module provides the DEFLATE output filter that allows
+output from your server to be compressed before being sent to the
+client over the network.
+
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
@@ -558,7 +568,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.authz_user files.autoindex files.buffer files.cache \
   files.cache_disk files.cache_socache \
   files.data \
-  files.deflate files.dialup files.dir files.dumpio files.echo \
+  files.dialup files.dir files.dumpio files.echo \
   files.env files.expires files.ext_filter files.file_cache files.filter \
   files.headers files.heartbeat files.heartmonitor files.include \
   files.info files.log_config files.log_debug files.log_forensic \
@@ -742,6 +752,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_dav_fs -f files.dav_fs
 %files -n ea-mod_dav_lock -f files.dav_lock
 %files -n ea-mod_dbd -f files.dbd
+%files -n ea-mod_deflate -f files.deflate
 
 %files -n ea-mod_ldap -f files.ldap
 
