@@ -287,6 +287,17 @@ The mod_headers module provides directives to control and modify HTTP
 request and response headers. Headers can be merged, replaced or
 removed.
 
+%package -n ea-mod_imagemap
+Group: System Environment/Daemons
+Summary: Server-side imagemap module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_imagemap
+The mod_imagemap module processes .map files, thereby replacing the
+functionality of the imagemap CGI program. Any directory or document
+type configured to use the handler imap-file (using either AddHandler
+or SetHandler) will be processed by this module.
+
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
@@ -428,7 +439,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
-        --disable-imagemap  \
+        --enable-imagemap  \
 	$*
 make %{?_smp_mflags}
 
@@ -587,7 +598,7 @@ for mod in \
   authz_user autoindex buffer cache cache_disk cache_socache \
   charset_lite data dav dav_fs dav_lock dbd deflate dialup dir dumpio \
   echo env expires ext_filter file_cache filter headers \
-  heartmonitor include info log_config log_debug log_forensic logio lua \
+  imagemap include info log_config log_debug log_forensic logio lua \
   macro mime mime_magic negotiation \
   proxy lbmethod_bybusyness lbmethod_byrequests lbmethod_bytraffic \
   lbmethod_heartbeat proxy_ajp proxy_balancer proxy_connect \
@@ -595,7 +606,7 @@ for mod in \
   proxy_wstunnel ratelimit reflector remoteip reqtimeout request rewrite \
   sed setenvif slotmem_plain slotmem_shm socache_dbm socache_memcache \
   socache_shmcb speling status substitute suexec unique_id unixd userdir \
-  usertrack version vhost_alias watchdog heartbeat \
+  usertrack version vhost_alias watchdog heartbeat heartmonitor \
   ssl \
   proxy_html xml2enc \
   ldap authnz_ldap \
@@ -824,6 +835,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_ext_filter -f files.ext_filter
 %files -n ea-mod_file_cache -f files.file_cache
 %files -n ea-mod_headers -f files.headers
+%files -n ea-mod_imagemap -f files.imagemap
 
 %files -n ea-mod_ldap -f files.ldap
 
