@@ -370,6 +370,16 @@ The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
+%package -n ea-mod_suexec
+Group: System Environment/Daemons
+Summary: Per-user/group execution module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_suexec
+The mod_suexec module allows CGI scripts to run as a specified user
+and group.  The suexec support program is contained within the
+ea-apache2 package.
+
 %package -n ea-mod_unique_id
 Group: System Environment/Daemons
 Summary: Unique request identifier module for the Apache HTTP Server
@@ -706,7 +716,7 @@ cat files.access_compat files.actions files.alias files.allowmethods \
   files.remoteip files.reqtimeout files.request files.rewrite files.sed \
   files.setenvif files.slotmem_plain files.slotmem_shm files.socache_dbm \
   files.socache_memcache files.socache_shmcb files.status \
-  files.substitute files.suexec files.unixd \
+  files.substitute files.unixd \
   files.userdir files.version files.vhost_alias \
   files.watchdog > files.httpd
 
@@ -891,6 +901,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_ssl -f files.ssl
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/ssl.conf
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
+%files -n ea-mod_suexec -f files.suexec
 %files -n ea-mod_unique_id -f files.unique_id
 %files -n ea-mod_usertrack -f files.usertrack
 
