@@ -259,6 +259,18 @@ The mod_authn_file module provides authentication front-ends such as
 mod_auth_digest and mod_auth_basic to authenticate users by looking up
 users in plain text password files.
 
+%package -n ea-mod_authn_socache
+Group: System Environment/Daemons
+Summary: Shared-memory authentication caching module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authn_core = 0:%{version}-%{release}
+Requires: ea-apache2-authn
+
+%description -n ea-mod_authn_socache
+The mod_authn_socache module maintains a cache of authentication
+credentials, so that a new backend lookup is not required for every
+authenticated request.
+
 %package -n ea-mod_authnz_ldap
 Group: System Environment/Daemons
 Summary: LDAP authentication/authorization module for the Apache HTTP Server
@@ -282,6 +294,22 @@ that authenticated users can be allowed or denied access to portions
 of the web site. mod_authz_core provides the functionality to register
 various authorization providers.
 
+%package -n ea-mod_authz_dbd
+Group: System Environment/Daemons
+Summary: DBD-based group authorization module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authz_core = 0:%{version}-%{release}
+Requires: ea-mod_dbd = 0:%{version}-%{release}
+Provides: ea-apache2-authz = dbd
+
+%description -n ea-mod_authz_dbd
+The mod_authz_dbd module provides authorization capabilities so that
+authenticated users can be allowed or denied access to portions of the
+web site by group membership. Similar functionality is provided by
+mod_authz_groupfile and mod_authz_dbm, with the exception that this
+module queries a SQL database to determine whether a user is a member
+of a group.
+
 %package -n ea-mod_authz_dbm
 Group: System Environment/Daemons
 Summary: DBM-based group authorization module for the Apache HTTP Server
@@ -294,6 +322,19 @@ The mod_authz_dbm module provides authorization capabilities so that
 authenticated users can be allowed or denied access to portions of the
 web site by group membership. Similar functionality is provided by
 mod_authz_groupfile.
+
+%package -n ea-mod_authz_groupfile
+Group: System Environment/Daemons
+Summary: File-based group authorization module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authz_core = 0:%{version}-%{release}
+Provides: ea-apache2-authz = groupfile
+
+%description -n ea-mod_authz_groupfile
+The mod_authz_groupfile module provides authorization capabilities so
+that authenticated users can be allowed or denied access to portions
+of the web site by group membership. Similar functionality is provided
+by mod_authz_dbm.
 
 %package -n ea-mod_authz_host
 Group: System Environment/Daemons
@@ -308,6 +349,34 @@ Require directive. The directive can be referenced within a
 <Directory>, <Files>, or <Location> section as well as .htaccess files
 to control access to particular parts of the server. Access can be
 controlled based on the client hostname or IP address.
+
+%package -n ea-mod_authz_owner
+Group: System Environment/Daemons
+Summary: Ownership-based authorization module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authz_core = 0:%{version}-%{release}
+Provides: ea-apache2-authz = owner
+
+%description -n ea-mod_authz_owner
+The mod_authz_owner module authorizes access to files by comparing the
+userid used for HTTP authentication (the web userid) with the
+file-system owner or group of the requested file. The supplied
+username and password must be already properly verified by an
+authentication module, such as mod_auth_basic or mod_auth_digest.
+
+%package -n ea-mod_authz_user
+Group: System Environment/Daemons
+Summary: Ownership-based authorization module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_authz_core = 0:%{version}-%{release}
+Provides: ea-apache2-authz = user
+
+%description -n ea-mod_authz_user
+The mod_authz_user module provides authorization capabilities so that
+authenticated users can be allowed or denied access to portions of the
+web site. mod_authz_user grants access if the authenticated user is
+listed in a Require user directive. Alternatively Require valid-user
+can be used to grant access to all successfully authenticated users.
 
 %package -n ea-mod_charset_lite
 Group: System Environment/Daemons
@@ -651,7 +720,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
-        --enable-imagemap  \
+        --enable-imagemap --disable-echo \
 	$*
 make %{?_smp_mflags}
 
@@ -809,7 +878,7 @@ for mod in \
   authz_core authz_dbd authz_dbm authz_groupfile authz_host authz_owner \
   authz_user autoindex buffer cache cache_disk cache_socache \
   charset_lite data dav dav_fs dav_lock dbd deflate dialup dir dumpio \
-  echo env expires ext_filter file_cache filter headers \
+  env expires ext_filter file_cache filter headers \
   imagemap include info log_config log_debug log_forensic logio lua \
   macro mime mime_magic negotiation \
   proxy lbmethod_bybusyness lbmethod_byrequests lbmethod_bytraffic \
@@ -847,12 +916,10 @@ cat files.session_cookie files.session_dbd files.auth_form \
 
 # The rest of the modules, into the main list
 cat files.access_compat files.actions files.alias files.allowmethods \
-  files.authn_socache files.authz_dbd \
-  files.authz_groupfile files.authz_owner \
-  files.authz_user files.autoindex files.buffer files.cache \
+  files.autoindex files.buffer files.cache \
   files.cache_disk files.cache_socache \
   files.data \
-  files.dialup files.dir files.dumpio files.echo \
+  files.dialup files.dir files.dumpio \
   files.filter \
   files.heartbeat files.heartmonitor files.include \
   files.info files.log_config files.log_debug files.log_forensic \
@@ -1037,10 +1104,15 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_authn_dbd -f files.authn_dbd
 %files -n ea-mod_authn_dbm -f files.authn_dbm
 %files -n ea-mod_authn_file -f files.authn_file
+%files -n ea-mod_authn_socache -f files.authn_socache
 %files -n ea-mod_authnz_ldap -f files.authnz_ldap
 %files -n ea-mod_authz_core -f files.authz_core
+%files -n ea-mod_authz_dbd -f files.authz_dbd
 %files -n ea-mod_authz_dbm -f files.authz_dbm
+%files -n ea-mod_authz_groupfile -f files.authz_groupfile
 %files -n ea-mod_authz_host -f files.authz_host
+%files -n ea-mod_authz_owner -f files.authz_owner
+%files -n ea-mod_authz_user -f files.authz_user
 %files -n ea-mod_charset_lite -f files.charset_lite
 %files -n ea-mod_dav -f files.dav
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
