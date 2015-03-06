@@ -345,6 +345,81 @@ web site. mod_authz_user grants access if the authenticated user is
 listed in a Require user directive. Alternatively Require valid-user
 can be used to grant access to all successfully authenticated users.
 
+%package -n ea-mod_cache
+Group: System Environment/Daemons
+Summary: Content caching module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_cache
+The mod_cache module implements an RFC 2616 compliant HTTP content
+caching filter, with support for the caching of content negotiated
+responses containing the Vary header.
+
+RFC 2616 compliant caching provides a mechanism to verify whether
+stale or expired content is still fresh, and can represent a
+significant performance boost when the origin server supports
+conditional requests by honouring the If-None-Match HTTP request
+header. Content is only regenerated from scratch when the content has
+changed, and not when the cached entry expires.
+
+As a filter, mod_cache can be placed in front of content originating
+from any handler, including flat files (served from a slow disk cached
+on a fast disk), the output of a CGI script or dynamic content
+generator, or content proxied from another server.
+
+In the default configuration, mod_cache inserts the caching filter as
+far forward as possible within the filter stack, utilising the quick
+handler to bypass all per request processing when returning content to
+the client. In this mode of operation, mod_cache may be thought of as
+a caching proxy server bolted to the front of the webserver, while
+running within the webserver itself.
+
+%package -n ea-mod_cache_disk
+Group: System Environment/Daemons
+Summary: Disk-based caching module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_cache = 0:%{version}-%{release}
+
+%description -n ea-mod_cache_disk
+The mod_cache_disk module implements a disk based storage manager for
+mod_cache.
+
+The headers and bodies of cached responses are stored separately on
+disk, in a directory structure derived from the md5 hash of the cached
+URL.
+
+Multiple content negotiated responses can be stored concurrently,
+however the caching of partial content is not yet supported by this
+module.
+
+Atomic cache updates to both header and body files are achieved
+without the need for locking by storing the device and inode numbers
+of the body file within the header file. This has the side effect that
+cache entries manually moved into the cache will be ignored.
+
+The htcacheclean tool is provided to list cached URLs, remove cached
+URLs, or to maintain the size of the disk cache within size and/or
+inode limits. The tool can be run on demand, or can be daemonized to
+offer continuous monitoring of directory sizes.
+
+%package -n ea-mod_cache_socache
+Group: System Environment/Daemons
+Summary: Shared-memory caching module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_cache = 0:%{version}-%{release}
+
+%description -n ea-mod_cache_socache
+The mod_cache_socache module implements a shared object cache
+(socache) based storage manager for mod_cache.
+
+The headers and bodies of cached responses are combined, and stored
+underneath a single key in the shared object cache. A number of
+implementations of shared object caches are available to choose from.
+
+Multiple content negotiated responses can be stored concurrently,
+however the caching of partial content is not yet supported by this
+module.
+
 %package -n ea-mod_cgi
 Group: System Environment/Daemons
 Summary: CGI module for the Apache HTTP Server
@@ -615,6 +690,61 @@ The mod_ldap module was created to improve the performance of websites
 relying on backend connections to LDAP servers. In addition to the
 functions provided by the standard LDAP libraries, this module adds an
 LDAP connection pool and an LDAP shared memory cache.
+
+%package -n ea-mod_log_config
+Group: System Environment/Daemons
+Summary: Log configuration module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_log_config
+The mod_log_config module provides for flexible logging of client
+requests. Logs are written in a customizable format, and may be
+written directly to a file, or to an external program. Conditional
+logging is provided so that individual requests may be included or
+excluded from the logs based on characteristics of the request.
+
+%package -n ea-mod_log_debug
+Group: System Environment/Daemons
+Summary: Debug logging module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_log_debug
+The mod_log_debug module provides a LogMessage directive which may be
+used to log arbitrary data.
+
+%package -n ea-mod_log_forensic
+Group: System Environment/Daemons
+Summary: Forensic logging module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_log_forensic
+The mod_log_forensic module provides for forensic logging of client
+requests. Logging is done before and after processing a request, so
+the forensic log contains two log lines for each request. The forensic
+logger is very strict, which means:
+
+  - The format is fixed. You cannot modify the logging format at
+    runtime.
+  - If it cannot write its data, the child process exits immediately
+    and may dump core (depending on your CoreDumpDirectory
+    configuration).
+
+The check_forensic script may be helpful in evaluating the forensic
+log output.
+
+%package -n ea-mod_logio
+Group: System Environment/Daemons
+Summary: I/O bandwidth logging module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-mod_log_config = 0:%{version}-%{release}
+
+%description -n ea-mod_logio
+The mod_logio module provides the logging of input and output number
+of bytes received/sent per request. The numbers reflect the actual
+bytes as received on the network, which then takes into account the
+headers and bodies of requests and responses. The counting is done
+before SSL/TLS on input and after SSL/TLS on output, so the numbers
+will correctly reflect any changes made by encryption.
 
 %package -n ea-mod_mime_magic
 Group: System Environment/Daemons
@@ -1001,6 +1131,9 @@ rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=$RPM_BUILD_ROOT install
 
+# install the forensic script
+install -m 755 support/check_forensic $RPM_BUILD_ROOT%{_sbindir}
+
 # install SYSV init stuff
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 for s in httpd htcacheclean; do
@@ -1122,6 +1255,7 @@ sed -i '/instdso/s,top_srcdir,top_builddir,' \
 # We'll number the conf.modules.d files, so we can force load order,
 # and since there's a lot of them, we'll use 3 digits
 
+# MPMs are mutually exclusive, and should be loaded first
 for mod in mpm_event mpm_prefork mpm_worker
 do
     printf -v modname "000_mod_%s.conf" $mod
@@ -1135,6 +1269,7 @@ EOF
 EOF
 done
 
+# CGIs are also mutually exclusive
 for mod in cgi cgid
 do
     printf -v modname "005_mod_%s.conf" $mod
@@ -1195,13 +1330,11 @@ cat files.session_cookie files.session_dbd files.auth_form \
 # The rest of the modules, into the main list
 cat files.access_compat files.actions files.alias files.allowmethods \
   files.authn_core files.authz_core files.autoindex files.buffer \
-  files.cache files.cache_disk files.cache_socache \
   files.data \
   files.dialup files.dir files.dumpio \
   files.filter \
   files.include \
-  files.info files.log_config files.log_debug files.log_forensic \
-  files.logio files.lua files.macro files.mime \
+  files.info files.lua files.macro files.mime \
   files.negotiation \
   files.ratelimit files.reflector \
   files.remoteip files.reqtimeout files.request files.rewrite files.sed \
@@ -1383,6 +1516,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_authz_host -f files.authz_host
 %files -n ea-mod_authz_owner -f files.authz_owner
 %files -n ea-mod_authz_user -f files.authz_user
+%files -n ea-mod_cache -f files.cache
+%files -n ea-mod_cache_disk -f files.cache_disk
+%files -n ea-mod_cache_socache -f files.cache_socache
 %files -n ea-mod_cgi -f files.cgi
 %files -n ea-mod_cgid -f files.cgid
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/cgid.conf
@@ -1406,6 +1542,11 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_lbmethod_bytraffic -f files.lbmethod_bytraffic
 %files -n ea-mod_lbmethod_heartbeat -f files.lbmethod_heartbeat
 %files -n ea-mod_ldap -f files.ldap
+%files -n ea-mod_log_config -f files.log_config
+%files -n ea-mod_log_debug -f files.log_debug
+%files -n ea-mod_log_forensic -f files.log_forensic
+%{_sbindir}/check_forensic
+%files -n ea-mod_logio -f files.logio
 %files -n ea-mod_mime_magic -f files.mime_magic
 %files -n ea-mod_proxy -f files.proxy
 %files -n ea-mod_proxy_ajp -f files.proxy_ajp
