@@ -26,9 +26,9 @@ Source3: httpd.sysconf
 Source6: httpd.init
 
 Source10: httpd.conf
-Source14: 01-cgi.conf
 Source20: userdir.conf
 Source21: ssl.conf
+Source22: cgid.conf
 Source23: manual.conf
 
 # Documentation
@@ -189,21 +189,10 @@ a much better alternative.
 mod_auth_digest requires at least one authentication provider module,
 and one authorization provider module.
 
-%package -n ea-mod_authn_core
-Group: System Environment/Daemons
-Summary: Core authentication module for the Apache HTTP Server
-Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-
-%description -n ea-mod_authn_core
-The mod_authn_core module provides core authentication capabilities to
-allow or deny access to portions of the web site. mod_authn_core
-provides directives that are common to all authentication providers.
-
 %package -n ea-mod_authn_anon
 Group: System Environment/Daemons
 Summary: Anonymous-user authentication module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authn_core = 0:%{version}-%{release}
 Provides: ea-apache2-authn = anon
 
 %description -n ea-mod_authn_anon
@@ -223,7 +212,6 @@ independent and it allows users to share URLs.
 Group: System Environment/Daemons
 Summary: DBD-based authentication module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authn_core = 0:%{version}-%{release}
 Requires: ea-mod_dbd = 0:%{version}-%{release}
 Provides: ea-apache2-authn = dbd
 
@@ -237,7 +225,6 @@ example, mod_authn_file.
 Group: System Environment/Daemons
 Summary: DBM-based authentication module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authn_core = 0:%{version}-%{release}
 Requires: ea-mod_dbd = 0:%{version}-%{release}
 Provides: ea-apache2-authn = dbm
 
@@ -251,7 +238,6 @@ mod_authn_file.
 Group: System Environment/Daemons
 Summary: File-based authentication module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authn_core = 0:%{version}-%{release}
 Provides: ea-apache2-authn = file
 
 %description -n ea-mod_authn_file
@@ -263,7 +249,6 @@ users in plain text password files.
 Group: System Environment/Daemons
 Summary: Shared-memory authentication caching module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authn_core = 0:%{version}-%{release}
 Requires: ea-apache2-authn
 
 %description -n ea-mod_authn_socache
@@ -275,7 +260,6 @@ authenticated request.
 Group: System Environment/Daemons
 Summary: LDAP authentication/authorization module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authn_core = 0:%{version}-%{release}
 Requires: ea-mod_ldap = 0:%{version}-%{release}
 Provides: ea-apache2-authn = ldap, ea-apache2-authz = ldap
 
@@ -283,22 +267,10 @@ Provides: ea-apache2-authn = ldap, ea-apache2-authz = ldap
 The mod_authnz_ldap module allows authentication front-ends such as
 mod_auth_basic to authenticate users through an LDAP directory.
 
-%package -n ea-mod_authz_core
-Group: System Environment/Daemons
-Summary: Core authorization module for the Apache HTTP Server
-Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-
-%description -n ea-mod_authz_core
-The mod_authz_core module provides core authorization capabilities so
-that authenticated users can be allowed or denied access to portions
-of the web site. mod_authz_core provides the functionality to register
-various authorization providers.
-
 %package -n ea-mod_authz_dbd
 Group: System Environment/Daemons
 Summary: DBD-based group authorization module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authz_core = 0:%{version}-%{release}
 Requires: ea-mod_dbd = 0:%{version}-%{release}
 Provides: ea-apache2-authz = dbd
 
@@ -314,7 +286,6 @@ of a group.
 Group: System Environment/Daemons
 Summary: DBM-based group authorization module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authz_core = 0:%{version}-%{release}
 Provides: ea-apache2-authz = dbm
 
 %description -n ea-mod_authz_dbm
@@ -327,7 +298,6 @@ mod_authz_groupfile.
 Group: System Environment/Daemons
 Summary: File-based group authorization module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authz_core = 0:%{version}-%{release}
 Provides: ea-apache2-authz = groupfile
 
 %description -n ea-mod_authz_groupfile
@@ -340,7 +310,6 @@ by mod_authz_dbm.
 Group: System Environment/Daemons
 Summary: Host-based authorization module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authz_core = 0:%{version}-%{release}
 Provides: ea-apache2-authz = host
 
 %description -n ea-mod_authz_host
@@ -354,7 +323,6 @@ controlled based on the client hostname or IP address.
 Group: System Environment/Daemons
 Summary: Ownership-based authorization module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authz_core = 0:%{version}-%{release}
 Provides: ea-apache2-authz = owner
 
 %description -n ea-mod_authz_owner
@@ -368,7 +336,6 @@ authentication module, such as mod_auth_basic or mod_auth_digest.
 Group: System Environment/Daemons
 Summary: Ownership-based authorization module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_authz_core = 0:%{version}-%{release}
 Provides: ea-apache2-authz = user
 
 %description -n ea-mod_authz_user
@@ -377,6 +344,30 @@ authenticated users can be allowed or denied access to portions of the
 web site. mod_authz_user grants access if the authenticated user is
 listed in a Require user directive. Alternatively Require valid-user
 can be used to grant access to all successfully authenticated users.
+
+%package -n ea-mod_cgi
+Group: System Environment/Daemons
+Summary: CGI module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-apache2-mpm = forked
+Conflicts: ea-mod_cgid
+
+%description -n ea-mod_cgi
+The mod_cgi module adds a handler for executing CGI scripts. This
+module is meant for a forked MPM; for threaded MPMs, mod_cgid should
+be used.
+
+%package -n ea-mod_cgid
+Group: System Environment/Daemons
+Summary: CGI module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+Requires: ea-apache2-mpm = threaded
+Conflicts: ea-mod_cgi
+
+%description -n ea-mod_cgid
+The mod_cgid module adds a handler for executing CGI scripts. This
+module is meant for threaded MPMs; for forked MPMs, mod_cgi should be
+used.
 
 %package -n ea-mod_charset_lite
 Group: System Environment/Daemons
@@ -1022,12 +1013,8 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
       $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
-for f in 01-cgi.conf ; do
-  install -m 644 -p $RPM_SOURCE_DIR/$f \
-        $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/$f
-done
 
-for f in ssl.conf manual.conf userdir.conf; do
+for f in cgid.conf ssl.conf manual.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
@@ -1148,10 +1135,20 @@ EOF
 EOF
 done
 
-# Modules we're not splitting out... yet
-  #cgi cgid \
+for mod in cgi cgid
+do
+    printf -v modname "005_mod_%s.conf" $mod
+    cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
+# Enable mod_${mod}
+LoadModule ${mod}_module modules/mod_${mod}.so
+EOF
+    cat > files.${mod} <<EOF
+%attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
+EOF
+done
 
-modnum=5
+modnum=10
 
 for mod in \
   access_compat actions alias allowmethods asis auth_basic auth_digest \
@@ -1197,8 +1194,8 @@ cat files.session_cookie files.session_dbd files.auth_form \
 
 # The rest of the modules, into the main list
 cat files.access_compat files.actions files.alias files.allowmethods \
-  files.autoindex files.buffer files.cache \
-  files.cache_disk files.cache_socache \
+  files.authn_core files.authz_core files.autoindex files.buffer \
+  files.cache files.cache_disk files.cache_socache \
   files.data \
   files.dialup files.dir files.dumpio \
   files.filter \
@@ -1314,11 +1311,11 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/apache2/conf.d
 %{_sysconfdir}/apache2/conf.d/README
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/*.conf
+%exclude %{_sysconfdir}/apache2/conf.d/cgid.conf
 %exclude %{_sysconfdir}/apache2/conf.d/ssl.conf
 %exclude %{_sysconfdir}/apache2/conf.d/manual.conf
 
 %dir %{_sysconfdir}/apache2/conf.modules.d
-%config(noreplace) %{_sysconfdir}/apache2/conf.modules.d/01-cgi.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
 
@@ -1374,20 +1371,21 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_asis -f files.asis
 %files -n ea-mod_auth_basic -f files.auth_basic
 %files -n ea-mod_auth_digest -f files.auth_digest
-%files -n ea-mod_authn_core -f files.authn_core
 %files -n ea-mod_authn_anon -f files.authn_anon
 %files -n ea-mod_authn_dbd -f files.authn_dbd
 %files -n ea-mod_authn_dbm -f files.authn_dbm
 %files -n ea-mod_authn_file -f files.authn_file
 %files -n ea-mod_authn_socache -f files.authn_socache
 %files -n ea-mod_authnz_ldap -f files.authnz_ldap
-%files -n ea-mod_authz_core -f files.authz_core
 %files -n ea-mod_authz_dbd -f files.authz_dbd
 %files -n ea-mod_authz_dbm -f files.authz_dbm
 %files -n ea-mod_authz_groupfile -f files.authz_groupfile
 %files -n ea-mod_authz_host -f files.authz_host
 %files -n ea-mod_authz_owner -f files.authz_owner
 %files -n ea-mod_authz_user -f files.authz_user
+%files -n ea-mod_cgi -f files.cgi
+%files -n ea-mod_cgid -f files.cgid
+%config(noreplace) %{_sysconfdir}/apache2/conf.d/cgid.conf
 %files -n ea-mod_charset_lite -f files.charset_lite
 %files -n ea-mod_dav -f files.dav
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
