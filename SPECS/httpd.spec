@@ -65,7 +65,7 @@ BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 Requires: /etc/mime.types, system-logos >= 7.92.1-1, apr >= 1.5.0
-Requires: ea-apache2-mpm
+Requires: ea-apache2-mpm, ea-apache2-cgi
 Obsoletes: httpd-suexec
 Conflicts: webserver
 Provides: ea-webserver
@@ -146,6 +146,15 @@ Conflicts: ea-mod_mpm_event, ea-mod_mpm_prefork, ea-mod_mpm_itk
 %description -n ea-mod_mpm_worker
 The Worker MPM provides a threaded worker model.
 
+%package -n ea-mod_allowmethods
+Group: System Environment/Daemons
+Summary: HTTP request method restriction module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_allowmethods
+The mod_allowmethods module makes it easy to restrict what HTTP
+methods can used on an server.
+
 %package -n ea-mod_asis
 Group: System Environment/Daemons
 Summary: As-is provider module for the Apache HTTP Server
@@ -155,20 +164,6 @@ Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 The mod_asis module provides the handler send-as-is which causes
 Apache HTTP Server to send the document without adding most of the
 usual HTTP headers.
-
-%package -n ea-mod_auth_basic
-Group: System Environment/Daemons
-Summary: HTTP Basic Authentication module for the Apache HTTP Server
-Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-apache2-authn, ea-apache2-authz
-
-%description -n ea-mod_auth_basic
-The mod_auth_basic module allows the use of HTTP Basic Authentication
-to restrict access by looking up users in the given providers. HTTP
-Digest Authentication is provided by mod_auth_digest.
-
-mod_auth_basic requires at least one authentication provider module,
-and one authorization provider module.
 
 %package -n ea-mod_auth_digest
 Group: System Environment/Daemons
@@ -234,17 +229,6 @@ mod_auth_digest and mod_auth_basic to authenticate users by looking up
 users in dbm password files. Similar functionality is provided by
 mod_authn_file.
 
-%package -n ea-mod_authn_file
-Group: System Environment/Daemons
-Summary: File-based authentication module for the Apache HTTP Server
-Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Provides: ea-apache2-authn = file
-
-%description -n ea-mod_authn_file
-The mod_authn_file module provides authentication front-ends such as
-mod_auth_digest and mod_auth_basic to authenticate users by looking up
-users in plain text password files.
-
 %package -n ea-mod_authn_socache
 Group: System Environment/Daemons
 Summary: Shared-memory authentication caching module for the Apache HTTP Server
@@ -294,31 +278,6 @@ authenticated users can be allowed or denied access to portions of the
 web site by group membership. Similar functionality is provided by
 mod_authz_groupfile.
 
-%package -n ea-mod_authz_groupfile
-Group: System Environment/Daemons
-Summary: File-based group authorization module for the Apache HTTP Server
-Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Provides: ea-apache2-authz = groupfile
-
-%description -n ea-mod_authz_groupfile
-The mod_authz_groupfile module provides authorization capabilities so
-that authenticated users can be allowed or denied access to portions
-of the web site by group membership. Similar functionality is provided
-by mod_authz_dbm.
-
-%package -n ea-mod_authz_host
-Group: System Environment/Daemons
-Summary: Host-based authorization module for the Apache HTTP Server
-Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Provides: ea-apache2-authz = host
-
-%description -n ea-mod_authz_host
-The mod_authz_host module registers authorization providers to the
-Require directive. The directive can be referenced within a
-<Directory>, <Files>, or <Location> section as well as .htaccess files
-to control access to particular parts of the server. Access can be
-controlled based on the client hostname or IP address.
-
 %package -n ea-mod_authz_owner
 Group: System Environment/Daemons
 Summary: Ownership-based authorization module for the Apache HTTP Server
@@ -332,18 +291,27 @@ file-system owner or group of the requested file. The supplied
 username and password must be already properly verified by an
 authentication module, such as mod_auth_basic or mod_auth_digest.
 
-%package -n ea-mod_authz_user
+%package -n ea-mod_buffer
 Group: System Environment/Daemons
-Summary: Ownership-based authorization module for the Apache HTTP Server
+Summary: Request buffering module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Provides: ea-apache2-authz = user
 
-%description -n ea-mod_authz_user
-The mod_authz_user module provides authorization capabilities so that
-authenticated users can be allowed or denied access to portions of the
-web site. mod_authz_user grants access if the authenticated user is
-listed in a Require user directive. Alternatively Require valid-user
-can be used to grant access to all successfully authenticated users.
+%description -n ea-mod_buffer
+The mod_buffer module provides the ability to buffer the input and
+output filter stacks.
+
+Under certain circumstances, content generators might create content
+in small chunks. In order to promote memory reuse, in memory chunks
+are always 8k in size, regardless of the size of the chunk
+itself. When many small chunks are generated by a request, this can
+create a large memory footprint while the request is being processed,
+and an unnecessarily large amount of data on the wire. The addition of
+a buffer collapses the response into the fewest chunks possible.
+
+When httpd is used in front of an expensive content generator,
+buffering the response may allow the backend to complete processing
+and release resources sooner, depending on how the backend is
+designed.
 
 %package -n ea-mod_cache
 Group: System Environment/Daemons
@@ -426,6 +394,7 @@ Summary: CGI module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 Requires: ea-apache2-mpm = forked
 Conflicts: ea-mod_cgid
+Provides: ea-apache2-cgi
 
 %description -n ea-mod_cgi
 The mod_cgi module adds a handler for executing CGI scripts. This
@@ -438,6 +407,7 @@ Summary: CGI module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 Requires: ea-apache2-mpm = threaded
 Conflicts: ea-mod_cgi
+Provides: ea-apache2-cgi
 
 %description -n ea-mod_cgid
 The mod_cgid module adds a handler for executing CGI scripts. This
@@ -452,6 +422,21 @@ Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 %description -n ea-mod_charset_lite
 The mod_charset_lite module allows the server to change the character
 set of responses before sending them to the client.
+
+%package -n ea-mod_data
+Group: System Environment/Daemons
+Summary: RFC2379 data URL generation module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_data
+The mod_data module provides the ability to convert a response into an
+RFC2397 data URL.
+
+Data URLs can be embedded inline within web pages using something like
+the mod_include module, to remove the need for clients to make
+separate connections to fetch what may potentially be many small
+images. Data URLs may also be included into pages generated by
+scripting languages such as PHP.
 
 %package -n ea-mod_dav
 Group: System Environment/Daemons
@@ -507,6 +492,30 @@ Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 The mod_deflate module provides the DEFLATE output filter that allows
 output from your server to be compressed before being sent to the
 client over the network.
+
+%package -n ea-mod_dialup
+Group: System Environment/Daemons
+Summary: Bandwidth rate limiting module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_dialup
+It is a module that sends static content at a bandwidth rate limit,
+defined by the various old modem standards.
+
+%package -n ea-mod_dumpio
+Group: System Environment/Daemons
+Summary: Debug logging module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_dumpio
+The mod_dumpio module allows for the logging of all input received by
+Apache and/or all output sent by Apache to be logged (dumped) to the
+error.log file.
+
+The data logging is done right after SSL decoding (for input) and
+right before SSL encoding (for output). As can be expected, this can
+produce extreme volumes of data, and should only be used when
+debugging problems.
 
 %package -n ea-mod_env
 Group: System Environment/Daemons
@@ -691,18 +700,6 @@ relying on backend connections to LDAP servers. In addition to the
 functions provided by the standard LDAP libraries, this module adds an
 LDAP connection pool and an LDAP shared memory cache.
 
-%package -n ea-mod_log_config
-Group: System Environment/Daemons
-Summary: Log configuration module for the Apache HTTP Server
-Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-
-%description -n ea-mod_log_config
-The mod_log_config module provides for flexible logging of client
-requests. Logs are written in a customizable format, and may be
-written directly to a file, or to an external program. Conditional
-logging is provided so that individual requests may be included or
-excluded from the logs based on characteristics of the request.
-
 %package -n ea-mod_log_debug
 Group: System Environment/Daemons
 Summary: Debug logging module for the Apache HTTP Server
@@ -732,19 +729,30 @@ logger is very strict, which means:
 The check_forensic script may be helpful in evaluating the forensic
 log output.
 
-%package -n ea-mod_logio
+%package -n ea-mod_lua
 Group: System Environment/Daemons
-Summary: I/O bandwidth logging module for the Apache HTTP Server
+Summary: Lua language extension module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_log_config = 0:%{version}-%{release}
 
-%description -n ea-mod_logio
-The mod_logio module provides the logging of input and output number
-of bytes received/sent per request. The numbers reflect the actual
-bytes as received on the network, which then takes into account the
-headers and bodies of requests and responses. The counting is done
-before SSL/TLS on input and after SSL/TLS on output, so the numbers
-will correctly reflect any changes made by encryption.
+%description -n ea-mod_lua
+The mod_lua module allows the server to be extended with scripts
+written in the Lua programming language. The extension points (hooks)
+available with mod_lua include many of the hooks available to natively
+compiled Apache HTTP Server modules, such as mapping requests to
+files, generating dynamic responses, access control, authentication,
+and authorization
+
+%package -n ea-mod_macro
+Group: System Environment/Daemons
+Summary: Configuration macro module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_macro
+The mod_macro module provides macros within Apache httpd runtime
+configuration files, to ease the process of creating numerous similar
+configuration blocks. When the server starts up, the macros are
+expanded using the provided parameters, and the result is processed as
+along with the rest of the configuration file.
 
 %package -n ea-mod_mime_magic
 Group: System Environment/Daemons
@@ -914,6 +922,95 @@ The mod_proxy_wstunnel module provides support for the tunnelling of
 web socket connections to a backend websockets server. The connection
 is automagically upgraded to a websocket connection.
 
+%package -n ea-mod_ratelimit
+Group: System Environment/Daemons
+Summary: Client bandwidth limiting module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_ratelimit
+The mod_ratelimit module provides a filter named RATE_LIMIT to limit
+client bandwidth. The connection speed to be simulated is specified,
+in KiB/s, using the environment variable rate-limit.
+
+%package -n ea-mod_reflector
+Group: System Environment/Daemons
+Summary: Filter-as-service module for the Apache HTTP server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_reflector
+The mod_reflector module allows request bodies to be reflected back to
+the client, in the process passing the request through the output
+filter stack. A suitably configured chain of filters can be used to
+transform the request into a response. This module can be used to turn
+an output filter into an HTTP service.
+
+%package -n ea-mod_remoteip
+Group: System Environment/Daemons
+Summary: IP replacement module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_remoteip
+The mod_remoteip module is used to treat the useragent which initiated
+the request as the originating useragent as identified by httpd for
+the purposes of authorization and logging, even where that useragent
+is behind a load balancer, front end server, or proxy server.
+
+The module overrides the client IP address for the connection with the
+useragent IP address reported in the request header configured with
+the RemoteIPHeader directive.
+
+Once replaced as instructed, this overridden useragent IP address is
+then used for the mod_authz_host Require ip feature, is reported by
+mod_status, and is recorded by mod_log_config %a and core %a format
+strings. The underlying client IP of the connection is available in
+the %{c}a format string.
+
+%package -n ea-mod_reqtimeout
+Group: System Environment/Daemons
+Summary: Request timeout module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_reqtimeout
+The mod_reqtimeout module can set various timeouts for receiving the
+request headers and the request body from the client. If the client
+fails to send headers or body within the configured time, a 408
+REQUEST TIME OUT error is sent.
+
+%package -n ea-mod_request
+Group: System Environment/Daemons
+Summary: Request body retention module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_request
+The mod_request module makes request bodies available to applications,
+where they may normally be discarded, i.e. during GET requests.
+
+%package -n ea-mod_sed
+Group: System Environment/Daemons
+Summary: Regex replacement content filter module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_sed
+The mod_sed module is an in-process content filter. The mod_sed filter
+implements the sed editing commands implemented by the Solaris 10 sed
+program as described in the manual page. However, unlike sed, mod_sed
+does not take data from standard input. Instead, the filter acts on
+the entity data sent between client and server. mod_sed can be used as
+an input or output filter. mod_sed is a content filter, which means
+that it cannot be used to modify client or server http headers.
+
+The mod_sed output filter accepts a chunk of data, executes the sed
+scripts on the data, and generates the output which is passed to the
+next filter in the chain.
+
+The mod_sed input filter reads the data from the next filter in the
+chain, executes the sed scripts, and returns the generated data to the
+caller filter in the filter chain.
+
+Both the input and output filters only process the data if newline
+characters are seen in the content. At the end of the data, the rest
+of the data is treated as the last line.
+
 %package -n ea-mod_session
 Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
@@ -922,6 +1019,25 @@ Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 %description -n ea-mod_session
 The mod_session module and associated backends provide an abstract
 interface for storing and accessing per-user session data.
+
+%package -n ea-mod_slotmem_plain
+Group: System Environment/Daemons
+Summary: Slot-based memory module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_slotmem_plain
+The mod_slotmem_plain module provides for creation and access to a
+plain memory segment in which the datasets are organized in "slots."
+
+%package -n ea-mod_socache_memcache
+Group: System Environment/Daemons
+Summary: Memcache-based object cache module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_socache_memcache
+The mod_socache_memcache module is a shared object cache provider
+which provides for creation and access to a cache backed by the
+memcached high-performance, distributed memory object caching system.
 
 %package -n ea-mod_speling
 Group: System Environment/Daemons
@@ -954,37 +1070,14 @@ The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
-%package -n ea-mod_status
+%package -n ea-mod_substitute
 Group: System Environment/Daemons
-Summary: Server activity/performance module for the Apache HTTP Server
+Summary: Response body substitution module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 
-%description -n ea-mod_status
-The mod_status module allows a server administrator to find out how
-well their server is performing. A HTML page is presented that gives
-the current server statistics in an easily readable form. If required
-this page can be made to automatically refresh (given a compatible
-browser). Another page gives a simple machine-readable list of the
-current server state.
-
-The details given are:
-
-  - The number of worker serving requests
-  - The number of idle worker
-  - The status of each worker, the number of requests that worker has
-    performed and the total number of bytes served by the worker (*)
-  - A total number of accesses and byte count served (*)
-  - The time the server was started/restarted and the time it has been
-    running for
-  - Averages giving the number of requests per second, the number of
-    bytes served per second and the average number of bytes per
-    request (*)
-  - The current percentage CPU used by each worker and in total by all
-    workers combined (*)
-  - The current hosts and requests being processed (*)
-
-The lines marked "(*)" are only available if ExtendedStatus is On. In
-version 2.3.6+, ExtendedStatus is On by default.
+%description -n ea-mod_substitute
+The mod_substitute module provides a mechanism to perform both regular
+expression and fixed string substitutions on response bodies.
 
 %package -n ea-mod_suexec
 Group: System Environment/Daemons
@@ -1016,6 +1109,30 @@ Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 %description -n ea-mod_usertrack
 The mod_usertrack module provides tracking of a users through websites
 via browser cookies.
+
+%package -n ea-mod_version
+Group: System Environment/Daemons
+Summary: Version comparing module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_version
+The mod_version module is designed for the use in test suites and
+large networks which have to deal with different httpd versions and
+different configurations. It provides a new container -- <IfVersion>,
+which allows a flexible version checking including numeric comparisons
+and regular expressions.
+
+%package -n ea-mod_vhost_alias
+Group: System Environment/Daemons
+Summary: Dynamic mass virtual hosting module for the Apache HTTP Server
+Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
+
+%description -n ea-mod_vhost_alias
+The mod_vhost_alias module creates dynamically configured virtual
+hosts, by allowing the IP address and/or the Host: header of the HTTP
+request to be used as part of the pathname to determine what files to
+serve. This allows for easy use of a huge number of virtual hosts with
+similar configurations.
 
 %package -n ea-mod_watchdog
 Group: System Environment/Daemons
@@ -1328,20 +1445,14 @@ cat files.session_cookie files.session_dbd files.auth_form \
   files.session_crypto >> files.session
 
 # The rest of the modules, into the main list
-cat files.access_compat files.actions files.alias files.allowmethods \
-  files.authn_core files.authz_core files.autoindex files.buffer \
-  files.data \
-  files.dialup files.dir files.dumpio \
-  files.filter \
-  files.include \
-  files.info files.lua files.macro files.mime \
-  files.negotiation \
-  files.ratelimit files.reflector \
-  files.remoteip files.reqtimeout files.request files.rewrite files.sed \
-  files.setenvif files.slotmem_plain files.slotmem_shm files.socache_dbm \
-  files.socache_memcache files.socache_shmcb \
-  files.substitute files.unixd \
-  files.userdir files.version files.vhost_alias > files.httpd
+cat files.access_compat files.actions files.alias files.auth_basic \
+  files.authn_core files.authn_file files.authz_core \
+  files.authz_groupfile files.authz_host files.authz_user \
+  files.autoindex files.dir files.filter files.include files.info \
+  files.log_config files.logio files.mime files.negotiation \
+  files.rewrite files.setenvif files.slotmem_shm files.socache_dbm \
+  files.socache_shmcb files.status files.unixd \
+  files.userdir > files.httpd
 
 # Remove unpackaged files
 rm -vf \
@@ -1501,34 +1612,35 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_mpm_prefork -f files.mpm_prefork
 %files -n ea-mod_mpm_worker -f files.mpm_worker
 
+%files -n ea-mod_cgi -f files.cgi
+%files -n ea-mod_cgid -f files.cgid
+%config(noreplace) %{_sysconfdir}/apache2/conf.d/cgid.conf
+
+%files -n ea-mod_allowmethods -f files.allowmethods
 %files -n ea-mod_asis -f files.asis
-%files -n ea-mod_auth_basic -f files.auth_basic
 %files -n ea-mod_auth_digest -f files.auth_digest
 %files -n ea-mod_authn_anon -f files.authn_anon
 %files -n ea-mod_authn_dbd -f files.authn_dbd
 %files -n ea-mod_authn_dbm -f files.authn_dbm
-%files -n ea-mod_authn_file -f files.authn_file
 %files -n ea-mod_authn_socache -f files.authn_socache
 %files -n ea-mod_authnz_ldap -f files.authnz_ldap
 %files -n ea-mod_authz_dbd -f files.authz_dbd
 %files -n ea-mod_authz_dbm -f files.authz_dbm
-%files -n ea-mod_authz_groupfile -f files.authz_groupfile
-%files -n ea-mod_authz_host -f files.authz_host
 %files -n ea-mod_authz_owner -f files.authz_owner
-%files -n ea-mod_authz_user -f files.authz_user
+%files -n ea-mod_buffer -f files.buffer
 %files -n ea-mod_cache -f files.cache
 %files -n ea-mod_cache_disk -f files.cache_disk
 %files -n ea-mod_cache_socache -f files.cache_socache
-%files -n ea-mod_cgi -f files.cgi
-%files -n ea-mod_cgid -f files.cgid
-%config(noreplace) %{_sysconfdir}/apache2/conf.d/cgid.conf
 %files -n ea-mod_charset_lite -f files.charset_lite
+%files -n ea-mod_data -f files.data
 %files -n ea-mod_dav -f files.dav
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
 %files -n ea-mod_dav_fs -f files.dav_fs
 %files -n ea-mod_dav_lock -f files.dav_lock
 %files -n ea-mod_dbd -f files.dbd
 %files -n ea-mod_deflate -f files.deflate
+%files -n ea-mod_dialup -f files.dialup
+%files -n ea-mod_dumpio -f files.dumpio
 %files -n ea-mod_env -f files.env
 %files -n ea-mod_expires -f files.expires
 %files -n ea-mod_ext_filter -f files.ext_filter
@@ -1542,11 +1654,11 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_lbmethod_bytraffic -f files.lbmethod_bytraffic
 %files -n ea-mod_lbmethod_heartbeat -f files.lbmethod_heartbeat
 %files -n ea-mod_ldap -f files.ldap
-%files -n ea-mod_log_config -f files.log_config
 %files -n ea-mod_log_debug -f files.log_debug
 %files -n ea-mod_log_forensic -f files.log_forensic
 %{_sbindir}/check_forensic
-%files -n ea-mod_logio -f files.logio
+%files -n ea-mod_lua -f files.lua
+%files -n ea-mod_macro -f files.macro
 %files -n ea-mod_mime_magic -f files.mime_magic
 %files -n ea-mod_proxy -f files.proxy
 %files -n ea-mod_proxy_ajp -f files.proxy_ajp
@@ -1561,15 +1673,25 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_proxy_http -f files.proxy_http
 %files -n ea-mod_proxy_scgi -f files.proxy_scgi
 %files -n ea-mod_proxy_wstunnel -f files.proxy_wstunnel
+%files -n ea-mod_ratelimit -f files.ratelimit
+%files -n ea-mod_reflector -f files.reflector
+%files -n ea-mod_remoteip -f files.remoteip
+%files -n ea-mod_reqtimeout -f files.reqtimeout
+%files -n ea-mod_request -f files.request
+%files -n ea-mod_sed -f files.sed
 %files -n ea-mod_session -f files.session
+%files -n ea-mod_slotmem_plain -f files.slotmem_plain
+%files -n ea-mod_socache_memcache -f files.socache_memcache
 %files -n ea-mod_speling -f files.speling
 %files -n ea-mod_ssl -f files.ssl
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/ssl.conf
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
-%files -n ea-mod_status -f files.status
+%files -n ea-mod_substitute -f files.substitute
 %files -n ea-mod_suexec -f files.suexec
 %files -n ea-mod_unique_id -f files.unique_id
 %files -n ea-mod_usertrack -f files.usertrack
+%files -n ea-mod_version -f files.version
+%files -n ea-mod_vhost_alias -f files.vhost_alias
 %files -n ea-mod_watchdog -f files.watchdog
 
 %files devel
