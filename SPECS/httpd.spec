@@ -587,7 +587,6 @@ removed.
 Group: System Environment/Daemons
 Summary: Status reporting module for the Apache HTTP server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_status = 0:%{version}-%{release}
 Requires: ea-mod_watchdog = 0:%{version}-%{release}
 
 %description -n ea-mod_heartbeat
@@ -604,7 +603,6 @@ requests through the proxy server(s).
 Group: System Environment/Daemons
 Summary: Heartbeat monitoring module for the Apache HTTP server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: ea-mod_status = 0:%{version}-%{release}
 Requires: ea-mod_watchdog = 0:%{version}-%{release}
 
 %description -n ea-mod_heartmonitor
@@ -881,8 +879,7 @@ Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
 Requires: ea-mod_proxy = 0:%{version}-%{release}
 BuildRequires: libxml2-devel
-Epoch: 1
-Obsoletes: mod_proxy_html < 1:2.4.1-2
+Obsoletes: mod_proxy_html
 
 %description -n ea-mod_proxy_html
 The mod_proxy_html and mod_xml2enc modules provide filters which can
@@ -1058,7 +1055,6 @@ names which were matched using this strategy.
 %package -n ea-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
-Epoch: 1
 BuildRequires: openssl-devel
 Requires(post): openssl, /bin/cat
 Requires(pre): ea-apache2
@@ -1705,6 +1701,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Mar 11 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-2.el6.cpanel.1
+- Split many modules out into their own packages
+- Set dependencies between packages where needed
+
 * Fri Feb 27 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-1.el6.cpanel.1
 - Upgrade to 2.4.12
 - Remove inappropriate or already-applied patches
