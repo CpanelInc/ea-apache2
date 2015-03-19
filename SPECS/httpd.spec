@@ -27,7 +27,7 @@ Source6: httpd.init
 
 Source10: httpd.conf
 Source20: userdir.conf
-Source21: ssl.conf
+Source21: cp-ssl.conf
 Source22: cgid.conf
 Source23: manual.conf
 
@@ -66,6 +66,7 @@ BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 Requires: /etc/mime.types, system-logos >= 7.92.1-1, apr >= 1.5.0
 Requires: ea-apache2-mpm, ea-apache2-cgi
+Requires: ea-mod_ssl
 Obsoletes: httpd-suexec
 Conflicts: webserver
 Provides: ea-webserver
@@ -1260,7 +1261,7 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
-for f in cgid.conf ssl.conf manual.conf userdir.conf; do
+for f in cgid.conf cp-ssl.conf manual.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
@@ -1552,7 +1553,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/apache2/conf.d/README
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/*.conf
 %exclude %{_sysconfdir}/apache2/conf.d/cgid.conf
-%exclude %{_sysconfdir}/apache2/conf.d/ssl.conf
+%exclude %{_sysconfdir}/apache2/conf.d/cp-ssl.conf
 %exclude %{_sysconfdir}/apache2/conf.d/manual.conf
 
 %dir %{_sysconfdir}/apache2/conf.modules.d
@@ -1680,7 +1681,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-mod_socache_memcache -f files.socache_memcache
 %files -n ea-mod_speling -f files.speling
 %files -n ea-mod_ssl -f files.ssl
-%config(noreplace) %{_sysconfdir}/apache2/conf.d/ssl.conf
+%config(noreplace) %{_sysconfdir}/apache2/conf.d/cp-ssl.conf
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
 %files -n ea-mod_substitute -f files.substitute
 %files -n ea-mod_suexec -f files.suexec
