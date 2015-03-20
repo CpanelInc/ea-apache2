@@ -1,29 +1,7 @@
-From 092b0f0cf557158a8cbfb8ea5023acccc2572152 Mon Sep 17 00:00:00 2001
-From: Kevin Shaum <kevin.shaum@cpanel.net>
-Date: Mon, 22 Jul 2013 13:22:05 -0500
-Subject: [PATCH] 2.2.17_cpanel_suexec_script_share
-
-cpanel-specific patch that adds a feature which makes it possible to run
-"shared" scripts. Suppose you are a systems admin for large hosting
-provider and you want to offer your customers some standard scripts.
-The scripts would normally cause a security violation because the
-uid of the process varies from the uid owner of the script.
-
-This patch makes it possible to "trust" a certain user/group. Look below
-to define the user/group ID.
-
-The most specific use of this script is, cgi-sys/universal-redirect.cgi
-in cPanel/WHM.
----
- support/suexec.c | 39 ++++++++++++++++++++++++++++++---------
- support/suexec.h | 23 +++++++++++++++++++++++
- 2 files changed, 53 insertions(+), 9 deletions(-)
-
-diff --git a/support/suexec.c b/support/suexec.c
-index 2817125..78a2741 100644
---- a/support/suexec.c
-+++ b/support/suexec.c
-@@ -128,11 +128,11 @@ static const char *const safe_env_lst[] =
+diff -rup httpd-2.4.12-orig/support/suexec.c httpd-2.4.12/support/suexec.c
+--- httpd-2.4.12-orig/support/suexec.c	2015-03-19 17:24:52.960002258 -0500
++++ httpd-2.4.12/support/suexec.c	2015-03-20 09:21:14.620002278 -0500
+@@ -145,11 +145,11 @@ static const char *const safe_env_lst[] 
      NULL
  };
  
@@ -38,51 +16,56 @@ index 2817125..78a2741 100644
      __attribute__((format(printf,2,0)));
  
  static void err_output(int is_error, const char *fmt, va_list ap)
-@@ -573,12 +573,33 @@ int main(int argc, char *argv[])
+@@ -546,7 +546,12 @@ int main(int argc, char *argv[])
+         }
+     }
+ 
+-    if ((strncmp(cwd, dwd, strlen(dwd))) != 0) {
++    /*
++     * If it's not in a docroot or cPanel-approved directories, error out.
++     */
++    if ((strncmp(cwd, dwd, strlen(dwd))) != 0 &&
++        (strncmp(cwd, "/usr/local/cpanel/cgi-sys", 25)) != 0 &&
++        (strncmp(cwd, "/usr/local/bandmin", 18)) != 0) {
+         log_err("command not in docroot (%s/%s)\n", cwd, cmd);
+         exit(114);
+     }
+@@ -599,12 +604,31 @@ int main(int argc, char *argv[])
          (gid != dir_info.st_gid) ||
          (uid != prg_info.st_uid) ||
          (gid != prg_info.st_gid)) {
--        log_err("target uid/gid (%lu/%lu) mismatch "
--                "with directory (%lu/%lu) or program (%lu/%lu)\n",
--                (unsigned long)uid, (unsigned long)gid,
--                (unsigned long)dir_info.st_uid, (unsigned long)dir_info.st_gid,
--                (unsigned long)prg_info.st_uid, (unsigned long)prg_info.st_gid);
--        exit(120);
-+           /* <--- begin changed code ap1 suexec_standard.patch --->
-+            *
-+            * This patch adds a possibility to use "shared" scripts on a
-+            * shared webhosting box.
-+            */
 +#ifdef TRUSTED_USERS_SCRIPTS
-+       if ((atoi(SUEXEC_TRUSTED_USER) != prg_info.st_uid) ||
-+           (atoi(SUEXEC_TRUSTED_GROUP) != prg_info.st_gid) || ((strncmp(cwd, "/usr/local/cpanel/cgi-sys/", 26) != 0) && (strncmp(cwd, "/usr/local/bandmin/", 19) != 0) )) {
-+
-+          log_err("error: target uid/gid (%ld/%ld) mismatch "
-+                  "with directory (%ld/%ld) or program (%ld/%ld) or trusted user (%d/%d)\n",
-+                  uid, gid,
-+                  dir_info.st_uid, dir_info.st_gid,
-+                  prg_info.st_uid, prg_info.st_gid, atoi(SUEXEC_TRUSTED_USER), atoi(SUEXEC_TRUSTED_GROUP));
-+          exit(120);
-+       }
++        /*
++         * Check if we're using a "shared" script
++         */
++        if ((SUEXEC_TRUSTED_USER != prg_info.st_uid) ||
++            (SUEXEC_TRUSTED_GROUP != prg_info.st_gid) ||
++            ((strncmp(cwd, "/usr/local/cpanel/cgi-sys", 25) != 0) &&
++             (strncmp(cwd, "/usr/local/bandmin", 18) != 0) )) {
++            log_err("error: target uid/gid (%ld/%ld) mismatch "
++                    "with directory (%ld/%ld) or program (%ld/%ld) "
++                    "or trusted user (%d/%d)\n",
++                    uid, gid,
++                    dir_info.st_uid, dir_info.st_gid,
++                    prg_info.st_uid, prg_info.st_gid,
++                    SUEXEC_TRUSTED_USER, SUEXEC_TRUSTED_GROUP);
++            exit(120);
++        }
 +#else
-+       log_err("target uid/gid (%lu/%lu) mismatch "
-+               "with directory (%lu/%lu) or program (%lu/%lu)\n",
-+               (unsigned long)uid, (unsigned long)gid,
-+               (unsigned long)dir_info.st_uid, (unsigned long)dir_info.st_gid,
-+               (unsigned long)prg_info.st_uid, (unsigned long)prg_info.st_gid);
-+       exit(120);
+         log_err("target uid/gid (%lu/%lu) mismatch "
+                 "with directory (%lu/%lu) or program (%lu/%lu)\n",
+                 (unsigned long)uid, (unsigned long)gid,
+                 (unsigned long)dir_info.st_uid, (unsigned long)dir_info.st_gid,
+                 (unsigned long)prg_info.st_uid, (unsigned long)prg_info.st_gid);
+         exit(120);
 +#endif
-+       /*
-+        * end changed code
-+        */
      }
      /*
       * Error out if the program is not executable for the user.
-diff --git a/support/suexec.h b/support/suexec.h
-index 07bb7bb..14d21e0 100644
---- a/support/suexec.h
-+++ b/support/suexec.h
-@@ -40,6 +40,29 @@
+diff -rup httpd-2.4.12-orig/support/suexec.h httpd-2.4.12/support/suexec.h
+--- httpd-2.4.12-orig/support/suexec.h	2011-09-23 08:38:09.000000000 -0500
++++ httpd-2.4.12/support/suexec.h	2015-03-20 09:04:07.577002460 -0500
+@@ -40,6 +40,27 @@
  #endif
  
  /*
@@ -97,21 +80,16 @@ index 07bb7bb..14d21e0 100644
 + * define the user/group ID.
 + *
 + * Uncomment the define to make it actually happen.
-+ *
-+ * patch added as ap1 suexec_standard.patch clone
 + */
 +
 +#define TRUSTED_USERS_SCRIPTS
 +
 +#ifdef TRUSTED_USERS_SCRIPTS
-+#define SUEXEC_TRUSTED_USER "0"
-+#define SUEXEC_TRUSTED_GROUP "10"
++#define SUEXEC_TRUSTED_USER   0
++#define SUEXEC_TRUSTED_GROUP  10
 +#endif
 +
 +/*
   * UID_MIN -- Define this as the lowest UID allowed to be a target user
   *            for suEXEC.  For most systems, 500 or 100 is common.
   */
--- 
-2.2.0
-
