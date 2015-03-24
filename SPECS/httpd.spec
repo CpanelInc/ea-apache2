@@ -58,6 +58,9 @@ Patch302: 2.2.17_cpanel_suexec_script_share.patch
 Patch303: 2.2.17_cpanel_mailman_suexec.patch
 Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
 
+# Cloud Linux patches
+Patch400: httpd2-cagefs_jail.patch
+
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -1221,7 +1224,7 @@ export LYNX_PATH=/usr/bin/links
 	--enable-suexec --with-suexec \
         --enable-suexec-capabilities \
 	--with-suexec-caller=%{suexec_caller} \
-	--with-suexec-docroot=%{docroot} \
+	--with-suexec-docroot=/ \
 	--without-suexec-logfile \
         --with-suexec-syslog \
 	--with-suexec-bin=%{_sbindir}/suexec \

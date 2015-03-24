@@ -1,0 +1,52 @@
+diff -rupN ./1/Makefile.in ./2/Makefile.in
+--- ./1/Makefile.in	2011-06-17 01:16:28.000000000 -0400
++++ ./2/Makefile.in	2011-06-16 10:33:42.000000000 -0400
+@@ -60,7 +60,7 @@ checkgid: $(checkgid_OBJECTS)
+ 
+ suexec_OBJECTS = suexec.lo
+ suexec: $(suexec_OBJECTS)
+-	$(LINK) $(suexec_OBJECTS)
++	$(LINK) -ldl $(suexec_OBJECTS)
+ 
+ htcacheclean_OBJECTS = htcacheclean.lo
+ htcacheclean: $(htcacheclean_OBJECTS)
+diff -rupN ./1/suexec.c ./2/suexec.c
+--- ./1/suexec.c	2011-06-17 01:16:28.000000000 -0400
++++ ./2/suexec.c	2011-06-17 01:21:13.000000000 -0400
+@@ -55,6 +55,8 @@
+ #include <grp.h>
+ #endif
+ 
++#include <dlfcn.h>
++
+ /*
+  ***********************************************************************
+  * There is no initgroups() in QNX, so I believe this is safe :-)
+@@ -484,6 +486,27 @@ int main(int argc, char *argv[])
+         exit(108);
+     }
+ 
++#ifndef SECURELVE_MIN_UID
++#define SECURELVE_MIN_UID 100
++#endif
++    /* cagefs 2.0 suexec patch */
++    void *lib_handle;
++    lib_handle = dlopen("liblve.so.0", RTLD_LAZY);
++    if (lib_handle) {
++        char *error; char error_msg[1024];
++        dlerror();    /* Clear any existing error */
++        int (*jail)(struct passwd *, int, char*) = dlsym(lib_handle, "lve_jail_uid");
++        if ((error = dlerror()) != NULL) {
++            log_err("failed to init LVE library %s\n", error);
++            exit(130);
++        }
++        int result = jail(pw, SECURELVE_MIN_UID, error_msg);
++        if (result != 1 && result != 0) {
++            log_err("CageFS jail error %s\n", error_msg);
++            exit(131);
++        }
++    }
++
+     /*
+      * Change UID/GID here so that the following tests work over NFS.
+      *
