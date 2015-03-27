@@ -15,12 +15,11 @@
 Summary: Apache HTTP Server
 Name: ea-apache2
 Version: 2.4.12
-Release: 2%{?dist}.cpanel.1
+Release: 3%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: centos-noindex.tar.gz
-Source2: httpd.logrotate
 Source3: httpd.sysconf
 
 Source6: httpd.init
@@ -66,8 +65,8 @@ Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
-Requires: /etc/mime.types, system-logos >= 7.92.1-1, apr >= 1.5.0
+BuildRequires: ea-apr-devel >= 1.5.0, ea-apr-util-devel >= 1.2.0, pcre-devel >= 5.0
+Requires: /etc/mime.types, system-logos >= 7.92.1-1, ea-apr >= 1.5.0
 Requires: ea-apache2-mpm, ea-apache2-cgi
 Requires: ea-mod_ssl
 Obsoletes: httpd-suexec
@@ -87,7 +86,7 @@ web server.
 Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel, httpd-devel
-Requires: apr-devel >= 1.5.0, apr-util-devel, pkgconfig
+Requires: ea-apr-devel >= 1.5.0, ea-apr-util-devel, pkgconfig
 Requires: ea-apache2 = %{version}-%{release}
 
 %description devel
@@ -694,7 +693,7 @@ with the assumption that they are not fully initialized.
 Group: System Environment/Daemons
 Summary: LDAP connection-handling module for the Apache HTTP Server
 Requires: ea-apache2 = 0:%{version}-%{release}, ea-apache2-mmn = %{mmnisa}
-Requires: apr-util-ldap
+Requires: ea-apr-util-ldap
 
 %description -n ea-mod_ldap
 The mod_ldap module was created to improve the performance of websites
@@ -1345,11 +1344,6 @@ ln -s ../..%{_localstatedir}/log/apache2 $RPM_BUILD_ROOT/etc/apache2/logs
 ln -s ../..%{_localstatedir}/run/apache2 $RPM_BUILD_ROOT/etc/apache2/run
 ln -s ../..%{_libdir}/apache2/modules $RPM_BUILD_ROOT/etc/apache2/modules
 
-# Install logrotate config
-mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
-install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
-	$RPM_BUILD_ROOT/etc/logrotate.d/apache2
-
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/apache2/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/mime.types|/etc/mime.types|" \
@@ -1548,7 +1542,6 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/apache2/conf/httpd.conf
 %config(noreplace) %{_sysconfdir}/apache2/conf/magic
 
-%config(noreplace) %{_sysconfdir}/logrotate.d/apache2
 %{_initrddir}/httpd
 %{_initrddir}/htcacheclean
 
@@ -1705,6 +1698,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Mar 27 2015 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.12-3.el6.cpanel.1
+- Removed logrotate.d configuration to let WHM take care of this.
+
 * Wed Mar 11 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-2.el6.cpanel.1
 - Split many modules out into their own packages
 - Set dependencies between packages where needed
