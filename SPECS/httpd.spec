@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache2
 Version: 2.4.12
-Release: 3%{?dist}.cpanel.1
+Release: 4%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -65,8 +65,9 @@ Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: ea-apr-devel >= 1.5.0, ea-apr-util-devel >= 1.2.0, pcre-devel >= 5.0
-Requires: /etc/mime.types, system-logos >= 7.92.1-1, ea-apr >= 1.5.0
+BuildRequires: ea-apr-devel >= 1.5.0, ea-apr-util-devel >= 1.2.0
+BuildRequires: pcre-devel >= 5.0
+Requires: system-logos >= 7.92.1-1, ea-apr >= 1.5.0
 Requires: ea-apache2-mpm, ea-apache2-cgi
 Requires: ea-mod_ssl
 Obsoletes: httpd-suexec
@@ -1451,7 +1452,6 @@ cat files.access_compat files.actions files.alias files.auth_basic \
 # Remove unpackaged files
 rm -vf \
       $RPM_BUILD_ROOT%{_libdir}/*.exp \
-      $RPM_BUILD_ROOT/etc/apache2/conf/mime.types \
       $RPM_BUILD_ROOT%{_libdir}/apache2/modules/*.exp \
       $RPM_BUILD_ROOT%{_libdir}/apache2/build/config.nice \
       $RPM_BUILD_ROOT%{_bindir}/{ap?-config,dbmmanage} \
@@ -1541,6 +1541,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/apache2/conf
 %config(noreplace) %{_sysconfdir}/apache2/conf/httpd.conf
 %config(noreplace) %{_sysconfdir}/apache2/conf/magic
+%config(noreplace) %{_sysconfdir}/apache2/conf/mime.types
 
 %{_initrddir}/httpd
 %{_initrddir}/htcacheclean
@@ -1563,7 +1564,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir %{_libdir}/apache2
 %dir %{_libdir}/apache2/modules
-%{_libdir}/apache2/modules/mod_cgi*.so
 
 %dir %{contentdir}
 %dir %{contentdir}/icons
@@ -1698,6 +1698,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Mar 30 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-4.el6.cpanel.1
+- Added mime.types back into ea-apache2
+
 * Fri Mar 27 2015 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.12-3.el6.cpanel.1
 - Removed logrotate.d configuration to let WHM take care of this.
 
