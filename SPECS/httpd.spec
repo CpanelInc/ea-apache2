@@ -34,6 +34,10 @@ Source23: manual.conf
 Source30: README.confd
 Source40: htcacheclean.init
 Source41: htcacheclean.sysconf
+
+# Systemd service file
+Source42: httpd.service
+
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.3-apxs.patch
@@ -1258,6 +1262,9 @@ for s in httpd htcacheclean; do
 		$RPM_BUILD_ROOT%{_initrddir}/${s}
 done
 
+# install systemd service file
+    install -p m 644 $RPM_SOURCE_DIR/httpd.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
+
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
       $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d
@@ -1698,6 +1705,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Apr 28 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-5.el6.cpanel.1
+- Added httpd.service file and installation for CentOS 7 machines
+
 * Mon Mar 30 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-4.el6.cpanel.1
 - Added mime.types back into ea-apache2
 
