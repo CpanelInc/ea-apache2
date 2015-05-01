@@ -50,6 +50,7 @@ Patch27: httpd-2.4.2-icons.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
+Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
 # cPanel-specific patches
 Patch301: 2.2_cpanel_whmserverstatus.patch
@@ -1160,6 +1161,7 @@ mod_watchdog hooks.
 %patch30 -p1 -b .cachehardmax
 
 %patch55 -p1 -b .malformedhost
+%patch56 -p1 -b .uniqueid
 %patch59 -p1 -b .r1556473
 
 %patch301 -p1 -b .cpWHM
