@@ -1262,8 +1262,11 @@ for s in httpd htcacheclean; do
 		$RPM_BUILD_ROOT%{_initrddir}/${s}
 done
 
-# install systemd service file
-    install -p m 644 $RPM_SOURCE_DIR/httpd.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
+# install systemd service file for CentOS 7 and up
+%if 0%{?rhel} >= 7
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/systemd/system/
+install -p -m 644 $RPM_SOURCE_DIR/httpd.service $RPM_BUILD_ROOT%{_sysconfdir}/systemd/system/httpd.service
+%endif
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
@@ -1559,6 +1562,10 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/apache2/conf.d/cgid.conf
 %exclude %{_sysconfdir}/apache2/conf.d/cp-ssl.conf
 %exclude %{_sysconfdir}/apache2/conf.d/manual.conf
+
+%if 0%{?rhel} >= 7
+%{_sysconfdir}/systemd/system/httpd.service
+%endif
 
 %dir %{_sysconfdir}/apache2/conf.modules.d
 
