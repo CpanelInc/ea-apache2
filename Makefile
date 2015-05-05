@@ -94,7 +94,7 @@ vars: check
 
 build-init: build-clean
 	mkdir OBS
-	osc branch $(OBS_PROJECT) $(OBS_PACKAGE) $(BUILD_TARGET) $(OBS_PACKAGE) || exit 0
+	osc branch $(OBS_PROJECT) $(OBS_PACKAGE) $(BUILD_TARGET) $(OBS_PACKAGE) 2>/dev/null || exit 0
 	cd OBS && osc co $(BUILD_TARGET)
 	mv OBS/$(OBS_WORKDIR)/.osc OBS/.osc.proj.$$ && rm -rf OBS/$(OBS_WORKDIR)/* && cp --remove-destination -pr SOURCES/* SPECS/* OBS/$(OBS_WORKDIR) && mv OBS/.osc.proj.$$ OBS/$(OBS_WORKDIR)/.osc
 
