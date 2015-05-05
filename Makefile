@@ -90,7 +90,6 @@ vars: check
 	@echo "OBS_WORKDIR: $(OBS_WORKDIR)"
 	@echo "OBS_PROJECT: $(OBS_PROJECT)"
 	@echo "OBS_PACKAGE: $(OBS_PACKAGE)"
-	set
 
 #-----------------------
 # Helper make targets
