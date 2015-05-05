@@ -1,0 +1,12 @@
+[Unit]
+Description=Apache web server managed by cPanel EasyApache
+ConditionPathExists=!/etc/httpddisable
+ConditionPathExists=!/etc/apachedisable
+ConditionPathExists=!/etc/httpdisable
+
+[Service]
+Type=forking
+ExecStart=/usr/local/cpanel/scripts/restartsrv_httpd --no-verbose
+
+[Install]
+WantedBy=multi-user.target
