@@ -1598,7 +1598,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %attr(0710,root,nobody) %dir %{_localstatedir}/run/apache2
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/run/apache2/htcacheclean
-%attr(0700,root,root) %dir %{_localstatedir}/log/apache2
+%attr(0711,root,root) %dir %{_localstatedir}/log/apache2
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/apache2
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/cache/apache2/proxy
 
