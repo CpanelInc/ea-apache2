@@ -1272,7 +1272,8 @@ install -p -m 644 $RPM_SOURCE_DIR/httpd.service $RPM_BUILD_ROOT%{_sysconfdir}/sy
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
-      $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d
+      $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d \
+      $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/includes
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
@@ -1559,6 +1560,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_initrddir}/htcacheclean
 
 %dir %{_sysconfdir}/apache2/conf.d
+%dir %{_sysconfdir}/apache2/conf.d/includes
 %{_sysconfdir}/apache2/conf.d/README
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/*.conf
 %exclude %{_sysconfdir}/apache2/conf.d/cgid.conf
