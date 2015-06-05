@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache2
 Version: 2.4.12
-Release: 4%{?dist}.cpanel.1
+Release: 6%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -29,6 +29,7 @@ Source20: userdir.conf
 Source21: cp-ssl.conf
 Source22: cgid.conf
 Source23: manual.conf
+Source43: cperror.conf
 
 # Documentation
 Source30: README.confd
@@ -1274,7 +1275,7 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
-for f in cgid.conf cp-ssl.conf manual.conf userdir.conf; do
+for f in cgid.conf cp-ssl.conf manual.conf userdir.conf cperror.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
@@ -1712,6 +1713,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Jun 06 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-6.el6.cpanel.1
+- Added cperror.conf to handle error page configuration
+
 * Tue Apr 28 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-5.el6.cpanel.1
 - Added httpd.service file and installation for CentOS 7 machines
 
