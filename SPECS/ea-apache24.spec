@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.12
-Release: 6%{?dist}.cpanel.1
+Release: 8%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1717,6 +1717,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Jun 06 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-8.el6.cpanel.1
+- Added includes handler for .shtml files in cperror.conf
+
 * Fri Jun 06 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-7.el6.cpanel.1
 - Added cperror.conf to handle error page configuration
 
