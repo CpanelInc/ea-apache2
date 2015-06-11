@@ -15,13 +15,13 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.12
-Release: 8%{?dist}.cpanel.1
+Release: 9%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: centos-noindex.tar.gz
 Source3: httpd.sysconf
-
+Source5: apache2.tmpfiles
 Source6: httpd.init
 
 Source10: httpd.conf
@@ -1302,6 +1302,13 @@ for s in httpd htcacheclean; do
                     $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/${s}
 done
 
+# tmpfiles.d configuration
+%if 0%{?rhel} >= 7
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d
+install -m 644 -p $RPM_SOURCE_DIR/apache2.tmpfiles \
+   $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/apache2.conf
+%endif
+
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
          $RPM_BUILD_ROOT%{_localstatedir}/run/apache2/htcacheclean
@@ -1570,6 +1577,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %if 0%{?rhel} >= 7
 %{_sysconfdir}/systemd/system/httpd.service
+%config(noreplace) %{_sysconfdir}/sysconfig/ht*
+%{_prefix}/lib/tmpfiles.d/apache2.conf
 %endif
 
 %dir %{_sysconfdir}/apache2/conf.modules.d
@@ -1717,6 +1726,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Jun 11 2015 Matt Dees <matt.dees@cpanel.net> - 2.4.12-9
+- Added tmpfiles.d entry for c7
+
 * Fri Jun 06 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-8.el6.cpanel.1
 - Added includes handler for .shtml files in cperror.conf
 
