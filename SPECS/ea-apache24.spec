@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.12
-Release: 9%{?dist}.cpanel.1
+Release: 10%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -62,9 +62,6 @@ Patch301: 2.2_cpanel_whmserverstatus.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
 Patch303: 2.2.17_cpanel_mailman_suexec.patch
 Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
-
-# Cloud Linux patches
-Patch400: httpd2-cagefs_jail.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -130,7 +127,7 @@ Group: System Environment/Daemons
 Summary: Threaded event Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
-Conflicts: ea-apache24-mod_mpm_prefork, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_itk
+Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_worker
 
 %description -n ea-apache24-mod_mpm_event
 The Event MPM provides a threaded model for workers, with the additional
@@ -141,7 +138,7 @@ Group: System Environment/Daemons
 Summary: Prefork Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = forked
-Conflicts: ea-apache24-mod_mpm_event, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_itk
+Conflicts: ea-apache24-mpm = threaded
 
 %description -n ea-apache24-mod_mpm_prefork
 The traditional forked worker model.
@@ -151,7 +148,7 @@ Group: System Environment/Daemons
 Summary: Threaded worker Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
-Conflicts: ea-apache24-mod_mpm_event, ea-apache24-mod_mpm_prefork, ea-apache24-mod_mpm_itk
+Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_event
 
 %description -n ea-apache24-mod_mpm_worker
 The Worker MPM provides a threaded worker model.
@@ -1727,6 +1724,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Jul 01 2015 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.12-10
+- Fixed mpm conflicts
+- Removed itk conflict since apache shoudln't be concerned with that..
+  only itk should be
+- Removed unused cloudlinux cagefs patch
+
 * Thu Jun 11 2015 Matt Dees <matt.dees@cpanel.net> - 2.4.12-9
 - Added tmpfiles.d entry for c7
 
