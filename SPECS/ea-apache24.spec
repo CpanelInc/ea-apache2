@@ -6,6 +6,10 @@
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring cPanel
 
+# Locations of the apr and apr-util packages
+%define apr_dir /opt/cpanel/ea-apr15
+%define apr_util_dir /opt/cpanel/ea-apr15-util
+
 # Drop automatic provides for module DSOs
 %{?filter_setup:
 %filter_provides_in %{_libdir}/apache2/modules/.*\.so$
@@ -15,7 +19,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.12
-Release: 10%{?dist}.cpanel.1
+Release: 11%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1225,7 +1229,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-layout=cPanel \
         --with-installbuilddir=%{_libdir}/apache2/build \
         --enable-mpms-shared=all \
-        --with-apr=%{_prefix} --with-apr-util=%{_prefix} \
+        --with-apr=%{apr_dir} --with-apr-util=%{apr_util_dir} \
 	--enable-suexec --with-suexec \
         --enable-suexec-capabilities \
 	--with-suexec-caller=%{suexec_caller} \
@@ -1724,9 +1728,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Jul 30 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-11
+- Reference new locations of apr and apr-util packages
+
 * Wed Jul 01 2015 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.12-10
 - Fixed mpm conflicts
-- Removed itk conflict since apache shoudln't be concerned with that..
+- Removed itk conflict since apache shouldn't be concerned with that..
   only itk should be
 - Removed unused cloudlinux cagefs patch
 
