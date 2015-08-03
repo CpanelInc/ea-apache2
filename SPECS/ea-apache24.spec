@@ -6,10 +6,6 @@
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring cPanel
 
-# Locations of the apr and apr-util packages
-%define apr_dir /opt/cpanel/ea-apr15
-%define apr_util_dir /opt/cpanel/ea-apr15-util
-
 # Drop automatic provides for module DSOs
 %{?filter_setup:
 %filter_provides_in %{_libdir}/apache2/modules/.*\.so$
@@ -19,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.12
-Release: 11%{?dist}.cpanel.1
+Release: 12%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -45,7 +41,6 @@ Source42: httpd.service
 
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
-Patch2: httpd-2.4.3-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 
@@ -1155,7 +1150,6 @@ mod_watchdog hooks.
 %prep
 %setup -q -n httpd-%{version}
 %patch1 -p1 -b .apctl
-%patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 
@@ -1229,7 +1223,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-layout=cPanel \
         --with-installbuilddir=%{_libdir}/apache2/build \
         --enable-mpms-shared=all \
-        --with-apr=%{apr_dir} --with-apr-util=%{apr_util_dir} \
+        --with-apr=%{ea_apr_dir} --with-apr-util=%{ea_apu_dir} \
 	--enable-suexec --with-suexec \
         --enable-suexec-capabilities \
 	--with-suexec-caller=%{suexec_caller} \
@@ -1728,6 +1722,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Jul 31 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-12
+- Repair apxs craziness
+
 * Thu Jul 30 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-11
 - Reference new locations of apr and apr-util packages
 
