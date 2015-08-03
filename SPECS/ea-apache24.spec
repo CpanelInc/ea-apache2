@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.12
-Release: 12%{?dist}.cpanel.1
+Release: 13%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -72,6 +72,7 @@ BuildRequires: pcre-devel >= 5.0
 Requires: system-logos >= 7.92.1-1, ea-apr >= 1.5.0
 Requires: ea-apache24-mpm, ea-apache24-cgi
 Requires: ea-apache24-mod_ssl
+Requires: ea-documentroot
 Obsoletes: httpd-suexec
 Conflicts: webserver
 Provides: ea-webserver
@@ -1722,6 +1723,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Aug 01 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-13
+- Add ea-documentroot as a require for ea-apache24
+
 * Fri Jul 31 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-12
 - Repair apxs craziness
 
