@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.12
-Release: 14%{?dist}.cpanel.1
+Release: 15%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1020,6 +1020,8 @@ of the data is treated as the last line.
 Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
+Requires: ea-apache24-mod_request
+Requires: ea-apr-util-openssl
 
 %description -n ea-apache24-mod_session
 The mod_session module and associated backends provide an abstract
@@ -1724,6 +1726,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Aug 05 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-15
+- Missing requirements for mod_session
+
 * Mon Aug 03 2015 Dan Muey <dan@cpanel.net> = 2.4.12-14
 - Add ea-apache24-tools as a require for ea-apache24
 
