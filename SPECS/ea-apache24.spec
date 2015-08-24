@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.12
-Release: 16%{?dist}.cpanel.1
+Release: 17%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -61,6 +61,7 @@ Patch301: 2.2_cpanel_whmserverstatus.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
 Patch303: 2.2.17_cpanel_mailman_suexec.patch
 Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
+Patch305: httpd-2.4.12-apxs-modules-dir.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1176,6 +1177,7 @@ mod_watchdog hooks.
 %patch302 -p1 -b .cpsuexec1
 %patch303 -p1 -b .cpsuexec2
 %patch304 -p1 -b .cpsuexec3
+%patch305 -p1 -b .cpapxs
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1729,6 +1731,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Aug 24 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-17
+- Patched apxs so that it correctly handles the conf.modules.d arrangement
+
 * Mon Aug 10 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-16
 - Added ea-apache24-config and ea-apache24-config-runtime as
   requirements for ea-apache24
