@@ -14,8 +14,8 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.12
-Release: 17%{?dist}.cpanel.1
+Version: 2.4.16
+Release: 1%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1731,6 +1731,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Aug 26 2015 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.16-1
+- Updated to version 2.4.16 via update_pkg.pl
+
 * Mon Aug 24 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-17
 - Patched apxs so that it correctly handles the conf.modules.d arrangement
 
