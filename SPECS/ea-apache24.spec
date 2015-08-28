@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.16
-Release: 1%{?dist}.cpanel.1
+Release: 2%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -85,6 +85,8 @@ Provides: ea-apache24-suexec = %{version}-%{release}
 Provides: ea-apache24-mmn = %{mmn}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mmn = %{oldmmnisa}
 Requires: ea-apache24-tools = %{version}-%{release}
+Requires: ea-apache24-mod_proxy_http
+Requires: ea-apache24-mod_proxy
 Requires(post): chkconfig
 
 %description
@@ -1731,6 +1733,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Aug 28 2015 Julian Brown <julian.brown@cpanel.net> - 2.4.16-2
+- Added requirements for ea-apache24-mod_proxy and mod_proxy_http
+- so we can support proxy subdomains
+
 * Wed Aug 26 2015 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.16-1
 - Updated to version 2.4.16 via update_pkg.pl
 
