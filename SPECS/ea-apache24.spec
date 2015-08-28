@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.16
-Release: 2%{?dist}.cpanel.1
+Release: 3%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1254,6 +1254,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
         --enable-imagemap --disable-echo \
+    --disable-v4-mapped \
 	$*
 make %{?_smp_mflags}
 
@@ -1733,6 +1734,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Aug 28 2015 Jacob Perkins <jacob.perkins@cpanel.net> 2.4.16-3
+- Disabled IPv4 Mapping
+
 * Fri Aug 28 2015 Julian Brown <julian.brown@cpanel.net> - 2.4.16-2
 - Added requirements for ea-apache24-mod_proxy and mod_proxy_http
 - so we can support proxy subdomains
