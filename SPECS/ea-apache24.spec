@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.16
-Release: 3%{?dist}.cpanel.1
+Release: 4%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -87,6 +87,7 @@ Provides: ea-apache24-mmn = %{oldmmnisa}
 Requires: ea-apache24-tools = %{version}-%{release}
 Requires: ea-apache24-mod_proxy_http
 Requires: ea-apache24-mod_proxy
+Requires: ea-cpanel-tools
 Requires(post): chkconfig
 
 %description
@@ -1734,6 +1735,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Aug 31 2015 Julian Brown <julian.brown@cpanel.net> - 2.4.16-4
+- Added requirements for ea-cpanel-tools, scripting tools to work
+- with cPanel.
+
 * Fri Aug 28 2015 Jacob Perkins <jacob.perkins@cpanel.net> 2.4.16-3
 - Disabled IPv4 Mapping
 
