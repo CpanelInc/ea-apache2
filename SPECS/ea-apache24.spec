@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.16
-Release: 4%{?dist}.cpanel.1
+Release: 5%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1207,8 +1207,7 @@ rm -rf srclib/{apr,apr-util,pcre}
 autoheader && autoconf || exit 1
 
 # Before configure; fix location of build dir in generated apxs
-%{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache2/build:g" \
-	support/apxs.in
+%{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache2/build:g" support/apxs.in
 
 export CFLAGS=$RPM_OPT_FLAGS
 export LDFLAGS="-Wl,-z,relro,-z,now"
@@ -1222,41 +1221,45 @@ export LYNX_PATH=/usr/bin/links
 
 # Build the daemon
 ./configure \
- 	--prefix=%{_sysconfdir}/apache2 \
- 	--exec-prefix=%{_prefix} \
- 	--bindir=%{_bindir} \
- 	--sbindir=%{_sbindir} \
- 	--mandir=%{_mandir} \
-	--libdir=%{_libdir} \
-	--sysconfdir=%{_sysconfdir}/apache2/conf \
-	--includedir=%{_includedir}/apache2 \
-	--libexecdir=%{_libdir}/apache2/modules \
-	--datadir=%{contentdir} \
-        --enable-layout=cPanel \
-        --with-installbuilddir=%{_libdir}/apache2/build \
-        --enable-mpms-shared=all \
-        --with-apr=%{ea_apr_dir} --with-apr-util=%{ea_apu_dir} \
-	--enable-suexec --with-suexec \
-        --enable-suexec-capabilities \
-	--with-suexec-caller=%{suexec_caller} \
-	--with-suexec-docroot=/ \
-	--without-suexec-logfile \
-        --with-suexec-syslog \
-	--with-suexec-bin=%{_sbindir}/suexec \
-	--with-suexec-uidmin=500 --with-suexec-gidmin=100 \
-        --enable-pie \
-        --with-pcre \
-        --enable-mods-shared=all \
-	--enable-ssl --with-ssl --disable-distcache \
-	--enable-proxy \
-        --enable-cache \
-        --enable-disk-cache \
-        --enable-ldap --enable-authnz-ldap \
-        --enable-cgid --enable-cgi \
-        --enable-authn-anon --enable-authn-alias \
-        --enable-imagemap --disable-echo \
+    --prefix=%{_sysconfdir}/apache2 \
+    --exec-prefix=%{_prefix} \
+    --bindir=%{_bindir} \
+    --sbindir=%{_sbindir} \
+    --mandir=%{_mandir} \
+    --libdir=%{_libdir} \
+    --sysconfdir=%{_sysconfdir}/apache2/conf \
+    --includedir=%{_includedir}/apache2 \
+    --libexecdir=%{_libdir}/apache2/modules \
+    --datadir=%{contentdir} \
+    --enable-layout=cPanel \
+    --with-installbuilddir=%{_libdir}/apache2/build \
+    --enable-mpms-shared=all \
+    --with-apr=%{ea_apr_dir} --with-apr-util=%{ea_apu_dir} \
+    --enable-suexec --with-suexec \
+    --enable-suexec-capabilities \
+    --with-suexec-caller=%{suexec_caller} \
+    --with-suexec-docroot=/ \
+    --without-suexec-logfile \
+    --with-suexec-syslog \
+    --with-suexec-bin=%{_sbindir}/suexec \
+    --with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+    --enable-pie \
+    --with-pcre \
+    --enable-mods-shared=all \
+    --enable-ssl --with-ssl \
+    --disable-distcache \
+    --enable-proxy \
+    --enable-cache \
+    --enable-disk-cache \
+    --enable-ldap \
+    --enable-authnz-ldap \
+    --enable-cgid --enable-cgi \
+    --enable-authn-anon \
+    --enable-authn-alias \
+    --enable-imagemap \
+    --disable-echo \
     --disable-v4-mapped \
-	$*
+    $*
 make %{?_smp_mflags}
 
 %install
@@ -1270,8 +1273,8 @@ install -m 755 support/check_forensic $RPM_BUILD_ROOT%{_sbindir}
 # install SYSV init stuff
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 for s in httpd htcacheclean; do
-	install -p -m 755 $RPM_SOURCE_DIR/${s}.init \
-		$RPM_BUILD_ROOT%{_initrddir}/${s}
+    install -p -m 755 $RPM_SOURCE_DIR/${s}.init \
+        $RPM_BUILD_ROOT%{_initrddir}/${s}
 done
 
 # install systemd service file for CentOS 7 and up
@@ -1283,7 +1286,9 @@ install -p -m 644 $RPM_SOURCE_DIR/httpd.service $RPM_BUILD_ROOT%{_sysconfdir}/sy
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
       $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d \
-      $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/includes
+      $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/includes \
+      $RPM_BUILD_ROOT%{_sysconfdir}/apache2/bin
+
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
@@ -1333,8 +1338,10 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rpm
 cat > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.apache2 <<EOF
 %%_httpd_mmn %{mmnisa}
 %%_httpd_apxs %{_bindir}/apxs
-%%_httpd_modconfdir %{_sysconfdir}/apache2/conf.modules.d
-%%_httpd_confdir %{_sysconfdir}/apache2/conf.d
+%%_httpd_dir %{_sysconfdir}/apache2
+%%_httpd_bindir %{_httpd_dir}/bin
+%%_httpd_modconfdir %{_httpd_dir}/conf.modules.d
+%%_httpd_confdir %{_httpd_dir}/conf.d
 %%_httpd_contentdir %{contentdir}
 %%_httpd_moddir %{_libdir}/apache2/modules
 EOF
@@ -1591,6 +1598,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %dir %{_sysconfdir}/apache2/conf.modules.d
+%dir %{_sysconfdir}/apache2/bin
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
 
@@ -1735,6 +1743,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Oct  1 2015 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.16-5
+- Added /etc/apache2/bin directory for apache-specific utility scripts
+- Added additional macros to /etc/rpm/macros.apache2 so other rpms
+  can make use of those paths
+
 * Mon Aug 31 2015 Julian Brown <julian.brown@cpanel.net> - 2.4.16-4
 - Added requirements for ea-cpanel-tools, scripting tools to work
 - with cPanel.
