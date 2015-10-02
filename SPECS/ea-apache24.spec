@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.16
-Release: 5%{?dist}.cpanel.1
+Release: 6%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -25,7 +25,6 @@ Source5: apache2.tmpfiles
 Source6: httpd.init
 
 Source10: httpd.conf
-Source20: userdir.conf
 Source21: cp-ssl.conf
 Source22: cgid.conf
 Source23: manual.conf
@@ -1292,7 +1291,7 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
-for f in cgid.conf cp-ssl.conf manual.conf userdir.conf cperror.conf; do
+for f in cgid.conf cp-ssl.conf manual.conf cperror.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
@@ -1743,6 +1742,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Oct 02 2015 Dan Muey <dan@cpanel.net> 2.4.16-6
+- Stop installing userdir.conf since it is broken and the functionality is handled elsewhere
+
 * Thu Oct  1 2015 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.16-5
 - Added /etc/apache2/bin directory for apache-specific utility scripts
 - Added additional macros to /etc/rpm/macros.apache2 so other rpms
