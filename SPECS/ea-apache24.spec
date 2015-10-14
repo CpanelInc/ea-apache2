@@ -14,8 +14,8 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.16
-Release: 6%{?dist}.cpanel.1
+Version: 2.4.17
+Release: 1%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1742,6 +1742,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Oct 13 2015 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.17-1
+- Updated to version 2.4.17 via update_pkg.pl
+
 * Fri Oct 02 2015 Dan Muey <dan@cpanel.net> 2.4.16-6
 - Stop installing userdir.conf since it is broken and the functionality is handled elsewhere
 
