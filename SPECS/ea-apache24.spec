@@ -134,7 +134,7 @@ Group: System Environment/Daemons
 Summary: Threaded event Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
-Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_worker
+Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_prefork
 
 %description -n ea-apache24-mod_mpm_event
 The Event MPM provides a threaded model for workers, with the additional
@@ -145,7 +145,7 @@ Group: System Environment/Daemons
 Summary: Prefork Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = forked
-Conflicts: ea-apache24-mpm = threaded
+Conflicts: ea-apache24-mpm = threaded, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_event
 
 %description -n ea-apache24-mod_mpm_prefork
 The traditional forked worker model.
@@ -155,7 +155,7 @@ Group: System Environment/Daemons
 Summary: Threaded worker Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
-Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_event
+Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_event, ea-apache24-mod_mpm_prefork
 
 %description -n ea-apache24-mod_mpm_worker
 The Worker MPM provides a threaded worker model.
