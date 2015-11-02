@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.17
-Release: 1%{?dist}.cpanel.1
+Release: 2%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -407,7 +407,7 @@ Group: System Environment/Daemons
 Summary: CGI module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-mpm = forked
-Conflicts: ea-apache24-mod_cgid
+Conflicts: ea-apache24-mod_cgid, ea-apache24-mod_mpm_event, ea-apache24-mod_mpm_worker
 Provides: ea-apache24-cgi
 
 %description -n ea-apache24-mod_cgi
@@ -420,7 +420,7 @@ Group: System Environment/Daemons
 Summary: CGI module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-mpm = threaded
-Conflicts: ea-apache24-mod_cgi
+Conflicts: ea-apache24-mod_cgi, ea-apache24-mod_mpm_prefork
 Provides: ea-apache24-cgi
 
 %description -n ea-apache24-mod_cgid
@@ -1742,6 +1742,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Nov 02 2015 Darren Mobley <darren@cpanel.net> - 2.4.17-2
+- Added explicit conflicts for mod_cgi/mod_cgid and the mpms
+  they conflict with. HB-1153
+
 * Tue Oct 13 2015 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.17-1
 - Updated to version 2.4.17 via update_pkg.pl
 
