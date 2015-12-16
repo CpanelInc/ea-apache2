@@ -76,6 +76,7 @@ Requires: ea-documentroot
 Requires: ea-apache24-tools
 Requires: ea-apache24-config
 Requires: ea-apache24-config-runtime
+Requires: ea-apache24-mod_bwlimited
 
 Obsoletes: httpd-suexec
 Conflicts: webserver
@@ -1742,6 +1743,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Dec 16 2015 Dan Muey <dan@cpanel.net> 2.4.16-9
+- Add ea-apache24-mod_bwlimited as a requirement
+
 * Tue Nov 03 2015 Jacob Perkins <jacob.perkins@cpanel.net) - 2.4.16-8
 - Reverted Apache 2.4.17
 
