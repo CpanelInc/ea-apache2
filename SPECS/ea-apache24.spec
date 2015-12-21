@@ -14,8 +14,8 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.16
-Release: 8%{?dist}.cpanel.1
+Version: 2.4.18
+Release: 1%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1743,6 +1743,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Dec 17 2015 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.18-1
+- Updated to version 2.4.18 via update_pkg.pl
+
 * Wed Dec 16 2015 Dan Muey <dan@cpanel.net> 2.4.16-9
 - Add ea-apache24-mod_bwlimited as a requirement
 
