@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.18
-Release: 2%{?dist}.cpanel.1
+Release: 3%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -80,7 +80,7 @@ Requires: ea-apache24-config-runtime
 Requires: ea-apache24-mod_bwlimited
 
 Obsoletes: httpd-suexec
-Conflicts: webserver
+Conflicts: httpd-mmn
 Provides: ea-webserver
 Provides: ea-apache24-suexec = %{version}-%{release}
 Provides: ea-apache24-mmn = %{mmn}, ea-apache24-mmn = %{mmnisa}
@@ -1745,6 +1745,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Mar 1 2016 David Nielson <david.nielson@cpanel.net> 2.4.18-3
+- Remove conflict on 'webserver' and add conflict on 'httpd-mmn' so
+  Nginx can be installed from EPEL.
+
 * Thu Jan 14 2016 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.18-2
 - Applied fix for Apache Bug #58854.  This patch should be removed
   once it has made into upstream.
