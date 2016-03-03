@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.18
-Release: 3%{?dist}.cpanel.1
+Release: 4%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -55,7 +55,6 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
-Patch60: httpd-2.4.18-bz58854.patch
 # cPanel-specific patches
 Patch301: 2.2_cpanel_whmserverstatus.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
@@ -1176,7 +1175,6 @@ mod_watchdog hooks.
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch59 -p1 -b .r1556473
-%patch60 -p1 -b .bz58854
 
 %patch301 -p1 -b .cpWHM
 %patch302 -p1 -b .cpsuexec1
@@ -1745,6 +1743,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Mar 3 2016 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.18-4
+- Removed Apache Bug #58854 (ZC-1512)
+
 * Tue Mar 1 2016 David Nielson <david.nielson@cpanel.net> 2.4.18-3
 - Remove conflict on 'webserver' and add conflict on 'httpd-mmn' so
   Nginx can be installed from EPEL.
