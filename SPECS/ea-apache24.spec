@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.18
-Release: 4%{?dist}.cpanel.1
+Release: 5%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1743,6 +1743,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Mar 10 2016 Matt Dees <matt@cpanel.net> - 2.4.18.5
+- Add PIDFile to httpd.service
+
 * Thu Mar 3 2016 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.18-4
 - Removed Apache Bug #58854 (ZC-1512)
 

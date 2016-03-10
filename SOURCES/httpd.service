@@ -7,6 +7,7 @@ ConditionPathExists=!/etc/httpdisable
 [Service]
 Type=forking
 ExecStart=/usr/local/cpanel/scripts/restartsrv_httpd --no-verbose
+PIDFile=/var/run/apache2/httpd.pid
 
 [Install]
 WantedBy=multi-user.target
