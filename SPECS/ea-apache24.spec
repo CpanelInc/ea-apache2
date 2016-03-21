@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.18
-Release: 5%{?dist}.cpanel.1
+Release: 6%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -136,6 +136,8 @@ Summary: Threaded event Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
 Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_prefork
+Conflicts: ea-apache24-mod_cgi
+Requires: ea-apache24-mod_cgid
 
 %description -n ea-apache24-mod_mpm_event
 The Event MPM provides a threaded model for workers, with the additional
@@ -147,6 +149,8 @@ Summary: Prefork Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = forked
 Conflicts: ea-apache24-mpm = threaded, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_event
+Conflicts: ea-apache24-mod_cgid
+Requires: ea-apache24-mod_cgi
 
 %description -n ea-apache24-mod_mpm_prefork
 The traditional forked worker model.
@@ -157,6 +161,8 @@ Summary: Threaded worker Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
 Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_event, ea-apache24-mod_mpm_prefork
+Conflicts: ea-apache24-mod_cgi
+Requires: ea-apache24-mod_cgid
 
 %description -n ea-apache24-mod_mpm_worker
 The Worker MPM provides a threaded worker model.
@@ -1743,6 +1749,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Mar 21 2016 Matt Dees <matt@cpanel.net> 2.4.18.5
+- Create direct dependencies on mod_cgi/mod_cgid for the various MPMs.
+
 * Thu Mar 10 2016 Matt Dees <matt@cpanel.net> - 2.4.18.5
 - Add PIDFile to httpd.service
 
