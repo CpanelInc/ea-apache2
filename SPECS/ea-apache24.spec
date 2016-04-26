@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.20
-Release: 1%{?dist}.cpanel.1
+Release: 2%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -25,7 +25,7 @@ Source5: apache2.tmpfiles
 Source6: httpd.init
 
 Source10: httpd.conf
-Source21: cp-ssl.conf
+# Source21: reuse this as needed
 Source22: cgid.conf
 Source23: manual.conf
 Source43: cperror.conf
@@ -1298,7 +1298,7 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
-for f in cgid.conf cp-ssl.conf manual.conf cperror.conf; do
+for f in cgid.conf manual.conf cperror.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
@@ -1594,7 +1594,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/apache2/conf.d/README
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/*.conf
 %exclude %{_sysconfdir}/apache2/conf.d/cgid.conf
-%exclude %{_sysconfdir}/apache2/conf.d/cp-ssl.conf
 %exclude %{_sysconfdir}/apache2/conf.d/manual.conf
 
 %if 0%{?rhel} >= 7
@@ -1728,7 +1727,6 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_socache_memcache -f files.socache_memcache
 %files -n ea-apache24-mod_speling -f files.speling
 %files -n ea-apache24-mod_ssl -f files.ssl
-%config(noreplace) %{_sysconfdir}/apache2/conf.d/cp-ssl.conf
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
 %files -n ea-apache24-mod_substitute -f files.substitute
 %files -n ea-apache24-mod_suexec -f files.suexec
@@ -1749,6 +1747,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Apr 26 2016 David Nielson <david.nielson@cpanel.net> - 2.4.20-2
+- Remove cp-ssl.conf
+
 * Mon Apr 11 2016 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.20-1
 - Updated to version 2.4.20 via update_pkg.pl (EA-4446)
 
