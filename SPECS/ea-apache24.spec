@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.20
-Release: 2%{?dist}.cpanel.1
+Release: 3%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1248,7 +1248,7 @@ export LYNX_PATH=/usr/bin/links
     --without-suexec-logfile \
     --with-suexec-syslog \
     --with-suexec-bin=%{_sbindir}/suexec \
-    --with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+    --with-suexec-uidmin=100 --with-suexec-gidmin=100 \
     --enable-pie \
     --with-pcre \
     --enable-mods-shared=all \
@@ -1747,6 +1747,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri May 27 2016 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.20-3
+- Updated suexec minimum uid to match EA3
+
 * Tue Apr 26 2016 David Nielson <david.nielson@cpanel.net> - 2.4.20-2
 - Remove cp-ssl.conf
 
