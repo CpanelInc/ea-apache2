@@ -14,8 +14,8 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.18
-Release: 2%{?dist}.cpanel.1
+Version: 2.4.20
+Release: 3%{?dist}.cpanel.1
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -25,7 +25,7 @@ Source5: apache2.tmpfiles
 Source6: httpd.init
 
 Source10: httpd.conf
-Source21: cp-ssl.conf
+# Source21: reuse this as needed
 Source22: cgid.conf
 Source23: manual.conf
 Source43: cperror.conf
@@ -55,7 +55,6 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
-Patch60: httpd-2.4.18-bz58854.patch
 # cPanel-specific patches
 Patch301: 2.2_cpanel_whmserverstatus.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
@@ -80,7 +79,7 @@ Requires: ea-apache24-config-runtime
 Requires: ea-apache24-mod_bwlimited
 
 Obsoletes: httpd-suexec
-Conflicts: webserver
+Conflicts: httpd-mmn
 Provides: ea-webserver
 Provides: ea-apache24-suexec = %{version}-%{release}
 Provides: ea-apache24-mmn = %{mmn}, ea-apache24-mmn = %{mmnisa}
@@ -137,6 +136,8 @@ Summary: Threaded event Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
 Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_prefork
+Conflicts: ea-apache24-mod_cgi
+Requires: ea-apache24-mod_cgid
 
 %description -n ea-apache24-mod_mpm_event
 The Event MPM provides a threaded model for workers, with the additional
@@ -148,6 +149,8 @@ Summary: Prefork Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = forked
 Conflicts: ea-apache24-mpm = threaded, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_event
+Conflicts: ea-apache24-mod_cgid
+Requires: ea-apache24-mod_cgi
 
 %description -n ea-apache24-mod_mpm_prefork
 The traditional forked worker model.
@@ -158,6 +161,8 @@ Summary: Threaded worker Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
 Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_event, ea-apache24-mod_mpm_prefork
+Conflicts: ea-apache24-mod_cgi
+Requires: ea-apache24-mod_cgid
 
 %description -n ea-apache24-mod_mpm_worker
 The Worker MPM provides a threaded worker model.
@@ -1176,7 +1181,6 @@ mod_watchdog hooks.
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch59 -p1 -b .r1556473
-%patch60 -p1 -b .bz58854
 
 %patch301 -p1 -b .cpWHM
 %patch302 -p1 -b .cpsuexec1
@@ -1244,7 +1248,7 @@ export LYNX_PATH=/usr/bin/links
     --without-suexec-logfile \
     --with-suexec-syslog \
     --with-suexec-bin=%{_sbindir}/suexec \
-    --with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+    --with-suexec-uidmin=100 --with-suexec-gidmin=100 \
     --enable-pie \
     --with-pcre \
     --enable-mods-shared=all \
@@ -1294,7 +1298,7 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
-for f in cgid.conf cp-ssl.conf manual.conf cperror.conf; do
+for f in cgid.conf manual.conf cperror.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
@@ -1590,7 +1594,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/apache2/conf.d/README
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/*.conf
 %exclude %{_sysconfdir}/apache2/conf.d/cgid.conf
-%exclude %{_sysconfdir}/apache2/conf.d/cp-ssl.conf
 %exclude %{_sysconfdir}/apache2/conf.d/manual.conf
 
 %if 0%{?rhel} >= 7
@@ -1724,7 +1727,6 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_socache_memcache -f files.socache_memcache
 %files -n ea-apache24-mod_speling -f files.speling
 %files -n ea-apache24-mod_ssl -f files.ssl
-%config(noreplace) %{_sysconfdir}/apache2/conf.d/cp-ssl.conf
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
 %files -n ea-apache24-mod_substitute -f files.substitute
 %files -n ea-apache24-mod_suexec -f files.suexec
@@ -1745,6 +1747,28 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri May 27 2016 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.20-3
+- Updated suexec minimum uid to match EA3
+
+* Tue Apr 26 2016 David Nielson <david.nielson@cpanel.net> - 2.4.20-2
+- Remove cp-ssl.conf
+
+* Mon Apr 11 2016 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.20-1
+- Updated to version 2.4.20 via update_pkg.pl (EA-4446)
+
+* Mon Mar 21 2016 Matt Dees <matt@cpanel.net> 2.4.18.5
+- Create direct dependencies on mod_cgi/mod_cgid for the various MPMs.
+
+* Thu Mar 10 2016 Matt Dees <matt@cpanel.net> - 2.4.18.5
+- Add PIDFile to httpd.service
+
+* Thu Mar 3 2016 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.18-4
+- Removed Apache Bug #58854 (ZC-1512)
+
+* Tue Mar 1 2016 David Nielson <david.nielson@cpanel.net> 2.4.18-3
+- Remove conflict on 'webserver' and add conflict on 'httpd-mmn' so
+  Nginx can be installed from EPEL.
+
 * Thu Jan 14 2016 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.18-2
 - Applied fix for Apache Bug #58854.  This patch should be removed
   once it has made into upstream.
