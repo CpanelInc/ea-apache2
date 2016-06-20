@@ -15,7 +15,9 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.20
-Release: 3%{?dist}.cpanel.1
+# Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
+%define release_prefix 4
+Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -1747,6 +1749,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Jun 20 2016 Dan Muey <dan@cpanel.net> - 2.4.20-4
+- EA-4383: Update Release value to OBS-proof versioning
+
 * Fri May 27 2016 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.20-3
 - Updated suexec minimum uid to match EA3
 
