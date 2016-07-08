@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.23
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -652,7 +652,7 @@ or SetHandler) will be processed by this module.
 
 %package -n ea-apache24-mod_info
 Group: System Environment/Daemons
-Summary: Extension providing a comprehensive overview of server configuration
+Summary: Extension providing a comprehensive overview of server configuration (NOT RECOMMENDED FOR SHARED SERVERS)
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
 %description -n ea-apache24-mod_info
@@ -763,7 +763,7 @@ log output.
 
 %package -n ea-apache24-mod_lua
 Group: System Environment/Daemons
-Summary: Lua language extension module for the Apache HTTP Server
+Summary: Lua language extension module for the Apache HTTP Server (NOT RECOMMENDED FOR SHARED SERVERS)
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
 %description -n ea-apache24-mod_lua
@@ -1492,8 +1492,6 @@ do
     # add to the condition to have comment-disabled modules
     if [ "${mod}" = "info" ]; then
       cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
-# Uncomment below to enable mod_${mod}
-#
 # Once mod_info is loaded into the server, its handler capability is available 
 # in all configuration files, including per-directory files (e.g., .htaccess).
 # This may have security-related ramifications for your server. In particular,
@@ -1502,7 +1500,18 @@ do
 # names, etc. Therefore, this module should only be used in a controlled
 # environment and always with caution.
 #
-# LoadModule ${mod}_module modules/mod_${mod}.so
+# If you still want to use this module, uncomment the LoadModule directive below.
+#LoadModule ${mod}_module modules/mod_${mod}.so
+EOF
+    elif [ "${mod}" = "lua" ]; then
+      cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
+# This module holds a great deal of power over httpd, which is both a strength
+# and a potential security risk. It is not recommended that you use this module
+# on a server that is shared with users you do not trust, as it can be abused
+# to change the internal workings of httpd.
+#
+# If you still want to use this module, uncomment the LoadModule directive below.
+#LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
     else
       cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
@@ -1716,7 +1725,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n ea-apache24-mod_cgi -f files.cgi
 %files -n ea-apache24-mod_cgid -f files.cgid
-%config(noreplace) %{_sysconfdir}/apache2/conf.d/cgid.conf
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/apache2/conf.d/cgid.conf
 
 %files -n ea-apache24-mod_allowmethods -f files.allowmethods
 %files -n ea-apache24-mod_asis -f files.asis
@@ -1759,7 +1768,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_ldap -f files.ldap
 %files -n ea-apache24-mod_log_debug -f files.log_debug
 %files -n ea-apache24-mod_log_forensic -f files.log_forensic
-%{_sbindir}/check_forensic
+%attr(0755,root,root) %{_sbindir}/check_forensic
 %files -n ea-apache24-mod_lua -f files.lua
 %files -n ea-apache24-mod_macro -f files.macro
 %files -n ea-apache24-mod_mime_magic -f files.mime_magic
@@ -1769,7 +1778,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_proxy_connect -f files.proxy_connect
 %files -n ea-apache24-mod_proxy_express -f files.proxy_express
 %files -n ea-apache24-mod_proxy_fcgi -f files.proxy_fcgi
-%{_sbindir}/fcgistarter
+%attr(0755,root,root) %{_sbindir}/fcgistarter
 %files -n ea-apache24-mod_proxy_fdpass -f files.proxy_fdpass
 %files -n ea-apache24-mod_proxy_ftp -f files.proxy_ftp
 %files -n ea-apache24-mod_proxy_hcheck -f files.proxy_hcheck
@@ -1808,6 +1817,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Jul 20 2016 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.23-2
+- mod_lua can be installed, but is off by default (EA-4825)
+- fixed a few rpmlint warnings complaining about lack of attr macros
+
 * Tue Jul 19 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.23-1
 - EA-4872: Updated to verison 2.4.23
 - Added mod_proxy_hcheck (side effect of upstream 2.5 backport into 2.4.23)
