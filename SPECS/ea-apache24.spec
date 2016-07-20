@@ -15,7 +15,9 @@
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.20
-Release: 3%{?dist}.cpanel.1
+# Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
+%define release_prefix 6
+Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -55,6 +57,7 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
+Patch60: httpd-2.4.20-asf_httpoxy-response.patch
 # cPanel-specific patches
 Patch301: 2.2_cpanel_whmserverstatus.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
@@ -647,6 +650,16 @@ functionality of the imagemap CGI program. Any directory or document
 type configured to use the handler imap-file (using either AddHandler
 or SetHandler) will be processed by this module.
 
+%package -n ea-apache24-mod_info
+Group: System Environment/Daemons
+Summary: Extension providing a comprehensive overview of server configuration
+Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
+
+%description -n ea-apache24-mod_info
+The mod_info module adds a server-info handler to the apache configuration,
+allowing a detailed description of the current server configuration state.
+It is not appropriate for shared hosting systems.
+
 %package -n ea-apache24-mod_lbmethod_bybusyness
 Group: System Environment/Daemons
 Summary: Busyness load-balancing module for the Apache HTTP server
@@ -1181,6 +1194,7 @@ mod_watchdog hooks.
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch59 -p1 -b .r1556473
+%patch60 -p1 -b .asf_httpoxy-response
 
 %patch301 -p1 -b .cpWHM
 %patch302 -p1 -b .cpsuexec1
@@ -1462,14 +1476,39 @@ for mod in \
   session session_cookie session_dbd auth_form session_crypto
 do
     printf -v modname "%03d_mod_%s.conf" $modnum $mod
-    cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
+    # add to the condition to have comment-disabled modules
+    if [ "${mod}" = "info" ]; then
+      cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
+# Uncomment below to enable mod_${mod}
+#
+# Once mod_info is loaded into the server, its handler capability is available 
+# in all configuration files, including per-directory files (e.g., .htaccess).
+# This may have security-related ramifications for your server. In particular,
+# this module can leak sensitive information from the configuration directives
+# of other Apache modules such as system paths, usernames/passwords, database
+# names, etc. Therefore, this module should only be used in a controlled
+# environment and always with caution.
+#
+# LoadModule ${mod}_module modules/mod_${mod}.so
+EOF
+    else
+      cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
 # Enable mod_${mod}
 LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
-    cat > files.${mod} <<EOF
+    fi
+    if [ "${mod}" = "info" ]; then
+        cat > files.${mod} <<EOF
+%attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
+%doc docs/conf/extra/httpd-info.conf
+EOF
+    else
+        cat > files.${mod} <<EOF
 %attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
 %config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
 EOF
+    fi
     # Let's stride by 5, in case there is need to insert things
     # between two modules
     modnum=$(($modnum+5))
@@ -1486,7 +1525,7 @@ cat files.session_cookie files.session_dbd files.auth_form \
 cat files.access_compat files.actions files.alias files.auth_basic \
   files.authn_core files.authn_file files.authz_core \
   files.authz_groupfile files.authz_host files.authz_user \
-  files.autoindex files.dir files.filter files.include files.info \
+  files.autoindex files.dir files.filter files.include \
   files.log_config files.logio files.mime files.negotiation \
   files.rewrite files.setenvif files.slotmem_shm files.socache_dbm \
   files.socache_shmcb files.status files.unixd \
@@ -1575,7 +1614,14 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
-%doc docs/conf/extra/*.conf
+%doc docs/conf/extra/httpd-dav.conf
+%doc docs/conf/extra/httpd-default.conf
+%doc docs/conf/extra/httpd-languages.conf
+%doc docs/conf/extra/httpd-manual.conf
+%doc docs/conf/extra/httpd-mpm.conf
+%doc docs/conf/extra/httpd-multilang-errordoc.conf
+%doc docs/conf/extra/httpd-vhosts.conf
+%doc docs/conf/extra/proxy-html.conf
 
 %dir %{_sysconfdir}/apache2
 %{_sysconfdir}/apache2/modules
@@ -1692,6 +1738,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_heartbeat -f files.heartbeat
 %files -n ea-apache24-mod_heartmonitor -f files.heartmonitor
 %files -n ea-apache24-mod_imagemap -f files.imagemap
+%files -n ea-apache24-mod_info -f files.info
 %files -n ea-apache24-mod_lbmethod_bybusyness -f files.lbmethod_bybusyness
 %files -n ea-apache24-mod_lbmethod_byrequests -f files.lbmethod_byrequests
 %files -n ea-apache24-mod_lbmethod_bytraffic -f files.lbmethod_bytraffic
@@ -1747,6 +1794,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Jul 18 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.20-6
+- Apply recommendations in asf-httpoxy-repsponse.txt for CVE-2016-5387
+
+* Thu Jun 30 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.20-5
+- ZC-1937: Move mod_info into a separate child RPM
+
+* Mon Jun 20 2016 Dan Muey <dan@cpanel.net> - 2.4.20-4
+- EA-4383: Update Release value to OBS-proof versioning
+
 * Fri May 27 2016 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.20-3
 - Updated suexec minimum uid to match EA3
 
@@ -1821,7 +1877,7 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Aug 03 2015 Dan Muey <dan@cpanel.net> = 2.4.12-14
 - Add ea-apache24-tools as a require for ea-apache24
 
-* Mon Aug 01 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-13
+* Sat Aug 01 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-13
 - Add ea-documentroot as a require for ea-apache24
 
 * Fri Jul 31 2015 Trinity Quirk <trinity.quirk@cpanel.net> - 2.4.12-12
@@ -1839,10 +1895,10 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Jun 11 2015 Matt Dees <matt.dees@cpanel.net> - 2.4.12-9
 - Added tmpfiles.d entry for c7
 
-* Fri Jun 06 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-8.el6.cpanel.1
+* Sat Jun 06 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-8.el6.cpanel.1
 - Added includes handler for .shtml files in cperror.conf
 
-* Fri Jun 06 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-7.el6.cpanel.1
+* Sat Jun 06 2015 Darren Mobley <darren@cpanel.net> - 2.4.12-7.el6.cpanel.1
 - Added cperror.conf to handle error page configuration
 
 * Wed May 27 2015 Julian Brown <julian.brown@cpanel.net> - 2.4.12-6.el6.cpanel.1
