@@ -14,9 +14,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.20
+Version: 2.4.23
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 6
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -907,6 +907,18 @@ Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 The mod_proxy_ftp module provides support for the proxying FTP
 sites. Note that FTP support is currently limited to the GET method.
 
+%package -n ea-apache24-mod_proxy_hcheck
+Group: System Environment/Daemons
+Summary: Dynamic health check of Balancer members (workers) for mod_proxy
+Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_watchdog = 0:%{version}-%{release}
+
+%description -n ea-apache24-mod_proxy_hcheck
+The mod_proxy_hcheck module provides support for dynamic health checking of
+balancer members (workers).  This can be enabled on a worker-by-worker basis.
+The health check is done independently of the actual revers proxy requests.
+
 %package -n ea-apache24-mod_proxy_html
 Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
@@ -1269,6 +1281,7 @@ export LYNX_PATH=/usr/bin/links
     --enable-ssl --with-ssl \
     --disable-distcache \
     --enable-proxy \
+    --enable-proxy-fdpass \
     --enable-cache \
     --enable-disk-cache \
     --enable-ldap \
@@ -1473,7 +1486,7 @@ for mod in \
   ssl \
   proxy_html xml2enc \
   ldap authnz_ldap \
-  session session_cookie session_dbd auth_form session_crypto
+  session session_cookie session_dbd auth_form session_crypto proxy_hcheck
 do
     printf -v modname "%03d_mod_%s.conf" $modnum $mod
     # add to the condition to have comment-disabled modules
@@ -1759,6 +1772,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/fcgistarter
 %files -n ea-apache24-mod_proxy_fdpass -f files.proxy_fdpass
 %files -n ea-apache24-mod_proxy_ftp -f files.proxy_ftp
+%files -n ea-apache24-mod_proxy_hcheck -f files.proxy_hcheck
 %files -n ea-apache24-mod_proxy_html -f files.proxy_html
 %files -n ea-apache24-mod_proxy_http -f files.proxy_http
 %files -n ea-apache24-mod_proxy_scgi -f files.proxy_scgi
@@ -1794,6 +1808,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Jul 19 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.23-1
+- EA-4872: Updated to verison 2.4.23
+- Added mod_proxy_hcheck (side effect of upstream 2.5 backport into 2.4.23)
+
 * Mon Jul 18 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.20-6
 - Apply recommendations in asf-httpoxy-repsponse.txt for CVE-2016-5387
 
