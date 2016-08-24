@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.23
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -27,6 +27,7 @@ Source5: apache2.tmpfiles
 Source6: httpd.init
 
 Source10: httpd.conf
+Source11: autoindex.conf
 # Source21: reuse this as needed
 Source22: cgid.conf
 Source23: manual.conf
@@ -1325,15 +1326,9 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
-for f in cgid.conf manual.conf cperror.conf; do
+for f in cgid.conf manual.conf cperror.conf autoindex.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
-done
-
-# Split-out extra config shipped as default in conf.d:
-for f in autoindex; do
-  mv docs/conf/extra/httpd-${f}.conf \
-        $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/${f}.conf
 done
 
 # Extra config trimmed:
@@ -1817,6 +1812,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Jul 20 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.23-3
+- Fixed autoindex.conf suppression of /icons/ in subdomains.
+
 * Wed Jul 20 2016 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.23-2
 - mod_lua can be installed, but is off by default (EA-4825)
 - fixed a few rpmlint warnings complaining about lack of attr macros
