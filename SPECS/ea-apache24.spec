@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.23
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -65,14 +65,16 @@ Patch302: 2.2.17_cpanel_suexec_script_share.patch
 Patch303: 2.2.17_cpanel_mailman_suexec.patch
 Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
 Patch305: httpd-2.4.12-apxs-modules-dir.patch
+Patch306: httpd-2.4.23-symlink.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: ea-apr-devel >= 1.5.0, ea-apr-util-devel >= 1.2.0
+BuildRequires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel >= 1.2.0
 BuildRequires: pcre-devel >= 5.0
+Requires: ea-apr >= 1.5.2-4
 Requires: system-logos >= 7.92.1-1, ea-apr >= 1.5.0
 Requires: ea-apache24-mpm, ea-apache24-cgi
 Requires: ea-apache24-mod_ssl
@@ -102,7 +104,7 @@ web server.
 Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel, httpd-devel
-Requires: ea-apr-devel >= 1.5.0, ea-apr-util-devel, pkgconfig
+Requires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel, pkgconfig
 Requires: ea-apache24 = %{version}-%{release}
 
 %description devel
@@ -1214,6 +1216,7 @@ mod_watchdog hooks.
 %patch303 -p1 -b .cpsuexec2
 %patch304 -p1 -b .cpsuexec3
 %patch305 -p1 -b .cpapxs
+%patch306 -p1 -b .symlink
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1812,6 +1815,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Oct 24 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.23-5
+- Add symlink protection root directive.
+
+* Mon Oct 24 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.23-4
+- Add symlink protection patch and configuration control.
+
 * Wed Jul 20 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.23-3
 - Fixed autoindex.conf suppression of /icons/ in subdomains.
 
