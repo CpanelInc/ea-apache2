@@ -1,0 +1,278 @@
+diff -ru httpd-2.4.23/include/http_core.h httpd-2.4.23-symlink/include/http_core.h
+--- httpd-2.4.23/include/http_core.h	2016-04-27 08:03:00.000000000 -0500
++++ httpd-2.4.23-symlink/include/http_core.h	2016-11-01 17:08:57.462948971 -0500
+@@ -727,6 +727,13 @@
+ 
+     apr_array_header_t *protocols;
+     int protocols_honor_order;
++
++    /* symlink protection */
++#define AP_SYMLINK_PROTECT_UNSET   0
++#define AP_SYMLINK_PROTECT_ENABLE  1
++#define AP_SYMLINK_PROTECT_DISABLE 2
++    int symlink_protect;
++    const char *symlink_protect_root;
+ } core_server_config;
+ 
+ /* for AddOutputFiltersByType in core.c */
+diff -ru httpd-2.4.23/modules/mappers/mod_userdir.c httpd-2.4.23-symlink/modules/mappers/mod_userdir.c
+--- httpd-2.4.23/modules/mappers/mod_userdir.c	2016-06-13 18:20:20.000000000 -0500
++++ httpd-2.4.23-symlink/modules/mappers/mod_userdir.c	2016-11-01 13:17:10.063161575 -0500
+@@ -51,6 +51,7 @@
+ 
+ #include "apr_strings.h"
+ #include "apr_user.h"
++#include "apr_env.h"
+ 
+ #define APR_WANT_STRFUNC
+ #include "apr_want.h"
+@@ -62,7 +63,9 @@
+ #include "ap_config.h"
+ #include "httpd.h"
+ #include "http_config.h"
++#include "http_core.h"
+ #include "http_request.h"
++#include "http_log.h"
+ 
+ #if !defined(WIN32) && !defined(OS2) && !defined(NETWARE)
+ #define HAVE_UNIX_SUEXEC
+@@ -203,6 +206,7 @@
+     const char *user, *dname;
+     char *redirect;
+     apr_finfo_t statbuf;
++    core_server_config *sconf;
+ 
+     /*
+      * If the URI doesn't match our basic pattern, we've nothing to do with
+@@ -259,6 +263,8 @@
+      * Special cases all checked, onward to normal substitution processing.
+      */
+ 
++    sconf = ap_get_core_module_config(server_conf);
++
+     while (*userdirs) {
+         const char *userdir = ap_getword_conf(r->pool, &userdirs);
+         char *filename = NULL, *prefix = NULL;
+@@ -313,18 +319,20 @@
+         }
+ 
+         /*
+-         * Now see if it exists, or we're at the last entry. If we are at the
+-         * last entry, then use the filename generated (if there is one)
+-         * anyway, in the hope that some handler might handle it. This can be
+-         * used, for example, to run a CGI script for the user.
+-         */
++        * Now see if it exists, or we're at the last entry. If we are at the
++        * last entry, then use the filename generated (if there is one)
++        * anyway, in the hope that some handler might handle it. This can be
++        * used, for example, to run a CGI script for the user.
++        */
+         if (filename && (!*userdirs
+-                      || ((rv = apr_stat(&statbuf, filename, APR_FINFO_MIN,
++                      || ((rv = apr_stat(&statbuf, filename, (
++                           sconf->symlink_protect == AP_SYMLINK_PROTECT_ENABLE) ? 
++                               APR_FINFO_NORM :
++                               APR_FINFO_MIN,
+                                          r->pool)) == APR_SUCCESS
+                                              || rv == APR_INCOMPLETE))) {
+             r->filename = apr_pstrcat(r->pool, filename, dname, NULL);
+-            ap_set_context_info(r, apr_pstrmemdup(r->pool, r->uri,
+-                                                  dname - r->uri),
++            ap_set_context_info(r, apr_pstrmemdup(r->pool, r->uri, dname - r->uri),
+                                 filename);
+             /* XXX: Does this walk us around FollowSymLink rules?
+              * When statbuf contains info on r->filename we can save a syscall
+@@ -332,6 +340,13 @@
+              */
+             if (*userdirs && dname[0] == 0)
+                 r->finfo = statbuf;
++   
++            /* This is used later on to make sure the symlink exploit is not
++             * exploitable.
++             */
++            if (sconf->symlink_protect == AP_SYMLINK_PROTECT_ENABLE) {
++                apr_table_set(r->subprocess_env, "SPT_DOCROOT", filename);
++            }
+ 
+             /* For use in the get_suexec_identity phase */
+             apr_table_setn(r->notes, "mod_userdir_user", user);
+diff -ru httpd-2.4.23/modules/mappers/mod_userdir.dep httpd-2.4.23-symlink/modules/mappers/mod_userdir.dep
+--- httpd-2.4.23/modules/mappers/mod_userdir.dep	2016-03-22 22:53:49.000000000 -0500
++++ httpd-2.4.23-symlink/modules/mappers/mod_userdir.dep	2016-11-01 13:17:10.063161575 -0500
+@@ -12,6 +12,7 @@
+ 	"..\..\include\ap_regex.h"\
+ 	"..\..\include\ap_release.h"\
+ 	"..\..\include\apache_noprobes.h"\
++	"..\..\include\http_core.h"\
+ 	"..\..\include\http_config.h"\
+ 	"..\..\include\http_request.h"\
+ 	"..\..\include\httpd.h"\
+diff -ru httpd-2.4.23/server/core.c httpd-2.4.23-symlink/server/core.c
+--- httpd-2.4.23/server/core.c	2016-06-13 18:08:08.000000000 -0500
++++ httpd-2.4.23-symlink/server/core.c	2016-11-01 17:52:23.890630204 -0500
+@@ -21,6 +21,8 @@
+ #include "apr_hash.h"
+ #include "apr_thread_proc.h"    /* for RLIMIT stuff */
+ #include "apr_random.h"
++#include "apr_env.h"
++#include "apr_file_io.h"
+ 
+ #define APR_WANT_IOVEC
+ #define APR_WANT_STRFUNC
+@@ -446,6 +448,7 @@
+ 
+     if (!is_virtual) {
+         conf->ap_document_root = DOCUMENT_LOCATION;
++        conf->symlink_protect_root = "/var/www/html";
+         conf->access_name = DEFAULT_ACCESS_FNAME;
+ 
+         /* A mapping only makes sense in the global context */
+@@ -499,6 +502,9 @@
+     if (virt->ap_document_root)
+         conf->ap_document_root = virt->ap_document_root;
+ 
++    if (virt->symlink_protect_root)
++        conf->symlink_protect_root = virt->symlink_protect_root;
++
+     if (virt->access_name)
+         conf->access_name = virt->access_name;
+ 
+@@ -536,6 +542,10 @@
+                            ? virt->merge_trailers
+                            : base->merge_trailers;
+ 
++    conf->symlink_protect = (virt->symlink_protect != AP_SYMLINK_PROTECT_UNSET)
++                            ? virt->symlink_protect
++                            : base->symlink_protect;
++
+     conf->protocols = ((virt->protocols->nelts > 0)? 
+                        virt->protocols : base->protocols);
+     conf->protocols_honor_order = ((virt->protocols_honor_order < 0)?
+@@ -4153,6 +4163,30 @@
+     return NULL;
+ }
+ 
++static const char *set_symlink_protect(cmd_parms *cmd, void *dummy, int arg)
++{
++    core_server_config *conf = ap_get_module_config(cmd->server->module_config,
++                                                    &core_module);
++    conf->symlink_protect = (arg ? AP_SYMLINK_PROTECT_ENABLE : 
++                             AP_SYMLINK_PROTECT_DISABLE);
++    return NULL;
++}
++
++static const char *set_symlink_protect_root(cmd_parms *cmd, void *dummy,
++                                     const char *arg)
++{
++    char* value;
++    core_server_config *conf = ap_get_module_config(cmd->server->module_config,
++                                                    &core_module);
++    if (arg == NULL) {
++        return "SymlinkProtectRoot must have a value";
++    }
++    value = apr_pstrdup(cmd->pool, arg);
++    conf->symlink_protect_root = value;
++
++    return NULL;
++}
++
+ /* Note --- ErrorDocument will now work from .htaccess files.
+  * The AllowOverride of Fileinfo allows webmasters to turn it off
+  */
+@@ -4415,6 +4449,10 @@
+ AP_INIT_TAKE1("ProtocolsHonorOrder", set_protocols_honor_order, NULL, RSRC_CONF,
+               "'off' (default) or 'on' to respect given order of protocols, "
+               "by default the client specified order determines selection"),
++AP_INIT_FLAG("SymlinkProtect", set_symlink_protect, NULL, RSRC_CONF,
++             "Controls whether symlink protection will be active or not"),
++AP_INIT_TAKE1("SymlinkProtectRoot", set_symlink_protect_root, NULL, RSRC_CONF,
++             "Root directory of the symlink protect algorithm"),
+ { NULL }
+ };
+ 
+@@ -4561,6 +4599,9 @@
+     int errstatus;
+     apr_file_t *fd = NULL;
+     apr_status_t status;
++    core_server_config *csconf;
++    apr_finfo_t post_open_dirstat;
++    apr_finfo_t post_open_finfo;
+     /* XXX if/when somebody writes a content-md5 filter we either need to
+      *     remove this support or coordinate when to use the filter vs.
+      *     when to use this code
+@@ -4571,6 +4612,13 @@
+     int bld_content_md5;
+ 
+     d = (core_dir_config *)ap_get_core_module_config(r->per_dir_config);
++
++    /* must fetch global configuration.  First to determine if we are
++     * going to apply symlink protection, and second to check the document
++     * root user against the open file user if using symlink protection.
++     */
++    csconf = ap_get_module_config(r->server->module_config, &core_module);
++
+     bld_content_md5 = (d->content_md5 == AP_CONTENT_MD5_ON)
+                       && r->output_filters->frec->ftype != AP_FTYPE_RESOURCE;
+ 
+@@ -4644,6 +4692,61 @@
+             return HTTP_FORBIDDEN;
+         }
+ 
++        if (csconf->symlink_protect == AP_SYMLINK_PROTECT_ENABLE) {
++            /* This is where the magic is. If a user is trying to hit the apache
++             * symlink race condition, then we will know about it here.
++             */
++
++            const char *sp_docroot = apr_table_get(r->subprocess_env, "SPT_DOCROOT");
++            apr_status_t post_dirstat_rv;
++            apr_status_t post_fdstat_rv;
++
++            if (strcmp(csconf->ap_document_root, csconf->symlink_protect_root) == 0
++                && sp_docroot != NULL) {
++                /* This request is from mod_userdir. We need to stat what was stored in SPT_DOCROOT. */
++                post_dirstat_rv = apr_stat(&post_open_dirstat, sp_docroot,
++                                           APR_FINFO_USER | APR_FINFO_LINK, r->pool);
++            }
++            else {
++                /* This request matched a vhost. We need to stat ap_document_root. */
++                post_dirstat_rv = apr_stat(&post_open_dirstat, csconf->ap_document_root,
++                                           APR_FINFO_USER | APR_FINFO_LINK, r->pool);
++            }
++
++            post_fdstat_rv = apr_stat_fd(&post_open_finfo, fd, APR_FINFO_USER, r->pool);
++
++            if (((post_dirstat_rv != APR_SUCCESS && post_dirstat_rv != APR_INCOMPLETE)
++                || !(post_open_dirstat.valid & APR_FINFO_USER))            
++                || ((post_fdstat_rv != APR_SUCCESS && post_fdstat_rv != APR_INCOMPLETE)
++                || !(post_open_finfo.valid & APR_FINFO_USER))) {           
++                /* Then we couldn't stat either the directory root of the vhost
++                 * (very unlikely) or we couldn't stat the open file descriptor
++                 * (probably impossible).                                  
++                 */                                                        
++                ap_log_rerror(APLOG_MARK, APLOG_ERR, status, r,            
++                    "Could not stat directory root or open file. Aborting request.");
++                apr_file_close(fd);                                        
++                return HTTP_NOT_FOUND;                                     
++            }                                                              
++                                                                       
++                                                                       
++            if (apr_uid_compare(r->finfo.user, post_open_dirstat.user)     
++                != APR_SUCCESS || apr_uid_compare(post_open_finfo.user, r->finfo.user)
++                != APR_SUCCESS) {                                          
++                /* Then we've caught a race condition abuser. */           
++                ap_log_rerror(APLOG_MARK, APLOG_ERR, status, r,            
++                    "Caught race condition abuser. attacker: %i, victim: %i"   
++                    " open file owner: %i, open file: %s", post_open_dirstat.user, r->finfo.user,
++                    post_open_finfo.user, r->filename);                        
++                                                                       
++                apr_file_close(fd);                                        
++                /* Return 404 because we don't want an attacker to be able to test
++                 * what files are where based on the return of an error.   
++                 */                                                        
++                return HTTP_NOT_FOUND;                                     
++            }                                           
++        }
++
+         ap_update_mtime(r, r->finfo.mtime);
+         ap_set_last_modified(r);
+         ap_set_etag(r);
