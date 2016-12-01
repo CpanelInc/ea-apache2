@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.23
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 5
+%define release_prefix 6
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -60,7 +60,7 @@ Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
 Patch60: httpd-2.4.20-asf_httpoxy-response.patch
 # cPanel-specific patches
-Patch301: 2.2_cpanel_whmserverstatus.patch
+Patch301: 2.4.23_cpanel_apachctl.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
 Patch303: 2.2.17_cpanel_mailman_suexec.patch
 Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
@@ -1815,6 +1815,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Dec 01 2016 Dan Muey <dan@cpanel.net> - 2.4.23-6
+- EA-5712: Patch apachectl to set PORT based on cpanel configuration
+
 * Mon Oct 24 2016 Edwin Buck <e.buck@cpanel.net> - 2.4.23-5
 - Add symlink protection root directive.
 
