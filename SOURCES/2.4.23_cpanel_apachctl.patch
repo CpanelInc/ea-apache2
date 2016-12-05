@@ -1,0 +1,12 @@
+--- httpd-2.4.23/support/apachectl.in.patched	2016-12-01 15:08:04.790003110 -0600
++++ httpd-2.4.23/support/apachectl.in	2016-12-01 15:08:56.834003744 -0600
+@@ -56,7 +56,8 @@
+ #
+ # the URL to your server's mod_status status page.  If you do not
+ # have one, then status and fullstatus will not work.
+-STATUSURL="http://localhost:@PORT@/server-status"
++PORT="$(grep 'apache_port=' /var/cpanel/cpanel.config 2>/dev/null | sed -e 's/.*=\([.0-9]*:\)\{0,1\}//;' -e 's/[^0-9]*//g' 2>/dev/null)"
++STATUSURL="http://localhost:${PORT:-80}/whm-server-status"
+ 
+ # Source /etc/sysconfig/httpd for $HTTPD setting, etc.
+ if [ -r /etc/sysconfig/httpd ]; then
