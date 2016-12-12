@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.23
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 6
+%define release_prefix 7
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1815,6 +1815,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Dec 06 2016 Dan Muey <dan@cpanel.net> - 2.4.23-7
+- EA-5557: turn off fancy indexing by default since the icons are broken under symlink protect
+
 * Thu Dec 01 2016 Dan Muey <dan@cpanel.net> - 2.4.23-6
 - EA-5712: Patch apachectl to set PORT based on cpanel configuration
 
