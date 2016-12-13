@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.23
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 7
+%define release_prefix 8
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -60,7 +60,7 @@ Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
 Patch60: httpd-2.4.20-asf_httpoxy-response.patch
 # cPanel-specific patches
-Patch301: 2.4.23_cpanel_apachctl.patch
+Patch301: 2.4.23_cpanel_apachectl.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
 Patch303: 2.2.17_cpanel_mailman_suexec.patch
 Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
@@ -74,8 +74,8 @@ BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel >= 1.2.0
 BuildRequires: pcre-devel >= 5.0
-Requires: ea-apr >= 1.5.2-4
-Requires: system-logos >= 7.92.1-1, ea-apr >= 1.5.0
+Requires: ea-apr%{?_isa} >= 1.5.2-4
+Requires: system-logos >= 7.92.1-1
 Requires: ea-apache24-mpm, ea-apache24-cgi
 Requires: ea-apache24-mod_ssl
 Requires: ea-documentroot
@@ -1211,7 +1211,7 @@ mod_watchdog hooks.
 %patch59 -p1 -b .r1556473
 %patch60 -p1 -b .asf_httpoxy-response
 
-%patch301 -p1 -b .cpWHM
+%patch301 -p1 -b .cpapachectl
 %patch302 -p1 -b .cpsuexec1
 %patch303 -p1 -b .cpsuexec2
 %patch304 -p1 -b .cpsuexec3
@@ -1815,8 +1815,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
-* Mon Dec 06 2016 Dan Muey <dan@cpanel.net> - 2.4.23-7
+* Tue Dec 06 2016 Dan Muey <dan@cpanel.net> - 2.4.23-8
 - EA-5557: turn off fancy indexing by default since the icons are broken under symlink protect
+
+* Mon Dec 05 2016 S. Kurt Newman <kurt.newman@cpanel.net> - 2.4.23-7
+- Update apachectl with ulimit calls modifying the open file
+  descriptor limit so that Apache will start up (EA-5662)
 
 * Thu Dec 01 2016 Dan Muey <dan@cpanel.net> - 2.4.23-6
 - EA-5712: Patch apachectl to set PORT based on cpanel configuration
