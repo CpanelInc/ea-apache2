@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.23
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 8
+%define release_prefix 9
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1815,6 +1815,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Dec 13 2016 Dan Muey <dan@cpanel.net> - 2.4.23-9
+- EA-5557: turn off icon directives by default since the icons are broken under symlink protect
+-          and are used by HTMLTable even when fancy indexinf is off
+
 * Tue Dec 06 2016 Dan Muey <dan@cpanel.net> - 2.4.23-8
 - EA-5557: turn off fancy indexing by default since the icons are broken under symlink protect
 
