@@ -14,9 +14,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.23
+Version: 2.4.25
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 9
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -55,17 +55,15 @@ Patch27: httpd-2.4.2-icons.patch
 
 Patch30: httpd-2.4.4-cachehardmax.patch
 # Bug fixes
-Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
-Patch60: httpd-2.4.20-asf_httpoxy-response.patch
 # cPanel-specific patches
 Patch301: 2.4.23_cpanel_apachectl.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
 Patch303: 2.2.17_cpanel_mailman_suexec.patch
 Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
 Patch305: httpd-2.4.12-apxs-modules-dir.patch
-Patch306: httpd-2.4.23-symlink.patch
+Patch306: httpd-2.4.25-symlink.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1206,10 +1204,8 @@ mod_watchdog hooks.
 
 %patch30 -p1 -b .cachehardmax
 
-%patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch59 -p1 -b .r1556473
-%patch60 -p1 -b .asf_httpoxy-response
 
 %patch301 -p1 -b .cpapachectl
 %patch302 -p1 -b .cpsuexec1
@@ -1815,6 +1811,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Dec 21 2016 Cory McIntire <cory@cpanel.net> - 2.4.25-1
+- Updated to version 2.4.25, drop version 2.4.23
+
 * Tue Dec 13 2016 Dan Muey <dan@cpanel.net> - 2.4.23-9
 - EA-5557: turn off icon directives by default since the icons are broken under symlink protect
 -          and are used by HTMLTable even when fancy indexinf is off
