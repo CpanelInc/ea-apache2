@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.25
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -914,6 +914,7 @@ Summary: Dynamic health check of Balancer members (workers) for mod_proxy
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 Requires: ea-apache24-mod_watchdog = 0:%{version}-%{release}
+Conflicts: ea-apache24-mpm = forked
 
 %description -n ea-apache24-mod_proxy_hcheck
 The mod_proxy_hcheck module provides support for dynamic health checking of
@@ -1811,6 +1812,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Jan 04 2017 Dan Muey <dan@cpanel.net> - 2.4.25-3
+* EA-5836: mod_proxy_hcheck w/ prefork segfaults frequently
+
 * Tue Jan 03 2017 Dan Muey <dan@cpanel.net> - 2.4.25-2
 EA-5836: Have httpd.service use /run instead of /var/run
 
