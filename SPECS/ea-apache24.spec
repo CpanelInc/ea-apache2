@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.25
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1811,6 +1811,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Jan 03 2017 Dan Muey <dan@cpanel.net> - 2.4.25-2
+EA-5836: Have httpd.service use /run instead of /var/run
+
 * Wed Dec 21 2016 Cory McIntire <cory@cpanel.net> - 2.4.25-1
 - Updated to version 2.4.25, drop version 2.4.23
 
