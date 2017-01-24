@@ -27,6 +27,16 @@ if [ -f /etc/sysconfig/httpd ]; then
         . /etc/sysconfig/httpd
 fi
 
+# Increase the maximum number of file descriptors to
+# facilitate all the log files on overloaded systems
+MIN_FD_LIMIT=1024
+MAX_FD_LIMIT=16384
+while [ $MIN_FD_LIMIT -lt $MAX_FD_LIMIT ]; do
+    MIN_FD_LIMIT=$(($MIN_FD_LIMIT * 2))
+    ulimit -H -n $MIN_FD_LIMIT 2>/dev/null
+    ulimit -S -n $MIN_FD_LIMIT 2>/dev/null
+done
+
 # Start httpd in the C locale by default.
 HTTPD_LANG=${HTTPD_LANG-"C"}
 
