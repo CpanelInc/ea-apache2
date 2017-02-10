@@ -7,7 +7,7 @@
 INTERVAL=15
 
 # Default cache root.
-CACHE_ROOT=/var/cache/httpd/proxy
+CACHE_ROOT=/var/cache/apache2/proxy
 
 # Cache size limit in bytes (K=Kbytes, M=Mbytes)
 LIMIT=100M
