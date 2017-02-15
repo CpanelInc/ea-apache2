@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.25
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 4
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1812,6 +1812,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Feb 10 2017 Dan Muey <dan@cpanel.net> - 2.4.25-5
+- EA-5514: update htcacheclean CACHE_ROOT to match reality
+
 * Wed Jan 11 2017 Dan Muey <dan@cpanel.net> - 2.4.25-4
 * EA-5845: Increase the maximum number of file descriptors for init.d systems
 
