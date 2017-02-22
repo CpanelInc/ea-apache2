@@ -1,0 +1,25 @@
+From f1edeff28c54f680fa3a7c7c18b0196ca71fdcdf Mon Sep 17 00:00:00 2001
+From: "J. Nick Koston" <nick@cpanel.net>
+Date: Wed, 22 Feb 2017 02:56:47 -0600
+Subject: [PATCH] Increase random seed size in order to reduce number of reads
+ of /dev/urandom
+
+---
+ server/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/server/core.c b/server/core.c
+index 20fa583..fa9070f 100644
+--- a/server/core.c
++++ b/server/core.c
+@@ -5115,7 +5115,7 @@ AP_CORE_DECLARE(void) ap_random_parent_after_fork(void)
+ 
+ AP_CORE_DECLARE(void) ap_init_rng(apr_pool_t *p)
+ {
+-    unsigned char seed[8];
++    unsigned char seed[1024];
+     apr_status_t rv;
+     rng = apr_random_standard_new(p);
+     do {
+-- 
+2.11.1
