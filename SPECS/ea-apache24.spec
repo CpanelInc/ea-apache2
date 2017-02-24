@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.25
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 5
+%define release_prefix 6
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -64,6 +64,9 @@ Patch303: 2.2.17_cpanel_mailman_suexec.patch
 Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
 Patch305: httpd-2.4.12-apxs-modules-dir.patch
 Patch306: httpd-2.4.25-symlink.patch
+
+# cPanel Performance Patches
+Patch401: 0001-Increase-random-seed-size.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1215,6 +1218,8 @@ mod_watchdog hooks.
 %patch305 -p1 -b .cpapxs
 %patch306 -p1 -b .symlink
 
+%patch401 -p1 -b .randomsstartupperformance
+
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -1812,6 +1817,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Feb 22 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.25-6
+- Add patch for higher seed chunks
+
 * Fri Feb 10 2017 Dan Muey <dan@cpanel.net> - 2.4.25-5
 - EA-5514: update htcacheclean CACHE_ROOT to match reality
 
