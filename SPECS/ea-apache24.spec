@@ -95,6 +95,7 @@ Requires: ea-apache24-tools = %{version}-%{release}
 Requires: ea-apache24-mod_proxy_http
 Requires: ea-apache24-mod_proxy
 Requires: ea-cpanel-tools
+Requires: links
 Requires(post): chkconfig
 
 %description
@@ -1817,6 +1818,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Mar 13 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.25-7
+- Added requirement for links for apachectl-status
+
 * Wed Feb 22 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.25-6
 - Add patch for higher seed chunks
 
