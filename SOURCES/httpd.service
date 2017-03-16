@@ -7,6 +7,7 @@ ConditionPathExists=!/etc/httpdisable
 [Service]
 Type=forking
 ExecStart=/usr/local/cpanel/scripts/restartsrv_httpd --no-verbose
+ExecStop=/usr/local/cpanel/scripts/restartsrv_httpd stop --no-verbose
 PIDFile=/run/apache2/httpd.pid
 
 [Install]
