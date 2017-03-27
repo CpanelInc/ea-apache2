@@ -1820,7 +1820,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
-* Fri Mar 10 2017 Cory McIntire <cory@cpanel.net> - 2.4.25-9
+* Fri Mar 24 2017 Cory McIntire <cory@cpanel.net> - 2.4.25-9
 - Add patch for segfaulting graceful restarts
 
 * Thu Mar 16 2017 Dan Muey <dan@cpanel.net> - 2.4.25-8
