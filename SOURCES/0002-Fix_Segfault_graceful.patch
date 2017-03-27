@@ -1,0 +1,22 @@
+--- a/server/mpm/event/event.c
++++ b/server/mpm/event/event.c
+@@ -2976,7 +2976,7 @@
+     }
+
+     /* we've been told to restart */
+-    apr_signal(SIGHUP, SIG_IGN);
++    apr_signal(AP_SIG_GRACEFUL, SIG_IGN);
+
+     if (one_process) {
+         /* not worth thinking about */
+--- a/server/mpm/worker/worker.c
++++ b/server/mpm/worker/worker.c
+@@ -1970,7 +1970,7 @@
+     }
+
+     /* we've been told to restart */
+-    apr_signal(SIGHUP, SIG_IGN);
++    apr_signal(AP_SIG_GRACEFUL, SIG_IGN);
+
+     if (one_process) {
+         /* not worth thinking about */
