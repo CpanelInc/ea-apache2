@@ -16,7 +16,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.25
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 7
+%define release_prefix 9
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -67,6 +67,7 @@ Patch306: httpd-2.4.25-symlink.patch
 
 # cPanel Performance Patches
 Patch401: 0001-Increase-random-seed-size.patch
+Patch402: 0002-Fix_Segfault_graceful.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1220,6 +1221,7 @@ mod_watchdog hooks.
 %patch306 -p1 -b .symlink
 
 %patch401 -p1 -b .randomsstartupperformance
+%patch402 -p1 -b .fixsegfaultgraceful
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1818,6 +1820,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Mar 24 2017 Cory McIntire <cory@cpanel.net> - 2.4.25-9
+- Add patch for segfaulting graceful restarts
+
+* Thu Mar 16 2017 Dan Muey <dan@cpanel.net> - 2.4.25-8
+- ZC-2483: Add ExecStop to systemd config
+
 * Mon Mar 13 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.25-7
 - Added requirement for links for apachectl-status
 
