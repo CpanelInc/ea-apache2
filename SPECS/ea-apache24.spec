@@ -13,7 +13,7 @@
 }
 
 # Don't build HTTP2 module if we're 32bit
-%if %{__isa_bits} == 64
+%ifarch x86_64
 %global with_http2   1
 %else
 %global with_http2   0
@@ -1869,6 +1869,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Jun 27 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.25-12
+- Replace __isa w/ifarch
+
 * Fri Jun 23 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.25-11
 - Disable HTTP2 building on 32bit architectures
 
