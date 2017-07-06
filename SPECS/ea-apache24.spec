@@ -12,11 +12,18 @@
 %filter_setup
 }
 
+# Don't build HTTP2 module if we're 32bit
+%ifarch x86_64
+%global with_http2   1
+%else
+%global with_http2   0
+%endif
+
 Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.25
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 9
+%define release_prefix 11
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -32,7 +39,9 @@ Source11: autoindex.conf
 Source22: cgid.conf
 Source23: manual.conf
 Source43: cperror.conf
-
+%if %{with_http2}
+Source53: http2.conf
+%endif
 # Documentation
 Source30: README.confd
 Source40: htcacheclean.init
@@ -76,6 +85,11 @@ BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel >= 1.2.0
 BuildRequires: pcre-devel >= 5.0
+BuildRequires: ea-openssl ea-openssl-devel
+%if %{with_http2}
+BuildRequires: ea-nghttp2 ea-libnghttp2
+%endif
+
 Requires: ea-apr%{?_isa} >= 1.5.2-4
 Requires: system-logos >= 7.92.1-1
 Requires: ea-apache24-mpm, ea-apache24-cgi
@@ -130,6 +144,19 @@ BuildArch: noarch
 The ea-apache24-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
 also be found at http://httpd.apache.org/docs/2.4/.
+
+%if %{with_http2}
+%package -n ea-apache24-mod_http2
+Group: System Environment/Daemons
+Summary: HTTP2 module for Apache HTTP Server
+BuildRequires: ea-libnghttp2-devel ea-openssl ea-openssl-devel
+Requires: ea-nghttp2
+Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
+Conflicts: ea-apache24-mod_mpm_itk
+
+%description -n ea-apache24-mod_http2
+This module sets up http2
+%endif
 
 %package tools
 Group: System Environment/Daemons
@@ -1287,7 +1314,14 @@ export LYNX_PATH=/usr/bin/links
     --enable-pie \
     --with-pcre \
     --enable-mods-shared=all \
-    --enable-ssl --with-ssl \
+%if %{with_http2}    
+    --enable-ssl --with-ssl=/opt/cpanel/ea-openssl/ \
+    --enable-ssl-staticlib-deps \
+    --with-nghttp2 \
+    --enable-nghttp2-staticlib-deps \
+%else
+	--enable-ssl --with-ssl \
+%endif
     --disable-distcache \
     --enable-proxy \
     --enable-proxy-fdpass \
@@ -1334,10 +1368,14 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
-for f in cgid.conf manual.conf cperror.conf autoindex.conf; do
+for f in cgid.conf manual.conf cperror.conf autoindex.conf ; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
+
+%if %{with_http2}
+install -m 644 -p $RPM_SOURCE_DIR/http2.conf $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/http2.conf
+%endif
 
 # Extra config trimmed:
 rm -v docs/conf/extra/httpd-{ssl,userdir}.conf
@@ -1487,6 +1525,9 @@ for mod in \
   socache_shmcb speling status substitute suexec unique_id unixd userdir \
   usertrack version vhost_alias watchdog heartbeat heartmonitor \
   ssl \
+%if %{with_http2}
+  http2 \
+%endif
   proxy_html xml2enc \
   ldap authnz_ldap \
   session session_cookie session_dbd auth_form session_crypto proxy_hcheck
@@ -1527,6 +1568,12 @@ EOF
 %attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
 %config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
 %doc docs/conf/extra/httpd-info.conf
+EOF
+    elif [ "${mod}" = "http2" ]; then
+    	cat > files.${mod} <<EOF
+%attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.d/http2.conf
 EOF
     else
         cat > files.${mod} <<EOF
@@ -1595,7 +1642,6 @@ test -f /etc/sysconfig/httpd-disable-posttrans || \
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
 
-%post -n ea-apache24-mod_ssl
 umask 077
 
 if [ -f %{sslkey} -o -f %{sslcert} ]; then
@@ -1800,6 +1846,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_socache_memcache -f files.socache_memcache
 %files -n ea-apache24-mod_speling -f files.speling
 %files -n ea-apache24-mod_ssl -f files.ssl
+%if %{with_http2}
+%files -n ea-apache24-mod_http2 -f files.http2
+%endif
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
 %files -n ea-apache24-mod_substitute -f files.substitute
 %files -n ea-apache24-mod_suexec -f files.suexec
@@ -1820,6 +1869,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Jun 27 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.25-12
+- Replace __isa w/ifarch
+
+* Fri Jun 23 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.25-11
+- Disable HTTP2 building on 32bit architectures
+
+* Fri Jun 09 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.25-10
+- Add HTTP2 Support
+
 * Fri Mar 24 2017 Cory McIntire <cory@cpanel.net> - 2.4.25-9
 - Add patch for segfaulting graceful restarts
 
