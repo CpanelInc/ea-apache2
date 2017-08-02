@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.27
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -152,7 +152,7 @@ Summary: HTTP2 module for Apache HTTP Server
 BuildRequires: ea-libnghttp2-devel ea-openssl ea-openssl-devel
 Requires: ea-nghttp2
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Conflicts: ea-apache24-mod_mpm_itk
+Conflicts: ea-apache24-mod_mpm_itk, ea-apache24-mod_mpm_prefork
 
 %description -n ea-apache24-mod_http2
 This module sets up http2
@@ -185,7 +185,7 @@ Summary: Prefork Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = forked
 Conflicts: ea-apache24-mpm = threaded, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_event
-Conflicts: ea-apache24-mod_cgid
+Conflicts: ea-apache24-mod_cgid, ea-apache24-mod_http2
 Requires: ea-apache24-mod_cgi
 
 %description -n ea-apache24-mod_mpm_prefork
@@ -1869,6 +1869,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Aug 02 2017 Cory McIntire <cory@cpanel.net> - 2.4.27-3
+- Add conflicts between prefork and HTTP2
+
 * Fri Jul 14 2017 Felipe Gasper <felipe@cpanel.net> - 2.4.27-2
 - Apply fix for https://bz.apache.org/bugzilla/show_bug.cgi?id=61283
 
