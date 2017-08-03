@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.27
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -66,6 +66,7 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 # Bug fixes
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
+Patch60: httpd-2.4.27-r1754164.patch
 # cPanel-specific patches
 Patch301: 2.4.23_cpanel_apachectl.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
@@ -1238,6 +1239,7 @@ mod_watchdog hooks.
 
 %patch56 -p1 -b .uniqueid
 %patch59 -p1 -b .r1556473
+%patch60 -p1 -b .r1754164
 
 %patch301 -p1 -b .cpapachectl
 %patch302 -p1 -b .cpsuexec1
@@ -1867,6 +1869,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Jul 14 2017 Felipe Gasper <felipe@cpanel.net> - 2.4.27-2
+- Apply fix for https://bz.apache.org/bugzilla/show_bug.cgi?id=61283
+
 * Fri Jul 07 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.27-1
 - Updated to version 2.4.27 via update_pkg.pl (EA-6522)
 

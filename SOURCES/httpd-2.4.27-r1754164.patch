@@ -1,0 +1,30 @@
+From https://svn.apache.org/viewvc/httpd/httpd/trunk/modules/proxy/mod_proxy_wstunnel.c?r1=1754164&r2=1754163&pathrev=1754164
+From: Felipe Gasper <felipe@cpanel.net>
+Date: Fri, 14 July 2017 16:18:36 -0500
+Subject: [PATCH] Apply custom cpanel changes
+
+This patch performs the following work:
+ - Applies the change from upstream SVN 1754164 to fix issue 61283.
+
+diff --git a/modules/proxy/mod_proxy_wstunnel.c b/modules/proxy/mod_proxy_wstunnel.c
+--- a/modules/proxy/mod_proxy_wstunnel.c
++++ b/modules/proxy/mod_proxy_wstunnel.c
+@@ -204,7 +204,7 @@
+                                                                   c,
+                                                                   header_brigade,
+                                                                   bb, "sock",
+-                                                                  NULL,
++                                                                  &replied,
+                                                                   AP_IOBUFSIZE,
+                                                                   0)
+                                                                  != APR_SUCCESS;
+@@ -229,8 +229,7 @@
+                     done |= ap_proxy_transfer_between_connections(r, c,
+                                                                   backconn, bb,
+                                                                   header_brigade,
+-                                                                  "client",
+-                                                                  &replied,
++                                                                  "client", NULL,
+                                                                   AP_IOBUFSIZE,
+                                                                   0)
+                                                                  != APR_SUCCESS;
