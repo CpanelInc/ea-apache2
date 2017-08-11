@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.27
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -99,6 +99,7 @@ Requires: ea-apache24-tools
 Requires: ea-apache24-config
 Requires: ea-apache24-config-runtime
 Requires: ea-apache24-mod_bwlimited
+Requires: ea-apache24-mod_proxy_wstunnel
 
 Obsoletes: httpd-suexec
 Conflicts: httpd-mmn
@@ -1869,6 +1870,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Aug 10 2017 Felipe Gasper <felipe@cpanel.net> - 2.4.27-4
+- Require mod_proxy_wstunnel for ea-apache24.
+
 * Tue Aug 02 2017 Cory McIntire <cory@cpanel.net> - 2.4.27-3
 - Add conflicts between prefork and HTTP2
 
