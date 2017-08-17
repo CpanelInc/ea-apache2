@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.27
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -77,6 +77,7 @@ Patch306: httpd-2.4.25-symlink.patch
 
 # cPanel Performance Patches
 Patch401: 0001-Increase-random-seed-size.patch
+Patch402: 0002-mod_h2-v1.10.10-apache-2.4.x.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -99,6 +100,7 @@ Requires: ea-apache24-tools
 Requires: ea-apache24-config
 Requires: ea-apache24-config-runtime
 Requires: ea-apache24-mod_bwlimited
+Requires: ea-apache24-mod_proxy_wstunnel
 
 Obsoletes: httpd-suexec
 Conflicts: httpd-mmn
@@ -1249,6 +1251,7 @@ mod_watchdog hooks.
 %patch306 -p1 -b .symlink
 
 %patch401 -p1 -b .randomsstartupperformance
+%patch402 -p0 -b .h2fixfor32bitstalls
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1869,6 +1872,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Aug 10 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.27-5
+- Patched H2 for stalling when writing > 32k
+
+* Thu Aug 10 2017 Felipe Gasper <felipe@cpanel.net> - 2.4.27-4
+- Require mod_proxy_wstunnel for ea-apache24.
+
 * Tue Aug 02 2017 Cory McIntire <cory@cpanel.net> - 2.4.27-3
 - Add conflicts between prefork and HTTP2
 
