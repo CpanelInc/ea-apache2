@@ -13,48 +13,42 @@ This patch performs the following work:
  support/apachectl.in | 21 +++++++++++----------
  1 file changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/support/apachectl.in b/support/apachectl.in
-index c6ac3ea..06c775f 100644
+index c6ac3ea..f5fb106 100644
 --- a/support/apachectl.in
 +++ b/support/apachectl.in
-@@ -56,26 +56,27 @@ fi
+@@ -56,7 +56,8 @@ fi
  #
  # the URL to your server's mod_status status page.  If you do not
  # have one, then status and fullstatus will not work.
 -STATUSURL="http://localhost:@PORT@/server-status"
 +PORT="$(grep 'apache_port=' /var/cpanel/cpanel.config 2>/dev/null | sed -e 's/.*=\([.0-9]*:\)\{0,1\}//;' -e 's/[^0-9]*//g' 2>/dev/null)"
 +STATUSURL="http://localhost:${PORT:-80}/whm-server-status"
- 
+
  # Source /etc/sysconfig/httpd for $HTTPD setting, etc.
  if [ -r /etc/sysconfig/httpd ]; then
-    . /etc/sysconfig/httpd
- fi
- 
--#
-+# ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
-+
- # Set this variable to a command that increases the maximum
+@@ -68,7 +69,22 @@ fi
  # number of file descriptors allowed per child process. This is
  # critical for configurations that use many file descriptors,
  # such as mass vhosting, or a multithreaded server.
 -ULIMIT_MAX_FILES="@APACHECTL_ULIMIT@"
--# --------------------                              --------------------
--# ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
--
--# Set the maximum number of file descriptors allowed per child process.
--if [ "x$ULIMIT_MAX_FILES" != "x" ] ; then
--    $ULIMIT_MAX_FILES
--fi
-+MIN_FD_LIMIT=1024
-+MAX_FD_LIMIT=16384
++
++# Can be overwritten by setting MIN_FD_LIMIT and MAX_FD_LIMIT in /etc/sysconfig/httpd
++if [ -z "$MIN_FD_LIMIT" ]; then
++    MIN_FD_LIMIT=1024
++fi
++
++if [ -z "$MAX_FD_LIMIT" ]; then
++    MAX_FD_LIMIT=16384
++fi
++
 +while [ $MIN_FD_LIMIT -lt $MAX_FD_LIMIT ]; do
 +    MIN_FD_LIMIT=$(($MIN_FD_LIMIT * 2))
 +    ulimit -H -n $MIN_FD_LIMIT 2>/dev/null
 +    ulimit -S -n $MIN_FD_LIMIT 2>/dev/null
 +done
++
+ # --------------------                              --------------------
+ # ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
  
- ERROR=0
- if [ "x$ARGV" = "x" ] ; then 
 -- 
 2.11.0
-

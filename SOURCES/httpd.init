@@ -29,8 +29,16 @@ fi
 
 # Increase the maximum number of file descriptors to
 # facilitate all the log files on overloaded systems
-MIN_FD_LIMIT=1024
-MAX_FD_LIMIT=16384
+
+# Can be overwritten by setting MIN_FD_LIMIT and MAX_FD_LIMIT in /etc/sysconfig/httpd
+if [ -z "$MIN_FD_LIMIT" ]; then
+    MIN_FD_LIMIT=1024
+fi
+
+if [ -z "$MAX_FD_LIMIT" ]; then
+    MAX_FD_LIMIT=16384
+fi
+
 while [ $MIN_FD_LIMIT -lt $MAX_FD_LIMIT ]; do
     MIN_FD_LIMIT=$(($MIN_FD_LIMIT * 2))
     ulimit -H -n $MIN_FD_LIMIT 2>/dev/null
