@@ -29,3 +29,7 @@ HTTPD_LANG=C
 # location needs to be reported in the PIDFILE.
 #
 #PIDFILE=/var/run/httpd/httpd.pid
+
+# cPanel Specific Variables to allow users to override FD limits
+#MIN_FD_LIMIT=10000
+#MAX_FD_LIMIT=60000
