@@ -1706,7 +1706,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/apache2/conf/magic
 %config(noreplace) %{_sysconfdir}/apache2/conf/mime.types
 
-%{_initrddir}/httpd
+%config(noreplace) %{_initrddir}/httpd
 %{_initrddir}/htcacheclean
 
 %dir %{_sysconfdir}/apache2/conf.d
