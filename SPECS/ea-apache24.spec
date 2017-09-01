@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.27
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 5
+%define release_prefix 6
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1706,7 +1706,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/apache2/conf/magic
 %config(noreplace) %{_sysconfdir}/apache2/conf/mime.types
 
-%{_initrddir}/httpd
+%config(noreplace) %{_initrddir}/httpd
 %{_initrddir}/htcacheclean
 
 %dir %{_sysconfdir}/apache2/conf.d
@@ -1872,6 +1872,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Aug 28 2017 Dan Muey <dan@cpanel.net> - 2.4.27-6
+- EA-6274 Allow users to override hard coded ulimit() by using /etc/sysconfig/httpd
+
 * Thu Aug 10 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.27-5
 - Patched H2 for stalling when writing > 32k
 
