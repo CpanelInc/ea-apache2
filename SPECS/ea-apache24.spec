@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.27
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 6
+%define release_prefix 7
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1172,7 +1172,7 @@ ea-apache24 package.
 
 %package -n ea-apache24-mod_unique_id
 Group: System Environment/Daemons
-Summary: Unique request identifier module for the Apache HTTP Server
+Summary: Unique request identifier module for the Apache HTTP Server (causes noticeable performance degradation)
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
 %description -n ea-apache24-mod_unique_id
@@ -1872,6 +1872,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Sep 11 2017 Dan Muey <dan@cpanel.net> - 2.4.27-7
+EA-6096: Add note to mod_unique_id summary about performance degradation
+
 * Mon Aug 28 2017 Dan Muey <dan@cpanel.net> - 2.4.27-6
 - EA-6274 Allow users to override hard coded ulimit() by using /etc/sysconfig/httpd
 
