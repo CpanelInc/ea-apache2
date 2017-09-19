@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.27
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 7
+%define release_prefix 8
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -78,6 +78,9 @@ Patch306: httpd-2.4.25-symlink.patch
 # cPanel Performance Patches
 Patch401: 0001-Increase-random-seed-size.patch
 Patch402: 0002-mod_h2-v1.10.10-apache-2.4.x.patch
+
+# cPanel Security Patches
+Patch501: 0003-Disallow-Methods-Registration-at-Runtime.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1252,6 +1255,7 @@ mod_watchdog hooks.
 
 %patch401 -p1 -b .randomsstartupperformance
 %patch402 -p0 -b .h2fixfor32bitstalls
+%patch501 -p1 -b .disallowmethodregistrations
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1872,8 +1876,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Sep 19 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.27-8
+- Patch core for htaccess method registrations
+
 * Mon Sep 11 2017 Dan Muey <dan@cpanel.net> - 2.4.27-7
-EA-6096: Add note to mod_unique_id summary about performance degradation
+- EA-6096: Add note to mod_unique_id summary about performance degradation
 
 * Mon Aug 28 2017 Dan Muey <dan@cpanel.net> - 2.4.27-6
 - EA-6274 Allow users to override hard coded ulimit() by using /etc/sysconfig/httpd
