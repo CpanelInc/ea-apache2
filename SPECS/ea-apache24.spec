@@ -21,9 +21,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.27
+Version: 2.4.28
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 8
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -66,7 +66,6 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 # Bug fixes
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
-Patch60: httpd-2.4.27-r1754164.patch
 # cPanel-specific patches
 Patch301: 2.4.23_cpanel_apachectl.patch
 Patch302: 2.2.17_cpanel_suexec_script_share.patch
@@ -77,10 +76,8 @@ Patch306: httpd-2.4.25-symlink.patch
 
 # cPanel Performance Patches
 Patch401: 0001-Increase-random-seed-size.patch
-Patch402: 0002-mod_h2-v1.10.10-apache-2.4.x.patch
 
 # cPanel Security Patches
-Patch501: 0003-Disallow-Methods-Registration-at-Runtime.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1244,7 +1241,6 @@ mod_watchdog hooks.
 
 %patch56 -p1 -b .uniqueid
 %patch59 -p1 -b .r1556473
-%patch60 -p1 -b .r1754164
 
 %patch301 -p1 -b .cpapachectl
 %patch302 -p1 -b .cpsuexec1
@@ -1254,8 +1250,6 @@ mod_watchdog hooks.
 %patch306 -p1 -b .symlink
 
 %patch401 -p1 -b .randomsstartupperformance
-%patch402 -p0 -b .h2fixfor32bitstalls
-%patch501 -p1 -b .disallowmethodregistrations
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1876,8 +1870,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Oct 10 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.28-1
+- Update Apache to 2.4.28
+
 * Wed Sep 19 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.27-8
-- Patch core for htaccess method registrations
+- Patch core for htaccess method registrations - CVE-2017-9798
 
 * Mon Sep 11 2017 Dan Muey <dan@cpanel.net> - 2.4.27-7
 - EA-6096: Add note to mod_unique_id summary about performance degradation
