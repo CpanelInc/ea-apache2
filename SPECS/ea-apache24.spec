@@ -21,7 +21,7 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.28
+Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -64,7 +64,6 @@ Patch27: httpd-2.4.2-icons.patch
 
 Patch30: httpd-2.4.4-cachehardmax.patch
 # Bug fixes
-Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch59: httpd-2.4.6-r1556473.patch
 # cPanel-specific patches
 Patch301: 2.4.23_cpanel_apachectl.patch
@@ -1239,7 +1238,6 @@ mod_watchdog hooks.
 
 %patch30 -p1 -b .cachehardmax
 
-%patch56 -p1 -b .uniqueid
 %patch59 -p1 -b .r1556473
 
 %patch301 -p1 -b .cpapachectl
@@ -1870,6 +1868,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Oct 18 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.29-1
+- Updated to version 2.4.29 via update_pkg.pl (ZC-2981)
+- Removed mod_unique_id patch as it was patched upstream.
+
 * Tue Oct 10 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.28-1
 - Update Apache to 2.4.28
 
