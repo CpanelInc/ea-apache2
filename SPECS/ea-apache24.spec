@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -75,6 +75,7 @@ Patch306: httpd-2.4.25-symlink.patch
 
 # cPanel Performance Patches
 Patch401: 0001-Increase-random-seed-size.patch
+Patch402: 0002-piped_logging_cpanel.patch
 
 # cPanel Security Patches
 
@@ -1248,6 +1249,7 @@ mod_watchdog hooks.
 %patch306 -p1 -b .symlink
 
 %patch401 -p1 -b .randomsstartupperformance
+%patch402 -p1 -b .pipedlogging
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1313,7 +1315,7 @@ export LYNX_PATH=/usr/bin/links
     --enable-pie \
     --with-pcre \
     --enable-mods-shared=all \
-%if %{with_http2}    
+%if %{with_http2}
     --enable-ssl --with-ssl=/opt/cpanel/ea-openssl/ \
     --enable-ssl-staticlib-deps \
     --with-nghttp2 \
@@ -1535,7 +1537,7 @@ do
     # add to the condition to have comment-disabled modules
     if [ "${mod}" = "info" ]; then
       cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
-# Once mod_info is loaded into the server, its handler capability is available 
+# Once mod_info is loaded into the server, its handler capability is available
 # in all configuration files, including per-directory files (e.g., .htaccess).
 # This may have security-related ramifications for your server. In particular,
 # this module can leak sensitive information from the configuration directives
@@ -1868,6 +1870,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Sun Dec 24 2017 Cory McIntire <cory@cpanel.net> - 2.4.29-2
+- EA-6020: Restarting Apache while using splitlogs can result in "Broken pipe" errors
+- Applying patch provided by Gary Stanley (gary@cpanel.net)
+
 * Wed Oct 18 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.29-1
 - Updated to version 2.4.29 via update_pkg.pl (ZC-2981)
 - Removed mod_unique_id patch as it was patched upstream.
