@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -960,7 +960,7 @@ Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
-BuildRequires: libxml2-devel
+BuildRequires: ea-libxml2-devel
 Obsoletes: mod_proxy_html
 
 %description -n ea-apache24-mod_proxy_html
@@ -1870,6 +1870,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Dec 27 2017 <cory@cpanel.net> - 2.4.29-3
+1881 - EA-7044: Adjust Apache to use ea-libxml2
+
 * Sun Dec 24 2017 Cory McIntire <cory@cpanel.net> - 2.4.29-2
 - EA-6020: Restarting Apache while using splitlogs can result in "Broken pipe" errors
 - Applying patch provided by Gary Stanley (gary@cpanel.net)
