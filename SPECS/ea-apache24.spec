@@ -1336,6 +1336,7 @@ export LYNX_PATH=/usr/bin/links
     --enable-imagemap \
     --disable-echo \
     --disable-v4-mapped \
+    --with-libxml2=/opt/cpanel/ea-libxml2 \
     $*
 make %{?_smp_mflags}
 
