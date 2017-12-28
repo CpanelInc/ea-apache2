@@ -1278,8 +1278,13 @@ autoheader && autoconf || exit 1
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache2/build:g" support/apxs.in
 
-export CFLAGS=$RPM_OPT_FLAGS
-export LDFLAGS="-Wl,-z,relro,-z,now"
+export CFLAGS="$RPM_OPT_FLAGS"
+
+%ifarch x86_64
+export LDFLAGS="-Wl,-rpath,/opt/cpanel/ea-libxml2/lib64 -L/opt/cpanel/ea-libxml2/lib64 -lxml2 -lz -llzma -lm -ldl -Wl,-z,relro,-z,now"
+%else
+export LDFLAGS="-Wl,-rpath,/opt/cpanel/ea-libxml2/lib -L/opt/cpanel/ea-libxml2/lib -lxml2 -lz -llzma -lm -ldl -Wl,-z,relro,-z,now"
+%endif
 
 %ifarch ppc64
 CFLAGS="$CFLAGS -O3"
@@ -1335,8 +1340,8 @@ export LYNX_PATH=/usr/bin/links
     --enable-authn-alias \
     --enable-imagemap \
     --disable-echo \
+    --with-libxml2=/opt/cpanel/ea-libxml2/include/libxml2 \
     --disable-v4-mapped \
-    --with-libxml2=/opt/cpanel/ea-libxml2 \
     $*
 make %{?_smp_mflags}
 
