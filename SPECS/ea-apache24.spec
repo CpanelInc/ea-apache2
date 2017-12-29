@@ -1279,12 +1279,7 @@ autoheader && autoconf || exit 1
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache2/build:g" support/apxs.in
 
 export CFLAGS="$RPM_OPT_FLAGS"
-
-%ifarch x86_64
-export LDFLAGS="-Wl,-rpath,/opt/cpanel/ea-libxml2/lib64 -L/opt/cpanel/ea-libxml2/lib64 -lxml2 -lz -llzma -lm -ldl -Wl,-z,relro,-z,now"
-%else
-export LDFLAGS="-Wl,-rpath,/opt/cpanel/ea-libxml2/lib -L/opt/cpanel/ea-libxml2/lib -lxml2 -lz -llzma -lm -ldl -Wl,-z,relro,-z,now"
-%endif
+export LDFLAGS="-Wl,-rpath,/opt/cpanel/ea-libxml2/%{_lib} -L/opt/cpanel/ea-libxml2/%{_lib} -lxml2 -lz -llzma -lm -ldl -Wl,-z,relro,-z,now"
 
 %ifarch ppc64
 CFLAGS="$CFLAGS -O3"
@@ -1877,7 +1872,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Wed Dec 27 2017 <cory@cpanel.net> - 2.4.29-3
-1881 - EA-7044: Adjust Apache to use ea-libxml2
+- EA-7044: Adjust Apache to use ea-libxml2
 
 * Sun Dec 24 2017 Cory McIntire <cory@cpanel.net> - 2.4.29-2
 - EA-6020: Restarting Apache while using splitlogs can result in "Broken pipe" errors
