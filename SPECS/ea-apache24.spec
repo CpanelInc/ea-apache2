@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -76,6 +76,7 @@ Patch306: httpd-2.4.25-symlink.patch
 # cPanel Performance Patches
 Patch401: 0001-Increase-random-seed-size.patch
 Patch402: 0002-piped_logging_cpanel.patch
+Patch403: 0003-silence-long-lost-pids.patch
 
 # cPanel Security Patches
 
@@ -1250,6 +1251,7 @@ mod_watchdog hooks.
 
 %patch401 -p1 -b .randomsstartupperformance
 %patch402 -p1 -b .pipedlogging
+%patch403 -p1 -b .longlostpids
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1871,6 +1873,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Jan 12 2018 <cory@cpanel.net> - 2.4.29-4
+- EA-7060: Supress Long Lost Pids warning
+- patch provided by Gary Stanley <gary@cpanel.net>
+
 * Wed Dec 27 2017 <cory@cpanel.net> - 2.4.29-3
 - EA-7044: Adjust Apache to use ea-libxml2
 
