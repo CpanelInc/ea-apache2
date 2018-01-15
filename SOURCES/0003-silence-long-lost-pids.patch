@@ -1,0 +1,36 @@
+diff -u -r httpd-2.4.29.old/server/mpm/event/event.c httpd-2.4.29/server/mpm/event/event.c
+--- httpd-2.4.29.old/server/mpm/event/event.c   2017-09-22 10:55:22.000000000 +0000
++++ httpd-2.4.29/server/mpm/event/event.c 2017-12-26 20:38:28.396747769 +0000
+@@ -2829,7 +2829,7 @@
+                 /* Great, we've probably just lost a slot in the
+                  * scoreboard.  Somehow we don't know about this child.
+                  */
+-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0,
++                ap_log_error(APLOG_MARK, APLOG_DEBUG, 0,
+                              ap_server_conf, APLOGNO(00488)
+                              "long lost child came home! (pid %ld)",
+                              (long) pid.pid);
+diff -u -r httpd-2.4.29.old/server/mpm/prefork/prefork.c httpd-2.4.29/server/mpm/prefork/prefork.c
+--- httpd-2.4.29.old/server/mpm/prefork/prefork.c  2017-08-16 16:49:12.000000000 +0000
++++ httpd-2.4.29/server/mpm/prefork/prefork.c   2017-12-26 20:38:45.796748654 +0000
+@@ -994,7 +994,7 @@
+                  * scoreboard.  Somehow we don't know about this
+                  * child.
+                  */
+-                ap_log_error(APLOG_MARK, APLOG_WARNING,
++                ap_log_error(APLOG_MARK, APLOG_DEBUG,
+                             0, ap_server_conf, APLOGNO(00167)
+                             "long lost child came home! (pid %ld)", (long)pid.pid);
+             }
+diff -u -r httpd-2.4.29.old/server/mpm/worker/worker.c httpd-2.4.29/server/mpm/worker/worker.c
+--- httpd-2.4.29.old/server/mpm/worker/worker.c 2017-06-05 12:09:49.000000000 +0000
++++ httpd-2.4.29/server/mpm/worker/worker.c  2017-12-26 20:38:12.007746937 +0000
+@@ -1620,7 +1620,7 @@
+                 /* Great, we've probably just lost a slot in the
+                  * scoreboard.  Somehow we don't know about this child.
+                  */
+-                ap_log_error(APLOG_MARK, APLOG_WARNING, 0,
++                ap_log_error(APLOG_MARK, APLOG_DEBUG, 0,
+                              ap_server_conf, APLOGNO(00291)
+                              "long lost child came home! (pid %ld)",
+                              (long)pid.pid);
