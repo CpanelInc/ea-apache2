@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -75,6 +75,7 @@ Patch306: httpd-2.4.25-symlink.patch
 
 # cPanel Performance Patches
 Patch401: 0001-Increase-random-seed-size.patch
+Patch402: 0002-piped_logging_cpanel.patch
 
 # cPanel Security Patches
 
@@ -959,7 +960,7 @@ Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
-BuildRequires: libxml2-devel
+BuildRequires: ea-libxml2-devel
 Obsoletes: mod_proxy_html
 
 %description -n ea-apache24-mod_proxy_html
@@ -1248,6 +1249,7 @@ mod_watchdog hooks.
 %patch306 -p1 -b .symlink
 
 %patch401 -p1 -b .randomsstartupperformance
+%patch402 -p1 -b .pipedlogging
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1276,8 +1278,8 @@ autoheader && autoconf || exit 1
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache2/build:g" support/apxs.in
 
-export CFLAGS=$RPM_OPT_FLAGS
-export LDFLAGS="-Wl,-z,relro,-z,now"
+export CFLAGS="$RPM_OPT_FLAGS"
+export LDFLAGS="-Wl,-rpath,/opt/cpanel/ea-libxml2/%{_lib} -L/opt/cpanel/ea-libxml2/%{_lib} -lxml2 -lz -llzma -lm -ldl -Wl,-z,relro,-z,now"
 
 %ifarch ppc64
 CFLAGS="$CFLAGS -O3"
@@ -1313,7 +1315,7 @@ export LYNX_PATH=/usr/bin/links
     --enable-pie \
     --with-pcre \
     --enable-mods-shared=all \
-%if %{with_http2}    
+%if %{with_http2}
     --enable-ssl --with-ssl=/opt/cpanel/ea-openssl/ \
     --enable-ssl-staticlib-deps \
     --with-nghttp2 \
@@ -1333,6 +1335,7 @@ export LYNX_PATH=/usr/bin/links
     --enable-authn-alias \
     --enable-imagemap \
     --disable-echo \
+    --with-libxml2=/opt/cpanel/ea-libxml2/include/libxml2 \
     --disable-v4-mapped \
     $*
 make %{?_smp_mflags}
@@ -1535,7 +1538,7 @@ do
     # add to the condition to have comment-disabled modules
     if [ "${mod}" = "info" ]; then
       cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
-# Once mod_info is loaded into the server, its handler capability is available 
+# Once mod_info is loaded into the server, its handler capability is available
 # in all configuration files, including per-directory files (e.g., .htaccess).
 # This may have security-related ramifications for your server. In particular,
 # this module can leak sensitive information from the configuration directives
@@ -1868,6 +1871,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Dec 27 2017 <cory@cpanel.net> - 2.4.29-3
+- EA-7044: Adjust Apache to use ea-libxml2
+
+* Sun Dec 24 2017 Cory McIntire <cory@cpanel.net> - 2.4.29-2
+- EA-6020: Restarting Apache while using splitlogs can result in "Broken pipe" errors
+- Applying patch provided by Gary Stanley (gary@cpanel.net)
+
 * Wed Oct 18 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.29-1
 - Updated to version 2.4.29 via update_pkg.pl (ZC-2981)
 - Removed mod_unique_id patch as it was patched upstream.
