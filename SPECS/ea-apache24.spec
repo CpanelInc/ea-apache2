@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 6
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -75,7 +75,7 @@ Patch306: httpd-2.4.25-symlink.patch
 
 # cPanel Performance Patches
 Patch401: 0001-Increase-random-seed-size.patch
-Patch402: 0002-piped_logging_cpanel.patch
+Patch403: 0003-silence-long-lost-pids.patch
 
 # cPanel Security Patches
 
@@ -87,6 +87,7 @@ BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel >= 1.2.0
 BuildRequires: pcre-devel >= 5.0
 BuildRequires: ea-openssl ea-openssl-devel
+BuildRequires: ea-libxml2 ea-libxml2-devel
 %if %{with_http2}
 BuildRequires: ea-nghttp2 ea-libnghttp2
 %endif
@@ -960,7 +961,7 @@ Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
-BuildRequires: ea-libxml2-devel
+BuildRequires: ea-libxml2 ea-libxml2-devel
 Obsoletes: mod_proxy_html
 
 %description -n ea-apache24-mod_proxy_html
@@ -1249,7 +1250,7 @@ mod_watchdog hooks.
 %patch306 -p1 -b .symlink
 
 %patch401 -p1 -b .randomsstartupperformance
-%patch402 -p1 -b .pipedlogging
+%patch403 -p1 -b .longlostpids
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1279,7 +1280,7 @@ autoheader && autoconf || exit 1
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache2/build:g" support/apxs.in
 
 export CFLAGS="$RPM_OPT_FLAGS"
-export LDFLAGS="-Wl,-rpath,/opt/cpanel/ea-libxml2/%{_lib} -L/opt/cpanel/ea-libxml2/%{_lib} -lxml2 -lz -llzma -lm -ldl -Wl,-z,relro,-z,now"
+export LDFLAGS="-Wl,-z,relro,-z,now"
 
 %ifarch ppc64
 CFLAGS="$CFLAGS -O3"
@@ -1337,6 +1338,8 @@ export LYNX_PATH=/usr/bin/links
     --disable-echo \
     --with-libxml2=/opt/cpanel/ea-libxml2/include/libxml2 \
     --disable-v4-mapped \
+    MOD_PROXY_HTML_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
+    MOD_XML2ENC_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     $*
 make %{?_smp_mflags}
 
@@ -1871,6 +1874,20 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Jan 15 2018 <cory@cpanel.net> - 2.4.29-6
+- EA-7125: Remove previous piped logging patch
+
+* Tue Jan 15 2018 <rish@cpanel.net> - 2.4.29-5
+- EA-7127: Ensure the mod_proxy_html and mod_xml2enc modules
+  build against ea-libxml2. Additionally, updated the build
+  process to avoid modifying the LDFLAGS - as it caused the
+  libxml2 dependency to be carried to extensions compiled
+  separately.
+
+* Fri Jan 12 2018 <cory@cpanel.net> - 2.4.29-4
+- EA-7060: Supress Long Lost Pids warning
+- patch provided by Gary Stanley <gary@cpanel.net>
+
 * Wed Dec 27 2017 <cory@cpanel.net> - 2.4.29-3
 - EA-7044: Adjust Apache to use ea-libxml2
 
