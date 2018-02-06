@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 7
+%define release_prefix 8
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1319,7 +1319,7 @@ export LYNX_PATH=/usr/bin/links
 %if %{with_http2}
     --enable-ssl --with-ssl=/opt/cpanel/ea-openssl/ \
     --enable-ssl-staticlib-deps \
-    --with-nghttp2 \
+    --with-nghttp2=/opt/cpanel/nghttp2/ \
     --enable-nghttp2-staticlib-deps \
 %else
 	--enable-ssl --with-ssl \
@@ -1874,6 +1874,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Feb 05 2018 <dan@cpanel.net> - 2.4.29-8
+- EA-7217: Make sure we use ea-nghttp2
+
 * Wed Jan 24 2018 <rish@cpanel.net> - 2.4.29-7
 - EA-7159: Use 'elinks' instead of 'links' as a dependency
   to ensure that EA4 does not pull any packages from
