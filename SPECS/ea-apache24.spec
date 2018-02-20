@@ -1705,7 +1705,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/apache2
 %{_sysconfdir}/apache2/modules
 %{_sysconfdir}/apache2/logs
-%attr(644,%{suexec_caller},%{suexec_caller}) /var/log/apache2/suexec_log
+%attr(644,root,%{suexec_caller}) /var/log/apache2/suexec_log
 %{_sysconfdir}/apache2/run
 %dir %{_sysconfdir}/apache2/conf
 %config(noreplace) %{_sysconfdir}/apache2/conf/httpd.conf
@@ -1736,7 +1736,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/ht*
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
-%caps(cap_setuid,cap_setgid+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
+%caps(cap_setuid,cap_setgid+pe) %attr(4755,root,%{suexec_caller}) %{_sbindir}/suexec
 
 %dir %{_libdir}/apache2
 %dir %{_libdir}/apache2/modules
