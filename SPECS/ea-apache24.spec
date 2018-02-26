@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 8
+%define release_prefix 9
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1309,8 +1309,7 @@ export LYNX_PATH=/usr/bin/links
     --enable-suexec-capabilities \
     --with-suexec-caller=%{suexec_caller} \
     --with-suexec-docroot=/ \
-    --without-suexec-logfile \
-    --with-suexec-syslog \
+    --with-suexec-logfile=%{_sysconfdir}/apache2/logs/suexec_log \
     --with-suexec-bin=%{_sbindir}/suexec \
     --with-suexec-uidmin=100 --with-suexec-gidmin=100 \
     --enable-pie \
@@ -1461,12 +1460,16 @@ ln -s ../..%{_localstatedir}/log/apache2 $RPM_BUILD_ROOT/etc/apache2/logs
 ln -s ../..%{_localstatedir}/run/apache2 $RPM_BUILD_ROOT/etc/apache2/run
 ln -s ../..%{_libdir}/apache2/modules $RPM_BUILD_ROOT/etc/apache2/modules
 
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/apache2/logs
+touch $RPM_BUILD_ROOT/%{_sysconfdir}/apache2/logs/suexec_log
+
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/apache2/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/mime.types|/etc/mime.types|" \
     -e "s|/usr/local/apache2/conf/magic|/etc/apache2/conf/magic|" \
     -e "s|/usr/local/apache2/logs/error_log|/var/log/apache2/error_log|" \
     -e "s|/usr/local/apache2/logs/access_log|/var/log/apache2/access_log|" \
+    -e "s|/usr/local/apache2/logs/suexec_log|/var/log/apache2/suexec_log|" \
     -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/apache2/httpd.pid|" \
     -e "s|/usr/local/apache2|/etc/apache2|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
@@ -1702,6 +1705,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/apache2
 %{_sysconfdir}/apache2/modules
 %{_sysconfdir}/apache2/logs
+%attr(644,root,%{suexec_caller}) /var/log/apache2/suexec_log
 %{_sysconfdir}/apache2/run
 %dir %{_sysconfdir}/apache2/conf
 %config(noreplace) %{_sysconfdir}/apache2/conf/httpd.conf
@@ -1732,7 +1736,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/ht*
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
-%caps(cap_setuid,cap_setgid+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
+%caps(cap_setuid,cap_setgid+pe) %attr(4755,root,%{suexec_caller}) %{_sbindir}/suexec
 
 %dir %{_libdir}/apache2
 %dir %{_libdir}/apache2/modules
@@ -1874,6 +1878,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Feb 14 2018 <dan@cpanel.net> - 2.4.29-9
+- EA-7238: use documented and ea3 parity safe suexec_log path
+
 * Mon Feb 05 2018 <dan@cpanel.net> - 2.4.29-8
 - EA-7217: Make sure we use ea-nghttp2
 
