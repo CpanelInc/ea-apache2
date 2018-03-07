@@ -23,7 +23,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 9
+%define release_prefix 10
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1140,8 +1140,8 @@ names which were matched using this strategy.
 %package -n ea-apache24-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
-BuildRequires: openssl-devel
-Requires(post): openssl, /bin/cat
+BuildRequires: ea-openssl-devel
+Requires(post): ea-openssl, /bin/cat
 Requires(pre): ea-apache24
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl, mod_ssl
@@ -1878,6 +1878,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Mar 06 2018 <cory@cpanel.net> - 2.4.29-10
+- ZC-3401: ensure building against and using ea-openssl
+
 * Wed Feb 14 2018 <dan@cpanel.net> - 2.4.29-9
 - EA-7238: use documented and ea3 parity safe suexec_log path
 
