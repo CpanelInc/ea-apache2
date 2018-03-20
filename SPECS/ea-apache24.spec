@@ -5,6 +5,7 @@
 %define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring cPanel
+%define ea_openssl_ver 1.0.2n-2
 
 # Drop automatic provides for module DSOs
 %{?filter_setup:
@@ -23,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.29
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 10
+%define release_prefix 11
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -86,7 +87,7 @@ BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel >= 1.2.0
 BuildRequires: pcre-devel >= 5.0
-BuildRequires: ea-openssl ea-openssl-devel
+BuildRequires: ea-openssl >= %{ea_openssl_ver}, ea-openssl-devel >= %{ea_openssl_ver}
 BuildRequires: ea-libxml2 ea-libxml2-devel
 %if %{with_http2}
 BuildRequires: ea-nghttp2 ea-libnghttp2
@@ -152,7 +153,7 @@ also be found at http://httpd.apache.org/docs/2.4/.
 %package -n ea-apache24-mod_http2
 Group: System Environment/Daemons
 Summary: HTTP2 module for Apache HTTP Server
-BuildRequires: ea-libnghttp2-devel ea-openssl ea-openssl-devel
+BuildRequires: ea-libnghttp2-devel ea-openssl >= %{ea_openssl_ver}, ea-openssl-devel >= %{ea_openssl_ver}
 Requires: ea-nghttp2
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Conflicts: ea-apache24-mod_mpm_itk, ea-apache24-mod_mpm_prefork
@@ -1140,8 +1141,8 @@ names which were matched using this strategy.
 %package -n ea-apache24-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
-BuildRequires: ea-openssl-devel
-Requires(post): ea-openssl, /bin/cat
+BuildRequires: ea-openssl-devel >= %{ea_openssl_ver}
+Requires(post): ea-openssl >= %{ea_openssl_ver}, /bin/cat
 Requires(pre): ea-apache24
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl, mod_ssl
@@ -1878,6 +1879,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Mar 20 2018 <cory@cpanel.net> - 2.4.29-11
+- ZC-3552: Add versioning to ea-openssl requirements
+
 * Tue Mar 06 2018 <cory@cpanel.net> - 2.4.29-10
 - ZC-3401: ensure building against and using ea-openssl
 
