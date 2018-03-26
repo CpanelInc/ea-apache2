@@ -1,7 +1,14 @@
-diff -u -r httpd-2.4.29.old/server/mpm/event/event.c httpd-2.4.29/server/mpm/event/event.c
---- httpd-2.4.29.old/server/mpm/event/event.c   2017-09-22 10:55:22.000000000 +0000
-+++ httpd-2.4.29/server/mpm/event/event.c 2017-12-26 20:38:28.396747769 +0000
-@@ -2829,7 +2829,7 @@
+commit 1f8e48dbabdaf65a0f8946bab5fa794e4580258d
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:22 2018 -0500
+
+    Apply 0003-silence-long-lost-pids.patch
+
+diff --git a/server/mpm/event/event.c b/server/mpm/event/event.c
+index 31fa04a..1179f9d 100644
+--- a/server/mpm/event/event.c
++++ b/server/mpm/event/event.c
+@@ -2944,7 +2944,7 @@ static void server_main_loop(int remaining_children_to_start, int num_buckets)
                  /* Great, we've probably just lost a slot in the
                   * scoreboard.  Somehow we don't know about this child.
                   */
@@ -10,10 +17,11 @@ diff -u -r httpd-2.4.29.old/server/mpm/event/event.c httpd-2.4.29/server/mpm/eve
                               ap_server_conf, APLOGNO(00488)
                               "long lost child came home! (pid %ld)",
                               (long) pid.pid);
-diff -u -r httpd-2.4.29.old/server/mpm/prefork/prefork.c httpd-2.4.29/server/mpm/prefork/prefork.c
---- httpd-2.4.29.old/server/mpm/prefork/prefork.c  2017-08-16 16:49:12.000000000 +0000
-+++ httpd-2.4.29/server/mpm/prefork/prefork.c   2017-12-26 20:38:45.796748654 +0000
-@@ -994,7 +994,7 @@
+diff --git a/server/mpm/prefork/prefork.c b/server/mpm/prefork/prefork.c
+index 3fb3284..752e3e3 100644
+--- a/server/mpm/prefork/prefork.c
++++ b/server/mpm/prefork/prefork.c
+@@ -991,7 +991,7 @@ static int prefork_run(apr_pool_t *_pconf, apr_pool_t *plog, server_rec *s)
                   * scoreboard.  Somehow we don't know about this
                   * child.
                   */
@@ -22,10 +30,11 @@ diff -u -r httpd-2.4.29.old/server/mpm/prefork/prefork.c httpd-2.4.29/server/mpm
                              0, ap_server_conf, APLOGNO(00167)
                              "long lost child came home! (pid %ld)", (long)pid.pid);
              }
-diff -u -r httpd-2.4.29.old/server/mpm/worker/worker.c httpd-2.4.29/server/mpm/worker/worker.c
---- httpd-2.4.29.old/server/mpm/worker/worker.c 2017-06-05 12:09:49.000000000 +0000
-+++ httpd-2.4.29/server/mpm/worker/worker.c  2017-12-26 20:38:12.007746937 +0000
-@@ -1620,7 +1620,7 @@
+diff --git a/server/mpm/worker/worker.c b/server/mpm/worker/worker.c
+index 7804efc..afc401f 100644
+--- a/server/mpm/worker/worker.c
++++ b/server/mpm/worker/worker.c
+@@ -1619,7 +1619,7 @@ static void server_main_loop(int remaining_children_to_start, int num_buckets)
                  /* Great, we've probably just lost a slot in the
                   * scoreboard.  Somehow we don't know about this child.
                   */
