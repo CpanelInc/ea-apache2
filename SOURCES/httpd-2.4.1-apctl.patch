@@ -1,15 +1,13 @@
+commit 762242ace936642cdd4f88419b1163c6a32cfab1
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:17 2018 -0500
 
-- fail gracefully if links is not installed on target system
-- source sysconfig/httpd for custom env. vars etc.
-- make httpd -t work even in SELinux
-- pass $OPTIONS to all $HTTPD invocation
+    Apply httpd-2.4.1-apctl.patch
 
-Upstream-HEAD: vendor
-Upstream-2.0: vendor
-Upstream-Status: Vendor-specific changes for better initscript integration
-
---- httpd-2.4.1/support/apachectl.in.apctl
-+++ httpd-2.4.1/support/apachectl.in
+diff --git a/support/apachectl.in b/support/apachectl.in
+index 3281c2e..c6ac3ea 100644
+--- a/support/apachectl.in
++++ b/support/apachectl.in
 @@ -44,19 +44,25 @@ ARGV="$@"
  # the path to your httpd binary, including options if necessary
  HTTPD='@exp_sbindir@/@progname@'
@@ -41,7 +39,7 @@ Upstream-Status: Vendor-specific changes for better initscript integration
  #
  # Set this variable to a command that increases the maximum
  # number of file descriptors allowed per child process. This is
-@@ -76,9 +82,27 @@ if [ "x$ARGV" = "x" ] ; then 
+@@ -76,9 +82,27 @@ if [ "x$ARGV" = "x" ] ; then
      ARGV="-h"
  fi
  

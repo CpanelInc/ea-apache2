@@ -1,11 +1,14 @@
+commit 3a8f067ca55bc5654ce3fb2540882e20f959b1ec
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:20 2018 -0500
 
-Log the SELinux context at startup.
+    Apply httpd-2.4.1-selinux.patch
 
-Upstream-Status: unlikely to be any interest in this upstream
-
---- httpd-2.4.1/configure.in.selinux
-+++ httpd-2.4.1/configure.in
-@@ -458,6 +458,11 @@ fopen64
+diff --git a/configure.in b/configure.in
+index 06fe5f2..f759585 100644
+--- a/configure.in
++++ b/configure.in
+@@ -483,6 +483,11 @@ getloadavg
  dnl confirm that a void pointer is large enough to store a long integer
  APACHE_CHECK_VOID_PTR_LEN
  
@@ -17,9 +20,11 @@ Upstream-Status: unlikely to be any interest in this upstream
  AC_CACHE_CHECK([for gettid()], ac_cv_gettid,
  [AC_TRY_RUN(#define _GNU_SOURCE
  #include <unistd.h>
---- httpd-2.4.1/server/core.c.selinux
-+++ httpd-2.4.1/server/core.c
-@@ -58,6 +58,10 @@
+diff --git a/server/core.c b/server/core.c
+index 4fd2b9f..c61304a 100644
+--- a/server/core.c
++++ b/server/core.c
+@@ -59,6 +59,10 @@
  #include <unistd.h>
  #endif
  
@@ -30,7 +35,7 @@ Upstream-Status: unlikely to be any interest in this upstream
  /* LimitRequestBody handling */
  #define AP_LIMIT_REQ_BODY_UNSET         ((apr_off_t) -1)
  #define AP_DEFAULT_LIMIT_REQ_BODY       ((apr_off_t) 0)
-@@ -4452,6 +4456,28 @@ static int core_post_config(apr_pool_t *
+@@ -4959,6 +4963,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
  #endif
  
