@@ -5,7 +5,7 @@
 %define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring cPanel
-%define ea_openssl_ver 1.0.2n-2
+%define ea_openssl_ver 1.0.2n-3
 
 # Drop automatic provides for module DSOs
 %{?filter_setup:
@@ -1368,6 +1368,7 @@ export LYNX_PATH=/usr/bin/links
     MOD_PROXY_HTML_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_XML2ENC_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_BROTLI_LDADD="-L/opt/cpanel/ea-brotli/lib -R/opt/cpanel/ea-brotli/lib" \
+    MOD_SSL_LDADD="-L/opt/cpanel/ea-openssl/%{_lib} -R/opt/cpanel/ea-openssl/%{_lib}" \
     $*
 make %{?_smp_mflags}
 
