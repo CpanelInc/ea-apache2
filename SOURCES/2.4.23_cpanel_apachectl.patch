@@ -1,18 +1,10 @@
-From eac81abc170deaafaf10e00b47820ed053c733af Mon Sep 17 00:00:00 2001
-From: Kurt Newman <kurt.newman@cpanel.net>
-Date: Mon, 5 Dec 2016 16:31:36 -0600
-Subject: [PATCH] Apply custom cpanel changes
+commit 5633c3bc736fc3db3a9c0a9155fa67b523c2b727
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:21 2018 -0500
 
-This patch performs the following work:
- - Updates status check to point to whm-server-status
- - Adheres to the cpanel configuration which allows Apache to run
-   on a port other than 80
- - Increases ulimit so that servers with large numbers of
-   (sub)?domains will operate correctly.
----
- support/apachectl.in | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+    Apply 2.4.23_cpanel_apachectl.patch
 
+diff --git a/support/apachectl.in b/support/apachectl.in
 index c6ac3ea..f5fb106 100644
 --- a/support/apachectl.in
 +++ b/support/apachectl.in
@@ -23,7 +15,7 @@ index c6ac3ea..f5fb106 100644
 -STATUSURL="http://localhost:@PORT@/server-status"
 +PORT="$(grep 'apache_port=' /var/cpanel/cpanel.config 2>/dev/null | sed -e 's/.*=\([.0-9]*:\)\{0,1\}//;' -e 's/[^0-9]*//g' 2>/dev/null)"
 +STATUSURL="http://localhost:${PORT:-80}/whm-server-status"
-
+ 
  # Source /etc/sysconfig/httpd for $HTTPD setting, etc.
  if [ -r /etc/sysconfig/httpd ]; then
 @@ -68,7 +69,22 @@ fi
@@ -50,5 +42,3 @@ index c6ac3ea..f5fb106 100644
  # --------------------                              --------------------
  # ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
  
--- 
-2.11.0

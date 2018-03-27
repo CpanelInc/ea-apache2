@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.29
+Version: 2.4.33
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 11
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -40,6 +40,7 @@ Source11: autoindex.conf
 Source22: cgid.conf
 Source23: manual.conf
 Source43: cperror.conf
+Source44: brotli.conf
 %if %{with_http2}
 Source53: http2.conf
 %endif
@@ -351,6 +352,18 @@ userid used for HTTP authentication (the web userid) with the
 file-system owner or group of the requested file. The supplied
 username and password must be already properly verified by an
 authentication module, such as mod_auth_basic or mod_auth_digest.
+
+%package -n ea-apache24-mod_brotli
+Group: System Environment/Daemons
+Summary: Compress content via Brotli before it is delivered to the client
+Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
+Requires: ea-brotli
+BuildRequires: ea-brotli-devel
+
+%description -n ea-apache24-mod_brotli
+The mod_brotli module provides the BROTLI_COMPRESS output filter that allows
+output from your server to be compressed using the brotli compression format
+before being sent to the client over the network.
 
 %package -n ea-apache24-mod_buffer
 Group: System Environment/Daemons
@@ -1003,6 +1016,18 @@ The mod_proxy_wstunnel module provides support for the tunnelling of
 web socket connections to a backend websockets server. The connection
 is automagically upgraded to a websocket connection.
 
+%package -n ea-apache24-mod_proxy_uwsgi
+Group: System Environment/Daemons
+Summary: Websockets proxy module for the Apache HTTP server
+Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
+
+%description -n ea-apache24-mod_proxy_uwsgi
+The uWSGI project provides application servers (for various programming languages and protocols
+like perl (PSGI), python (WSGI), ruby (Rack), Lua WSAPI, CGI, PHP, and Go ... to name a few),
+proxies, process managers and monitors.
+All implemented using a common api and a common configuration style.
+
 %package -n ea-apache24-mod_ratelimit
 Group: System Environment/Daemons
 Summary: Client bandwidth limiting module for the Apache HTTP server
@@ -1338,8 +1363,11 @@ export LYNX_PATH=/usr/bin/links
     --disable-echo \
     --with-libxml2=/opt/cpanel/ea-libxml2/include/libxml2 \
     --disable-v4-mapped \
+    --enable-brotli \
+    --with-brotli=/opt/cpanel/ea-brotli \
     MOD_PROXY_HTML_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_XML2ENC_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
+    MOD_BROTLI_LDADD="-L/opt/cpanel/ea-brotli/lib -R/opt/cpanel/ea-brotli/lib" \
     $*
 make %{?_smp_mflags}
 
@@ -1373,7 +1401,7 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d \
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/README
 
-for f in cgid.conf manual.conf cperror.conf autoindex.conf ; do
+for f in brotli.conf cgid.conf manual.conf cperror.conf autoindex.conf ; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.d/$f
 done
@@ -1521,7 +1549,7 @@ for mod in \
   access_compat actions alias allowmethods asis auth_basic auth_digest \
   authn_core authn_anon authn_dbd authn_dbm authn_file authn_socache \
   authz_core authz_dbd authz_dbm authz_groupfile authz_host authz_owner \
-  authz_user autoindex buffer cache cache_disk cache_socache \
+  authz_user autoindex brotli buffer cache cache_disk cache_socache \
   charset_lite data dav dav_fs dav_lock dbd deflate dialup dir dumpio \
   env expires ext_filter file_cache filter headers \
   imagemap include info log_config log_debug log_forensic logio lua \
@@ -1529,7 +1557,7 @@ for mod in \
   proxy lbmethod_bybusyness lbmethod_byrequests lbmethod_bytraffic \
   lbmethod_heartbeat proxy_ajp proxy_balancer proxy_connect \
   proxy_express proxy_fcgi proxy_fdpass proxy_ftp proxy_http proxy_scgi \
-  proxy_wstunnel ratelimit reflector remoteip reqtimeout request rewrite \
+  proxy_wstunnel proxy_uwsgi ratelimit reflector remoteip reqtimeout request rewrite \
   sed setenvif slotmem_plain slotmem_shm socache_dbm socache_memcache \
   socache_shmcb speling status substitute suexec unique_id unixd userdir \
   usertrack version vhost_alias watchdog heartbeat heartmonitor \
@@ -1720,6 +1748,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/apache2/conf.d/includes
 %{_sysconfdir}/apache2/conf.d/README
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/*.conf
+%exclude %{_sysconfdir}/apache2/conf.d/brotli.conf
 %exclude %{_sysconfdir}/apache2/conf.d/cgid.conf
 %exclude %{_sysconfdir}/apache2/conf.d/manual.conf
 
@@ -1797,6 +1826,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_authz_dbd -f files.authz_dbd
 %files -n ea-apache24-mod_authz_dbm -f files.authz_dbm
 %files -n ea-apache24-mod_authz_owner -f files.authz_owner
+%files -n ea-apache24-mod_brotli -f files.brotli
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/apache2/conf.d/brotli.conf
+
 %files -n ea-apache24-mod_buffer -f files.buffer
 %files -n ea-apache24-mod_cache -f files.cache
 %files -n ea-apache24-mod_cache_disk -f files.cache_disk
@@ -1845,6 +1877,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_proxy_http -f files.proxy_http
 %files -n ea-apache24-mod_proxy_scgi -f files.proxy_scgi
 %files -n ea-apache24-mod_proxy_wstunnel -f files.proxy_wstunnel
+%files -n ea-apache24-mod_proxy_uwsgi -f files.proxy_uwsgi
 %files -n ea-apache24-mod_ratelimit -f files.ratelimit
 %files -n ea-apache24-mod_reflector -f files.reflector
 %files -n ea-apache24-mod_remoteip -f files.remoteip
@@ -1879,38 +1912,41 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
-* Mon Mar 20 2018 <cory@cpanel.net> - 2.4.29-11
-- ZC-3552: Add versioning to ea-openssl requirements
+* Mon Mar 26 2018 Daniel Muey <dan@cpanel.net> - 2.4.33-1
+- EA-7327: Update to v2.4.33, drop v2.4.29
 
-* Tue Mar 06 2018 <cory@cpanel.net> - 2.4.29-10
+* Mon Mar 19 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.29-11
+- EA-7164: Build mod_brotli against the ea-brotli package.
+
+* Tue Mar 06 2018 Cory McIntire <cory@cpanel.net> - 2.4.29-10
 - ZC-3401: ensure building against and using ea-openssl
 
-* Wed Feb 14 2018 <dan@cpanel.net> - 2.4.29-9
+* Wed Feb 14 2018 Dan Muey <dan@cpanel.net> - 2.4.29-9
 - EA-7238: use documented and ea3 parity safe suexec_log path
 
-* Mon Feb 05 2018 <dan@cpanel.net> - 2.4.29-8
+* Mon Feb 05 2018 Dan Muey <dan@cpanel.net> - 2.4.29-8
 - EA-7217: Make sure we use ea-nghttp2
 
-* Wed Jan 24 2018 <rish@cpanel.net> - 2.4.29-7
+* Wed Jan 24 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.29-7
 - EA-7159: Use 'elinks' instead of 'links' as a dependency
   to ensure that EA4 does not pull any packages from
   the EPEL repos.
 
-* Mon Jan 15 2018 <cory@cpanel.net> - 2.4.29-6
+* Mon Jan 15 2018 Cory McIntire <cory@cpanel.net> - 2.4.29-6
 - EA-7125: Remove previous piped logging patch
 
-* Tue Jan 15 2018 <rish@cpanel.net> - 2.4.29-5
+* Mon Jan 15 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.29-5
 - EA-7127: Ensure the mod_proxy_html and mod_xml2enc modules
   build against ea-libxml2. Additionally, updated the build
   process to avoid modifying the LDFLAGS - as it caused the
   libxml2 dependency to be carried to extensions compiled
   separately.
 
-* Fri Jan 12 2018 <cory@cpanel.net> - 2.4.29-4
+* Fri Jan 12 2018 Cory McIntire <cory@cpanel.net> - 2.4.29-4
 - EA-7060: Supress Long Lost Pids warning
 - patch provided by Gary Stanley <gary@cpanel.net>
 
-* Wed Dec 27 2017 <cory@cpanel.net> - 2.4.29-3
+* Wed Dec 27 2017 Cory McIntire <cory@cpanel.net> - 2.4.29-3
 - EA-7044: Adjust Apache to use ea-libxml2
 
 * Sun Dec 24 2017 Cory McIntire <cory@cpanel.net> - 2.4.29-2
@@ -1924,7 +1960,7 @@ rm -rf $RPM_BUILD_ROOT
 * Tue Oct 10 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.28-1
 - Update Apache to 2.4.28
 
-* Wed Sep 19 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.27-8
+* Tue Sep 19 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 2.4.27-8
 - Patch core for htaccess method registrations - CVE-2017-9798
 
 * Mon Sep 11 2017 Dan Muey <dan@cpanel.net> - 2.4.27-7
@@ -1939,7 +1975,7 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Aug 10 2017 Felipe Gasper <felipe@cpanel.net> - 2.4.27-4
 - Require mod_proxy_wstunnel for ea-apache24.
 
-* Tue Aug 02 2017 Cory McIntire <cory@cpanel.net> - 2.4.27-3
+* Wed Aug 02 2017 Cory McIntire <cory@cpanel.net> - 2.4.27-3
 - Add conflicts between prefork and HTTP2
 
 * Fri Jul 14 2017 Felipe Gasper <felipe@cpanel.net> - 2.4.27-2
