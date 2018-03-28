@@ -1,11 +1,14 @@
+commit f9250018a1ed5ca357ecad14877565dc91ed2644
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:17 2018 -0500
 
-Link straight against .la files.
+    Apply httpd-2.4.1-deplibs.patch
 
-Upstream-Status: vendor specific
-
---- httpd-2.4.1/configure.in.deplibs
-+++ httpd-2.4.1/configure.in
-@@ -707,9 +707,9 @@ APACHE_HELP_STRING(--with-suexec-umask,u
+diff --git a/configure.in b/configure.in
+index 761e836..06fe5f2 100644
+--- a/configure.in
++++ b/configure.in
+@@ -756,9 +756,9 @@ APACHE_HELP_STRING(--with-suexec-umask,umask for suexec'd process),[
  
  dnl APR should go after the other libs, so the right symbols can be picked up
  if test x${apu_found} != xobsolete; then

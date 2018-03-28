@@ -1,7 +1,14 @@
-diff -rup httpd-2.4.12-orig/support/suexec.c httpd-2.4.12/support/suexec.c
---- httpd-2.4.12-orig/support/suexec.c	2015-03-19 17:24:52.960002258 -0500
-+++ httpd-2.4.12/support/suexec.c	2015-03-20 09:21:14.620002278 -0500
-@@ -145,11 +145,11 @@ static const char *const safe_env_lst[] 
+commit 0602df7318d4adf6d51775bb282a7f6a32b3a31b
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:21 2018 -0500
+
+    Apply 2.2.17_cpanel_suexec_script_share.patch
+
+diff --git a/support/suexec.c b/support/suexec.c
+index 0b52495..86c6dc7 100644
+--- a/support/suexec.c
++++ b/support/suexec.c
+@@ -146,11 +146,11 @@ static const char *const safe_env_lst[] =
      NULL
  };
  
@@ -16,7 +23,7 @@ diff -rup httpd-2.4.12-orig/support/suexec.c httpd-2.4.12/support/suexec.c
      __attribute__((format(printf,2,0)));
  
  static void err_output(int is_error, const char *fmt, va_list ap)
-@@ -599,12 +599,31 @@ int main(int argc, char *argv[])
+@@ -600,12 +600,31 @@ int main(int argc, char *argv[])
          (gid != dir_info.st_gid) ||
          (uid != prg_info.st_uid) ||
          (gid != prg_info.st_gid)) {
@@ -48,13 +55,15 @@ diff -rup httpd-2.4.12-orig/support/suexec.c httpd-2.4.12/support/suexec.c
      }
      /*
       * Error out if the program is not executable for the user.
-diff -rup httpd-2.4.12-orig/support/suexec.h httpd-2.4.12/support/suexec.h
---- httpd-2.4.12-orig/support/suexec.h	2011-09-23 08:38:09.000000000 -0500
-+++ httpd-2.4.12/support/suexec.h	2015-03-20 09:04:07.577002460 -0500
-@@ -40,6 +40,27 @@
+diff --git a/support/suexec.h b/support/suexec.h
+index 07bb7bb..2d371e8 100644
+--- a/support/suexec.h
++++ b/support/suexec.h
+@@ -39,6 +39,27 @@
+ #define AP_HTTPD_USER "www"
  #endif
  
- /*
++/*
 + * READ THIS BEFORE CONTINUING!!
 + *
 + * The patch below adds a feature which makes it possible to run "shared"
@@ -75,7 +84,6 @@ diff -rup httpd-2.4.12-orig/support/suexec.h httpd-2.4.12/support/suexec.h
 +#define SUEXEC_TRUSTED_GROUP  10
 +#endif
 +
-+/*
+ /*
   * UID_MIN -- Define this as the lowest UID allowed to be a target user
   *            for suEXEC.  For most systems, 500 or 100 is common.
-  */

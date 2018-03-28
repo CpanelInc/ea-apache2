@@ -1,19 +1,14 @@
-From ea6d9bd5e8d4883bb5d7765c6e4c83395cf3a9da Mon Sep 17 00:00:00 2001
-From: Kevin Shaum <kevin.shaum@cpanel.net>
-Date: Mon, 22 Jul 2013 13:26:04 -0500
-Subject: [PATCH 3/3] 2.2_cpanel_fileprotect_suexec_httpusergroupallow
+commit 79fa0fb32a3babdf64310b14de77208052068728
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:22 2018 -0500
 
-cpanel-specific patch for file protection allowing execution
-by suexec as long as the uid is in the supplemental groups
----
- support/suexec.c | 33 +++++++++++++++++++++++++++++++--
- 1 file changed, 31 insertions(+), 2 deletions(-)
+    Apply 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
 
 diff --git a/support/suexec.c b/support/suexec.c
-index d93b22f..29d7210 100644
+index 4e085be..1d9edbf 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
-@@ -268,6 +268,25 @@ static void clean_env(void)
+@@ -269,6 +269,25 @@ static void clean_env(void)
      environ = cleanenv;
  }
  
@@ -39,7 +34,7 @@ index d93b22f..29d7210 100644
  int main(int argc, char *argv[])
  {
      int userdir = 0;        /* ~userdir flag             */
-@@ -279,6 +298,7 @@ int main(int argc, char *argv[])
+@@ -280,6 +299,7 @@ int main(int argc, char *argv[])
      char *target_uname;     /* target user name          */
      char *target_gname;     /* target group name         */
      char *target_homedir;   /* target home directory     */
@@ -47,7 +42,7 @@ index d93b22f..29d7210 100644
      char *actual_uname;     /* actual user name          */
      char *actual_gname;     /* actual group name         */
      char *cmd;              /* command to be executed    */
-@@ -483,6 +503,7 @@ int main(int argc, char *argv[])
+@@ -484,6 +504,7 @@ int main(int argc, char *argv[])
      uid = pw->pw_uid;
      actual_uname = strdup(pw->pw_name);
      target_homedir = strdup(pw->pw_dir);
@@ -56,9 +51,10 @@ index d93b22f..29d7210 100644
          log_err("failed to alloc memory\n");
          exit(126);
 @@ -516,6 +537,14 @@ int main(int argc, char *argv[])
+         exit(108);
      }
  
-     /*
++    /*
 +     * Error out if user UID is not a member of group GID.
 +     */
 +    if ((gid != default_gid) && !is_group_member(actual_uname, gid)) {
@@ -66,11 +62,10 @@ index d93b22f..29d7210 100644
 +	exit(108);
 +    }
 +
-+    /*
+     /*
       * Change UID/GID here so that the following tests work over NFS.
       *
-      * Initialize the group access list for the target user,
-@@ -649,9 +678,9 @@ int main(int argc, char *argv[])
+@@ -645,9 +674,9 @@ int main(int argc, char *argv[])
       * the name/group of the cwd or the program.
       */
      if ((uid != dir_info.st_uid) ||
@@ -82,6 +77,3 @@ index d93b22f..29d7210 100644
  #ifdef TRUSTED_USERS_SCRIPTS
          /*
           * Check if we're using a "shared" script
--- 
-1.7.11.3
-

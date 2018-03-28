@@ -1,6 +1,14 @@
---- httpd-2.4.12/support/apxs.in.orig	2015-08-24 10:15:30.849001912 -0500
-+++ httpd-2.4.12/support/apxs.in	2015-08-24 11:40:52.886002008 -0500
-@@ -550,104 +550,20 @@
+commit 815d10d3c3c12fff7c28a5d8721804a50cb5f5de
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:22 2018 -0500
+
+    Apply httpd-2.4.12-apxs-modules-dir.patch
+
+diff --git a/support/apxs.in b/support/apxs.in
+index ad1287f..d05d3f6 100644
+--- a/support/apxs.in
++++ b/support/apxs.in
+@@ -550,104 +550,20 @@ if ($opt_i or $opt_e) {
  
      #   activate module via LoadModule/AddModule directive
      if ($opt_a or $opt_A) {
