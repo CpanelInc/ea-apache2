@@ -86,7 +86,7 @@ Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel >= 1.2.0
+BuildRequires: ea-apr-devel >= 1.6.3-1, ea-apr-util-devel >= 1.6.1-1
 BuildRequires: pcre-devel >= 5.0
 BuildRequires: ea-openssl >= %{ea_openssl_ver}, ea-openssl-devel >= %{ea_openssl_ver}
 BuildRequires: ea-libxml2 ea-libxml2-devel
@@ -94,7 +94,7 @@ BuildRequires: ea-libxml2 ea-libxml2-devel
 BuildRequires: ea-nghttp2 ea-libnghttp2
 %endif
 
-Requires: ea-apr%{?_isa} >= 1.5.2-4
+Requires: ea-apr%{?_isa} >= 1.6.3-1
 Requires: system-logos >= 7.92.1-1
 Requires: ea-apache24-mpm, ea-apache24-cgi
 Requires: ea-apache24-mod_ssl
@@ -126,7 +126,7 @@ web server.
 Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel, httpd-devel
-Requires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel, pkgconfig
+Requires: ea-apr-devel >= 1.6.3-1, ea-apr-util-devel, pkgconfig
 Requires: ea-apache24 = %{version}-%{release}
 
 %description devel
@@ -1913,8 +1913,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
-* Mon Mar 26 2018 Daniel Muey <dan@cpanel.net> - 2.4.33-1
+* Thu Mar 29 2018 Daniel Muey <dan@cpanel.net> - 2.4.33-1
 - EA-7327: Update to v2.4.33, drop v2.4.29
+
+* Tue Mar 27 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.29-12
+- EA-7339: Build against the latest apr/apr-util
 
 * Mon Mar 19 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.29-11
 - EA-7164: Build mod_brotli against the ea-brotli package.
