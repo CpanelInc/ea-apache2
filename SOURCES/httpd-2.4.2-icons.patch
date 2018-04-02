@@ -1,12 +1,14 @@
+commit 4f36d88c568c3a510ee9c2719de678de8aadec0b
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:20 2018 -0500
 
-- Fix config for /icons/ dir to allow symlink to poweredby.png.
-- Avoid using coredump GIF for a directory called "core"
+    Apply httpd-2.4.2-icons.patch
 
-Upstream-Status: vendor specific patch
-
---- httpd-2.4.2/docs/conf/extra/httpd-autoindex.conf.in.icons
-+++ httpd-2.4.2/docs/conf/extra/httpd-autoindex.conf.in
-@@ -21,7 +21,7 @@ IndexOptions FancyIndexing HTMLTable Ver
+diff --git a/docs/conf/extra/httpd-autoindex.conf.in b/docs/conf/extra/httpd-autoindex.conf.in
+index 51b02ed..0e8b626 100644
+--- a/docs/conf/extra/httpd-autoindex.conf.in
++++ b/docs/conf/extra/httpd-autoindex.conf.in
+@@ -21,7 +21,7 @@ IndexOptions FancyIndexing HTMLTable VersionSort
  Alias /icons/ "@exp_iconsdir@/"
  
  <Directory "@exp_iconsdir@">

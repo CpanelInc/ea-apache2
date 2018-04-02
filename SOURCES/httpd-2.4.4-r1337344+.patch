@@ -1,18 +1,43 @@
-# ./pullrev.sh 1337344 1341905 1342065 1341930
+commit cd788502247512e68dadf5a70f9ac98167d6c6ec
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:20 2018 -0500
 
-suexec enhancements:
+    Apply httpd-2.4.4-r1337344+.patch
 
-1) use syslog for logging
-2) use capabilities not setuid/setgid root binary
-
-http://svn.apache.org/viewvc?view=revision&revision=1337344
-http://svn.apache.org/viewvc?view=revision&revision=1341905
-http://svn.apache.org/viewvc?view=revision&revision=1342065
-http://svn.apache.org/viewvc?view=revision&revision=1341930
-
---- httpd-2.4.4/configure.in.r1337344+
-+++ httpd-2.4.4/configure.in
-@@ -734,7 +734,24 @@ APACHE_HELP_STRING(--with-suexec-gidmin,
+diff --git a/Makefile.in b/Makefile.in
+index 6ded87e..f667534 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -269,11 +269,22 @@ install-man:
+ 	  cd $(DESTDIR)$(manualdir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
+ 	fi
+ 
+-install-suexec:
++install-suexec: install-suexec-binary install-suexec-$(INSTALL_SUEXEC)
++
++install-suexec-binary:
+ 	@if test -f $(builddir)/support/suexec; then \
+             test -d $(DESTDIR)$(sbindir) || $(MKINSTALLDIRS) $(DESTDIR)$(sbindir); \
+             $(INSTALL_PROGRAM) $(top_builddir)/support/suexec $(DESTDIR)$(sbindir); \
+-            chmod 4755 $(DESTDIR)$(sbindir)/suexec; \
++	fi
++
++install-suexec-setuid:
++	@if test -f $(builddir)/support/suexec; then \
++	    chmod 4755 $(DESTDIR)$(sbindir)/suexec; \
++	fi
++
++install-suexec-caps:
++	@if test -f $(builddir)/support/suexec; then \
++            setcap 'cap_setuid,cap_setgid+pe' $(DESTDIR)$(sbindir)/suexec; \
+ 	fi
+ 
+ suexec:
+diff --git a/configure.in b/configure.in
+index f759585..38a7da4 100644
+--- a/configure.in
++++ b/configure.in
+@@ -749,7 +749,24 @@ APACHE_HELP_STRING(--with-suexec-gidmin,Minimal allowed GID),[
  
  AC_ARG_WITH(suexec-logfile,
  APACHE_HELP_STRING(--with-suexec-logfile,Set the logfile),[
@@ -38,7 +63,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
  
  AC_ARG_WITH(suexec-safepath,
  APACHE_HELP_STRING(--with-suexec-safepath,Set the safepath),[
-@@ -744,6 +761,15 @@ AC_ARG_WITH(suexec-umask,
+@@ -759,6 +776,15 @@ AC_ARG_WITH(suexec-umask,
  APACHE_HELP_STRING(--with-suexec-umask,umask for suexec'd process),[
    AC_DEFINE_UNQUOTED(AP_SUEXEC_UMASK, 0$withval, [umask for suexec'd process] ) ] )
  
@@ -54,9 +79,11 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
  dnl APR should go after the other libs, so the right symbols can be picked up
  if test x${apu_found} != xobsolete; then
    AP_LIBS="$AP_LIBS `$apu_config --avoid-ldap --link-libtool`"
---- httpd-2.4.4/docs/manual/suexec.html.en.r1337344+
-+++ httpd-2.4.4/docs/manual/suexec.html.en
-@@ -372,6 +372,21 @@
+diff --git a/docs/manual/suexec.html.en b/docs/manual/suexec.html.en
+index 526e793..63f7bad 100644
+--- a/docs/manual/suexec.html.en
++++ b/docs/manual/suexec.html.en
+@@ -374,6 +374,21 @@
        together with the <code>--enable-suexec</code> option to let
        APACI accept your request for using the suEXEC feature.</dd>
  
@@ -78,7 +105,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
        <dt><code>--with-suexec-bin=<em>PATH</em></code></dt>
  
        <dd>The path to the <code>suexec</code> binary must be hard-coded
-@@ -433,6 +448,12 @@
+@@ -435,6 +450,12 @@
        "<code>suexec_log</code>" and located in your standard logfile
        directory (<code>--logfiledir</code>).</dd>
  
@@ -91,7 +118,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
        <dt><code>--with-suexec-safepath=<em>PATH</em></code></dt>
  
        <dd>Define a safe PATH environment to pass to CGI
-@@ -548,9 +571,12 @@ Group webgroup
+@@ -550,9 +571,12 @@ Group webgroup</pre>
  
      <p>The suEXEC wrapper will write log information
      to the file defined with the <code>--with-suexec-logfile</code>
@@ -107,43 +134,18 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
  
  </div><div class="top"><a href="#page-header"><img alt="top" src="./images/up.gif" /></a></div>
  <div class="section">
-@@ -638,4 +664,4 @@ if (typeof(prettyPrint) !== 'undefined')
+@@ -640,4 +664,4 @@ if (typeof(prettyPrint) !== 'undefined') {
      prettyPrint();
  }
  //--><!]]></script>
 -</body></html>
 \ No newline at end of file
 +</body></html>
---- httpd-2.4.4/Makefile.in.r1337344+
-+++ httpd-2.4.4/Makefile.in
-@@ -238,11 +238,22 @@ install-man:
- 	  cd $(DESTDIR)$(manualdir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
- 	fi
- 
--install-suexec:
-+install-suexec: install-suexec-binary install-suexec-$(INSTALL_SUEXEC)
-+
-+install-suexec-binary:
- 	@if test -f $(builddir)/support/suexec; then \
-             test -d $(DESTDIR)$(sbindir) || $(MKINSTALLDIRS) $(DESTDIR)$(sbindir); \
-             $(INSTALL_PROGRAM) $(top_builddir)/support/suexec $(DESTDIR)$(sbindir); \
--            chmod 4755 $(DESTDIR)$(sbindir)/suexec; \
-+	fi
-+
-+install-suexec-setuid:
-+	@if test -f $(builddir)/support/suexec; then \
-+	    chmod 4755 $(DESTDIR)$(sbindir)/suexec; \
-+	fi
-+
-+install-suexec-caps:
-+	@if test -f $(builddir)/support/suexec; then \
-+            setcap 'cap_setuid,cap_setgid+pe' $(DESTDIR)$(sbindir)/suexec; \
- 	fi
- 
- suexec:
---- httpd-2.4.4/modules/arch/unix/mod_unixd.c.r1337344+
-+++ httpd-2.4.4/modules/arch/unix/mod_unixd.c
-@@ -284,6 +284,13 @@ unixd_set_suexec(cmd_parms *cmd, void *d
+diff --git a/modules/arch/unix/mod_unixd.c b/modules/arch/unix/mod_unixd.c
+index f6e9500..1baa278 100644
+--- a/modules/arch/unix/mod_unixd.c
++++ b/modules/arch/unix/mod_unixd.c
+@@ -284,6 +284,13 @@ unixd_set_suexec(cmd_parms *cmd, void *dummy, int arg)
      return NULL;
  }
  
@@ -157,7 +159,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
  static int
  unixd_pre_config(apr_pool_t *pconf, apr_pool_t *plog,
                   apr_pool_t *ptemp)
-@@ -300,7 +307,7 @@ unixd_pre_config(apr_pool_t *pconf, apr_
+@@ -300,7 +307,7 @@ unixd_pre_config(apr_pool_t *pconf, apr_pool_t *plog,
      ap_unixd_config.suexec_enabled = 0;
      if ((apr_stat(&wrapper, SUEXEC_BIN, APR_FINFO_NORM, ptemp))
           == APR_SUCCESS) {
@@ -166,8 +168,10 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
              && (access(SUEXEC_BIN, R_OK|X_OK) == 0)) {
              ap_unixd_config.suexec_enabled = 1;
              ap_unixd_config.suexec_disabled_reason = "";
---- httpd-2.4.4/support/suexec.c.r1337344+
-+++ httpd-2.4.4/support/suexec.c
+diff --git a/support/suexec.c b/support/suexec.c
+index 0b2491e..0b52495 100644
+--- a/support/suexec.c
++++ b/support/suexec.c
 @@ -58,6 +58,10 @@
  #include <grp.h>
  #endif
@@ -200,7 +204,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
  
  static const char *const safe_env_lst[] =
  {
-@@ -137,7 +154,14 @@ static void err_output(int is_error, con
+@@ -138,7 +155,14 @@ static void err_output(int is_error, const char *fmt, va_list ap)
  
  static void err_output(int is_error, const char *fmt, va_list ap)
  {
@@ -216,7 +220,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
      time_t timevar;
      struct tm *lt;
  
-@@ -299,7 +319,9 @@ int main(int argc, char *argv[])
+@@ -300,7 +324,9 @@ int main(int argc, char *argv[])
  #ifdef AP_HTTPD_USER
          fprintf(stderr, " -D AP_HTTPD_USER=\"%s\"\n", AP_HTTPD_USER);
  #endif
@@ -227,7 +231,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
          fprintf(stderr, " -D AP_LOG_EXEC=\"%s\"\n", AP_LOG_EXEC);
  #endif
  #ifdef AP_SAFE_PATH
-@@ -602,6 +617,12 @@ int main(int argc, char *argv[])
+@@ -603,6 +629,12 @@ int main(int argc, char *argv[])
  #endif /* AP_SUEXEC_UMASK */
  
      /* Be sure to close the log file so the CGI can't mess with it. */
@@ -240,7 +244,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1341930
      if (log != NULL) {
  #if APR_HAVE_FCNTL_H
          /*
-@@ -623,6 +644,7 @@ int main(int argc, char *argv[])
+@@ -624,6 +656,7 @@ int main(int argc, char *argv[])
          log = NULL;
  #endif
      }

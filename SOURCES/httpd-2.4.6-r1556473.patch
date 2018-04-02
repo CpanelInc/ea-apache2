@@ -1,31 +1,33 @@
-# ./pullrev.sh 1556473
+commit 5bb3a63ca6d7bee3e464194bdd82506900e1f376
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:21 2018 -0500
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1036666
+    Apply httpd-2.4.6-r1556473.patch
 
-http://svn.apache.org/viewvc?view=revision&revision=1556473
-
---- httpd-2.4.6/modules/ssl/ssl_engine_config.c
-+++ httpd-2.4.6/modules/ssl/ssl_engine_config.c
-@@ -699,9 +699,20 @@
+diff --git a/modules/ssl/ssl_engine_config.c b/modules/ssl/ssl_engine_config.c
+index 104d84a..9fbe5ae 100644
+--- a/modules/ssl/ssl_engine_config.c
++++ b/modules/ssl/ssl_engine_config.c
+@@ -805,20 +805,9 @@ const char *ssl_cmd_SSLCompression(cmd_parms *cmd, void *dcfg, int flag)
  #ifndef SSL_OP_NO_COMPRESSION
      const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
      if (err)
--        return "This version of openssl does not support configuring "
--               "compression within <VirtualHost> sections.";
-+        return "This version of OpenSSL does not support enabling "
-+               "SSLCompression within <VirtualHost> sections.";
+-        return "This version of OpenSSL does not support enabling "
+-               "SSLCompression within <VirtualHost> sections.";
++        return "This version of openssl does not support configuring "
++               "compression within <VirtualHost> sections.";
  #endif
-+    if (flag) {
-+        /* Some (packaged) versions of OpenSSL do not support
-+         * compression by default.  Enabling this directive would not
-+         * have the desired effect, so fail with an error. */
-+        STACK_OF(SSL_COMP) *meths = SSL_COMP_get_compression_methods();
-+
-+        if (sk_SSL_COMP_num(meths) == 0) {
-+            return "This version of OpenSSL does not have any compression methods "
-+                "available, cannot enable SSLCompression.";
-+        }
-+    }
+-    if (flag) {
+-        /* Some (packaged) versions of OpenSSL do not support
+-         * compression by default.  Enabling this directive would not
+-         * have the desired effect, so fail with an error. */
+-        STACK_OF(SSL_COMP) *meths = SSL_COMP_get_compression_methods();
+-
+-        if (sk_SSL_COMP_num(meths) == 0) {
+-            return "This version of OpenSSL does not have any compression methods "
+-                "available, cannot enable SSLCompression.";
+-        }
+-    }
      sc->compression = flag ? TRUE : FALSE;
      return NULL;
  #else

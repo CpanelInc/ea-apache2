@@ -5,6 +5,7 @@
 %define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring cPanel
+%define ea_openssl_ver 1.0.2n-3
 
 # Drop automatic provides for module DSOs
 %{?filter_setup:
@@ -21,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.29
+Version: 2.4.33
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 11
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -85,15 +86,15 @@ Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel >= 1.2.0
+BuildRequires: ea-apr-devel >= 1.6.3-1, ea-apr-util-devel >= 1.6.1-1
 BuildRequires: pcre-devel >= 5.0
-BuildRequires: ea-openssl ea-openssl-devel
+BuildRequires: ea-openssl >= %{ea_openssl_ver}, ea-openssl-devel >= %{ea_openssl_ver}
 BuildRequires: ea-libxml2 ea-libxml2-devel
 %if %{with_http2}
 BuildRequires: ea-nghttp2 ea-libnghttp2
 %endif
 
-Requires: ea-apr%{?_isa} >= 1.5.2-4
+Requires: ea-apr%{?_isa} >= 1.6.3-1
 Requires: system-logos >= 7.92.1-1
 Requires: ea-apache24-mpm, ea-apache24-cgi
 Requires: ea-apache24-mod_ssl
@@ -125,7 +126,7 @@ web server.
 Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel, httpd-devel
-Requires: ea-apr-devel >= 1.5.2-4, ea-apr-util-devel, pkgconfig
+Requires: ea-apr-devel >= 1.6.3-1, ea-apr-util-devel, pkgconfig
 Requires: ea-apache24 = %{version}-%{release}
 
 %description devel
@@ -153,7 +154,7 @@ also be found at http://httpd.apache.org/docs/2.4/.
 %package -n ea-apache24-mod_http2
 Group: System Environment/Daemons
 Summary: HTTP2 module for Apache HTTP Server
-BuildRequires: ea-libnghttp2-devel ea-openssl ea-openssl-devel
+BuildRequires: ea-libnghttp2-devel ea-openssl >= %{ea_openssl_ver}, ea-openssl-devel >= %{ea_openssl_ver}
 Requires: ea-nghttp2
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Conflicts: ea-apache24-mod_mpm_itk, ea-apache24-mod_mpm_prefork
@@ -1015,6 +1016,18 @@ The mod_proxy_wstunnel module provides support for the tunnelling of
 web socket connections to a backend websockets server. The connection
 is automagically upgraded to a websocket connection.
 
+%package -n ea-apache24-mod_proxy_uwsgi
+Group: System Environment/Daemons
+Summary: Websockets proxy module for the Apache HTTP server
+Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
+
+%description -n ea-apache24-mod_proxy_uwsgi
+The uWSGI project provides application servers (for various programming languages and protocols
+like perl (PSGI), python (WSGI), ruby (Rack), Lua WSAPI, CGI, PHP, and Go ... to name a few),
+proxies, process managers and monitors.
+All implemented using a common api and a common configuration style.
+
 %package -n ea-apache24-mod_ratelimit
 Group: System Environment/Daemons
 Summary: Client bandwidth limiting module for the Apache HTTP server
@@ -1153,8 +1166,8 @@ names which were matched using this strategy.
 %package -n ea-apache24-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
-BuildRequires: ea-openssl-devel
-Requires(post): ea-openssl, /bin/cat
+BuildRequires: ea-openssl-devel >= %{ea_openssl_ver}
+Requires(post): ea-openssl >= %{ea_openssl_ver}, /bin/cat
 Requires(pre): ea-apache24
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl, mod_ssl
@@ -1355,6 +1368,7 @@ export LYNX_PATH=/usr/bin/links
     MOD_PROXY_HTML_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_XML2ENC_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_BROTLI_LDADD="-L/opt/cpanel/ea-brotli/lib -R/opt/cpanel/ea-brotli/lib" \
+    MOD_SSL_LDADD="-L/opt/cpanel/ea-openssl/%{_lib} -R/opt/cpanel/ea-openssl/%{_lib}" \
     $*
 make %{?_smp_mflags}
 
@@ -1544,7 +1558,7 @@ for mod in \
   proxy lbmethod_bybusyness lbmethod_byrequests lbmethod_bytraffic \
   lbmethod_heartbeat proxy_ajp proxy_balancer proxy_connect \
   proxy_express proxy_fcgi proxy_fdpass proxy_ftp proxy_http proxy_scgi \
-  proxy_wstunnel ratelimit reflector remoteip reqtimeout request rewrite \
+  proxy_wstunnel proxy_uwsgi ratelimit reflector remoteip reqtimeout request rewrite \
   sed setenvif slotmem_plain slotmem_shm socache_dbm socache_memcache \
   socache_shmcb speling status substitute suexec unique_id unixd userdir \
   usertrack version vhost_alias watchdog heartbeat heartmonitor \
@@ -1864,6 +1878,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_proxy_http -f files.proxy_http
 %files -n ea-apache24-mod_proxy_scgi -f files.proxy_scgi
 %files -n ea-apache24-mod_proxy_wstunnel -f files.proxy_wstunnel
+%files -n ea-apache24-mod_proxy_uwsgi -f files.proxy_uwsgi
 %files -n ea-apache24-mod_ratelimit -f files.ratelimit
 %files -n ea-apache24-mod_reflector -f files.reflector
 %files -n ea-apache24-mod_remoteip -f files.remoteip
@@ -1898,6 +1913,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Mar 29 2018 Daniel Muey <dan@cpanel.net> - 2.4.33-1
+- EA-7327: Update to v2.4.33, drop v2.4.29
+
+* Tue Mar 27 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.29-12
+- EA-7339: Build against the latest apr/apr-util
+
 * Mon Mar 19 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.29-11
 - EA-7164: Build mod_brotli against the ea-brotli package.
 

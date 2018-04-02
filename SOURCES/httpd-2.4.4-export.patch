@@ -1,20 +1,20 @@
+commit 1ec0ba72ac2bf9436b85a350cabbaf13c33a4402
+Author: Daniel Muey <dan@cpanel.net>
+Date:   Mon Mar 26 08:32:20 2018 -0500
 
-There is no need to "suck in" the apr/apr-util symbols when using
-a shared libapr{,util}, it just bloats the symbol table; so don't.
+    Apply httpd-2.4.4-export.patch
 
-Upstream-HEAD: needed
-Upstream-2.0: omit
-Upstream-Status: EXPORT_DIRS change is conditional on using shared apr
-
---- httpd-2.4.4/server/Makefile.in.export
-+++ httpd-2.4.4/server/Makefile.in
-@@ -57,9 +57,6 @@ export_files:
- 	( for dir in $(EXPORT_DIRS); do \
- 	      ls $$dir/*.h ; \
+diff --git a/server/Makefile.in b/server/Makefile.in
+index 1fa3344..3f867be 100644
+--- a/server/Makefile.in
++++ b/server/Makefile.in
+@@ -63,6 +63,9 @@ export_files:
+ 	  for dir in $(EXPORT_DIRS_APR); do \
+ 	      ls $$dir/ap[ru].h $$dir/ap[ru]_*.h 2>/dev/null; \
  	  done; \
--	  for dir in $(EXPORT_DIRS_APR); do \
--	      ls $$dir/ap[ru].h $$dir/ap[ru]_*.h 2>/dev/null; \
--	  done; \
++	  for dir in $(EXPORT_DIRS_APR); do \
++	      ls $$dir/ap[ru].h $$dir/ap[ru]_*.h 2>/dev/null; \
++	  done; \
  	) | sed -e s,//,/,g | sort -u > $@
  
  exports.c: export_files
