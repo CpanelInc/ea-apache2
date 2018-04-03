@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.33
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -95,6 +95,7 @@ BuildRequires: ea-nghttp2 ea-libnghttp2
 %endif
 
 Requires: ea-apr%{?_isa} >= 1.6.3-1
+Requires: ea-apr-util%{?_isa} >= 1.6.1-1
 Requires: system-logos >= 7.92.1-1
 Requires: ea-apache24-mpm, ea-apache24-cgi
 Requires: ea-apache24-mod_ssl
@@ -1913,6 +1914,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Apr 03 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-2
+- EA-7366: Ensure that apr-util is properly listed as a dependency.
+
 * Thu Mar 29 2018 Daniel Muey <dan@cpanel.net> - 2.4.33-1
 - EA-7327: Update to v2.4.33, drop v2.4.29
 
