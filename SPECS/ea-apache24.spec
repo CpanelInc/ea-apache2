@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.33
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1370,6 +1370,7 @@ export LYNX_PATH=/usr/bin/links
     MOD_XML2ENC_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_BROTLI_LDADD="-L/opt/cpanel/ea-brotli/lib -R/opt/cpanel/ea-brotli/lib" \
     MOD_SSL_LDADD="-L/opt/cpanel/ea-openssl/%{_lib} -R/opt/cpanel/ea-openssl/%{_lib}" \
+    UTIL_LDFLAGS="-L/opt/cpanel/ea-openssl/%{_lib} -R/opt/cpanel/ea-openssl/%{_lib}" \
     $*
 make %{?_smp_mflags}
 
@@ -1914,6 +1915,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Apr 03 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-3
+- EA-7367: Ensure that the tools are properly linked against ea-openssl.
+
 * Thu Apr 03 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-2
 - EA-7366: Ensure that apr-util is properly listed as a dependency.
 
