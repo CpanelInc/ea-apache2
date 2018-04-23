@@ -5,7 +5,7 @@
 %define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring cPanel
-%define ea_openssl_ver 1.0.2n-3
+%define ea_openssl_ver 1.0.2o-2
 
 # Drop automatic provides for module DSOs
 %{?filter_setup:
@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.33
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 4
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1918,6 +1918,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Apr 16 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-5
+- EA-7382: Update dependency on ea-openssl to require the latest version with versioned symbols.
+
 * Wed Apr 04 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-4
 - EA-7376: Ensure that mod_http2 is properly linked against ea-openssl.
 
