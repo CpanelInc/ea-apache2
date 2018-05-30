@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.33
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 5
+%define release_prefix 6
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1297,6 +1297,9 @@ fi
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa} and vendor string '%{vstring}'
 
 %build
+# Force dependency resolution to pick /usr/bin/perl instead of /bin/perl
+# This helps downstream users of our RPMS (see: EA-7468)
+export PATH="/usr/bin:$PATH"
 # forcibly prevent use of bundled apr, apr-util, pcre
 rm -rf srclib/{apr,apr-util,pcre}
 
@@ -1918,6 +1921,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon May 29 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-6
+- EA-7468: Ensure dependency resolution picks /usr/bin/perl instead
+  of /bin/perl. This helps downstream users of our RPMs as their
+  build environments can be simplified.
+
 * Mon Apr 16 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-5
 - EA-7382: Update dependency on ea-openssl to require the latest version with versioned symbols.
 
