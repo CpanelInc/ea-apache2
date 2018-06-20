@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.33
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 7
+%define release_prefix 8
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -51,6 +51,7 @@ Source41: htcacheclean.sysconf
 
 # Systemd service file
 Source42: httpd.service
+Source45: htcacheclean.service
 
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
@@ -1397,8 +1398,11 @@ done
 
 # install systemd service file for CentOS 7 and up
 %if 0%{?rhel} >= 7
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/systemd/system/
-install -p -m 644 $RPM_SOURCE_DIR/httpd.service $RPM_BUILD_ROOT%{_sysconfdir}/systemd/system/httpd.service
+mkdir -p $RPM_BUILD_ROOT%{_unitdir}
+for s in httpd.service htcacheclean.service; do
+  install -p -m 644 $RPM_SOURCE_DIR/${s} \
+                    $RPM_BUILD_ROOT%{_unitdir}/${s}
+done
 %endif
 
 # install conf file/directory
@@ -1669,21 +1673,40 @@ if [ -L /etc/apache2 ] ; then
 fi
 
 %post
+%if 0%{?rhel} >= 7
+# NOTE: Can't use %%systemd_post here cause this service is not covered by the centos presets.
+# Additionally, We do not START these services here cause we depend on the yum hook to do that for us.
+/bin/systemctl enable httpd.service >/dev/null 2>&1 || :
+%else
 # Register the httpd service
 /sbin/chkconfig --add httpd
-/sbin/chkconfig --add htcacheclean
+%endif
 
 %preun
+%if 0%{?rhel} >= 7
+%systemd_preun httpd.service htcacheclean.service
+%else
 if [ $1 = 0 ]; then
         /sbin/service httpd stop > /dev/null 2>&1
         /sbin/chkconfig --del httpd
         /sbin/service htcacheclean stop > /dev/null 2>&1
         /sbin/chkconfig --del htcacheclean
 fi
+%endif
+
+%if 0%{?rhel} >= 7
+%postun
+%systemd_postun
+%endif
 
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
- /sbin/service httpd condrestart >/dev/null 2>&1 || :
+%if 0%{?rhel} >= 7
+  /bin/systemctl try-restart httpd.service htcacheclean.service >/dev/null 2>&1 || :
+%else
+  /sbin/service httpd condrestart >/dev/null 2>&1 || :
+  /sbin/service htcacheclean condrestart >/dev/null 2>&1 || :
+%endif
 
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
@@ -1762,7 +1785,8 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/apache2/conf.d/manual.conf
 
 %if 0%{?rhel} >= 7
-%{_sysconfdir}/systemd/system/httpd.service
+%{_unitdir}/httpd.service
+%{_unitdir}/htcacheclean.service
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
 %{_prefix}/lib/tmpfiles.d/apache2.conf
 %endif
@@ -1921,6 +1945,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Jun 19 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-8
+- EA-5971: Ensure that htcacheclean service is functional on
+  Centos 7 systems
+
 * Thu May 31 2018 Cory McIntire <cory@cpanel.net> - 2.4.33-7
 - EA-7487: Add ExecReload to httpd.service file
 
