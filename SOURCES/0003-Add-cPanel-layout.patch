@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Cory McIntire <cory@cpanel.net>
+Date: Thu, 12 Jul 2018 15:14:33 -0500
+Subject: [PATCH 03/16] Add cPanel layout
+
+---
+ config.layout | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/config.layout b/config.layout
+index 76612db..ae4f468 100644
+--- a/config.layout
++++ b/config.layout
+@@ -394,3 +394,27 @@
+     logfiledir:      ${localstatedir}/log/httpd
+     proxycachedir:   ${localstatedir}/cache/httpd
+ </Layout>
++
++# cPanel layout
++<Layout cPanel>
++    prefix:        /usr
++    exec_prefix:   ${prefix}
++    bindir:        ${prefix}/bin
++    sbindir:       ${prefix}/sbin
++    libdir:        ${prefix}/lib
++    libexecdir:    ${prefix}/libexec
++    mandir:        ${prefix}/man
++    sysconfdir:    /etc/apache2/conf
++    datadir:       ${prefix}/share/apache2
++    installbuilddir: ${libdir}/apache2/build
++    errordir:      ${datadir}/error
++    iconsdir:      ${datadir}/icons
++    htdocsdir:     /var/www/html
++    manualdir:     ${datadir}/manual
++    cgidir:        /var/www/cgi-bin
++    includedir:    ${prefix}/include/apache2
++    localstatedir: /var
++    runtimedir:    /var/run/apache2
++    logfiledir:    ${localstatedir}/log/apache2
++    proxycachedir: ${localstatedir}/cache/apache2/proxy
++</Layout>
