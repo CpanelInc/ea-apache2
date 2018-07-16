@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Cory McIntire <cory@cpanel.net>
+Date: Thu, 12 Jul 2018 15:38:46 -0500
+Subject: [PATCH 08/16] BUG: r1556473 Avoid additional checks for
+ SSLCompression
+
+---
+ modules/ssl/ssl_engine_config.c | 15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
+
+diff --git a/modules/ssl/ssl_engine_config.c b/modules/ssl/ssl_engine_config.c
+index 195380e..72138e0 100644
+--- a/modules/ssl/ssl_engine_config.c
++++ b/modules/ssl/ssl_engine_config.c
+@@ -813,20 +813,9 @@ const char *ssl_cmd_SSLCompression(cmd_parms *cmd, void *dcfg, int flag)
+ #ifndef SSL_OP_NO_COMPRESSION
+     const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
+     if (err)
+-        return "This version of OpenSSL does not support enabling "
+-               "SSLCompression within <VirtualHost> sections.";
++        return "This version of openssl does not support configuring "
++               "compression within <VirtualHost> sections.";
+ #endif
+-    if (flag) {
+-        /* Some (packaged) versions of OpenSSL do not support
+-         * compression by default.  Enabling this directive would not
+-         * have the desired effect, so fail with an error. */
+-        STACK_OF(SSL_COMP) *meths = SSL_COMP_get_compression_methods();
+-
+-        if (sk_SSL_COMP_num(meths) == 0) {
+-            return "This version of OpenSSL does not have any compression methods "
+-                "available, cannot enable SSLCompression.";
+-        }
+-    }
+     sc->compression = flag ? TRUE : FALSE;
+     return NULL;
+ #else
