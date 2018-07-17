@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.33
+Version: 2.4.34
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 8
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -54,31 +54,31 @@ Source42: httpd.service
 Source45: htcacheclean.service
 
 # build/scripts patches
-Patch1: httpd-2.4.1-apctl.patch
-Patch3: httpd-2.4.1-deplibs.patch
-Patch5: httpd-2.4.3-layout.patch
+Patch1: 0001-Apachectl-additions-and-options.patch
+Patch3: 0002-Remove-libs-dependency-in-AP_LIBS.patch
+Patch5: 0003-Add-cPanel-layout.patch
 
 # Features/functional changes
-Patch23: httpd-2.4.4-export.patch
-Patch24: httpd-2.4.1-corelimit.patch
-Patch25: httpd-2.4.1-selinux.patch
-Patch26: httpd-2.4.4-r1337344+.patch
-Patch27: httpd-2.4.2-icons.patch
+Patch24: 0004-Bump-coresize-limit-if-coredumpdirectory-is-configur.patch
+Patch25: 0005-Add-SELinux-support.patch
+Patch27: 0006-Update-Icon-configuration-in-autoindex.conf.patch
 
-Patch30: httpd-2.4.4-cachehardmax.patch
+Patch30: 0007-Update-CacheMaxExpire-to-have-a-hard-option.patch
+
 # Bug fixes
-Patch59: httpd-2.4.6-r1556473.patch
+Patch59: 0008-BUG-r1556473-Avoid-additional-checks-for-SSLCompress.patch
+
 # cPanel-specific patches
-Patch301: 2.4.23_cpanel_apachectl.patch
-Patch302: 2.2.17_cpanel_suexec_script_share.patch
-Patch303: 2.2.17_cpanel_mailman_suexec.patch
-Patch304: 2.2_cpanel_fileprotect_suexec_httpusergroupallow.patch
-Patch305: httpd-2.4.12-apxs-modules-dir.patch
-Patch306: httpd-2.4.25-symlink.patch
+Patch301: 0009-Update-Apachectl-to-reference-cpanel.config-Addition.patch
+Patch302: 0010-Update-suexec-to-allow-trusted-scripts.patch
+Patch303: 0011-Update-suexec-to-work-with-cPanel-Mailman-installati.patch
+Patch304: 0012-Update-suexec-to-allow-execution-for-httpusergroup-m.patch
+Patch305: 0013-Update-apxs-to-automatically-generate-module-conf-fi.patch
+Patch306: 0014-Add-SymlinkProtect-and-SymlinkProtectRoot-functional.patch
 
 # cPanel Performance Patches
-Patch401: 0001-Increase-random-seed-size.patch
-Patch403: 0003-silence-long-lost-pids.patch
+Patch401: 0015-Increase-random-seed-size.patch
+Patch403: 0016-Downgrade-loglevel-for-long-lost-pid-warnings.patch
 
 # cPanel Security Patches
 
@@ -1260,10 +1260,8 @@ mod_watchdog hooks.
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 
-%patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
-%patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
 
 %patch30 -p1 -b .cachehardmax
@@ -1945,6 +1943,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Jul 12 2018 Cory McIntire <cory@cpanel.net> - 2.4.34-1
+- EA-7683 Update httpd-2.4.33 to httpd-2.4.34
+  Redid patches to be a git format-patch set
+
 * Tue Jun 19 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-8
 - EA-5971: Ensure that htcacheclean service is functional on
   Centos 7 systems
