@@ -1,0 +1,95 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Cory McIntire <cory@cpanel.net>
+Date: Thu, 12 Jul 2018 15:11:13 -0500
+Subject: [PATCH 01/16] Apachectl additions and options
+
+---
+ support/apachectl.in | 43 ++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 34 insertions(+), 9 deletions(-)
+
+diff --git a/support/apachectl.in b/support/apachectl.in
+index 3281c2e..c6ac3ea 100644
+--- a/support/apachectl.in
++++ b/support/apachectl.in
+@@ -44,19 +44,25 @@ ARGV="$@"
+ # the path to your httpd binary, including options if necessary
+ HTTPD='@exp_sbindir@/@progname@'
+ #
+-# pick up any necessary environment variables
+-if test -f @exp_sbindir@/envvars; then
+-  . @exp_sbindir@/envvars
+-fi
+ #
+ # a command that outputs a formatted text version of the HTML at the
+ # url given on the command line.  Designed for lynx, however other
+ # programs may work.  
+-LYNX="@LYNX_PATH@ -dump"
++if [ -x "@LYNX_PATH@" ]; then
++  LYNX="@LYNX_PATH@ -dump"
++else
++  LYNX=none
++fi
+ #
+ # the URL to your server's mod_status status page.  If you do not
+ # have one, then status and fullstatus will not work.
+ STATUSURL="http://localhost:@PORT@/server-status"
++
++# Source /etc/sysconfig/httpd for $HTTPD setting, etc.
++if [ -r /etc/sysconfig/httpd ]; then
++   . /etc/sysconfig/httpd
++fi
++
+ #
+ # Set this variable to a command that increases the maximum
+ # number of file descriptors allowed per child process. This is
+@@ -76,9 +82,27 @@ if [ "x$ARGV" = "x" ] ; then
+     ARGV="-h"
+ fi
+ 
++function checklynx() {
++if [ "$LYNX" = "none" ]; then
++   echo "The 'links' package is required for this functionality."
++   exit 8
++fi
++}
++
++function testconfig() {
++# httpd is denied terminal access in SELinux, so run in the
++# current context to get stdout from $HTTPD -t.
++if test -x /usr/sbin/selinuxenabled && /usr/sbin/selinuxenabled; then
++  runcon -- `id -Z` $HTTPD $OPTIONS -t
++else
++  $HTTPD $OPTIONS -t
++fi
++ERROR=$?
++}
++
+ case $ACMD in
+ start|stop|restart|graceful|graceful-stop)
+-    $HTTPD -k $ARGV
++    $HTTPD $OPTIONS -k $ARGV
+     ERROR=$?
+     ;;
+ startssl|sslstart|start-SSL)
+@@ -88,17 +112,18 @@ startssl|sslstart|start-SSL)
+     ERROR=2
+     ;;
+ configtest)
+-    $HTTPD -t
+-    ERROR=$?
++    testconfig
+     ;;
+ status)
++    checklynx
+     $LYNX $STATUSURL | awk ' /process$/ { print; exit } { print } '
+     ;;
+ fullstatus)
++    checklynx
+     $LYNX $STATUSURL
+     ;;
+ *)
+-    $HTTPD "$@"
++    $HTTPD $OPTIONS "$@"
+     ERROR=$?
+ esac
+ 
