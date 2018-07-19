@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.34
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -81,6 +81,7 @@ Patch401: 0015-Increase-random-seed-size.patch
 Patch403: 0016-Downgrade-loglevel-for-long-lost-pid-warnings.patch
 
 # cPanel Security Patches
+Patch500: 0017-EA-7715-Revert-mod_ratelimit-back-to-the-2.3.33-vers.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1278,6 +1279,8 @@ mod_watchdog hooks.
 %patch401 -p1 -b .randomsstartupperformance
 %patch403 -p1 -b .longlostpids
 
+%patch500 -p1 -b .fix_modratelimit
+
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -1943,6 +1946,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Jul 19 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.34-2
+- EA-7715: Revert mod_ratelimit back to the 2.3.33 version.
+  This is to ensure that it emits proper chunks, as there are several
+  issues with the 2.3.34 version.
+
 * Thu Jul 12 2018 Cory McIntire <cory@cpanel.net> - 2.4.34-1
 - EA-7683 Update httpd-2.4.33 to httpd-2.4.34
   Redid patches to be a git format-patch set
