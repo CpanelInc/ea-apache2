@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:45:12 -0500
-Subject: [PATCH 11/16] Update suexec to work with cPanel Mailman installations
+Subject: [PATCH 11/17] Update suexec to work with cPanel Mailman installations
 
 ---
- support/suexec.c | 72 ++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 60 insertions(+), 12 deletions(-)
+ support/suexec.c | 74 +++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 61 insertions(+), 13 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
 index 86c6dc7..4e085be 100644
@@ -69,6 +69,7 @@ index 86c6dc7..4e085be 100644
 -    if (((setgid(gid)) != 0) || (initgroups(actual_uname, gid) != 0)) {
 -        log_err("failed to setgid (%lu: %s)\n", (unsigned long)gid, cmd);
 -        exit(109);
+-    }
 +    if (mailman) {
 +        /*
 +         * Mailman runs with the permissions of the webserver as if suexec
@@ -79,18 +80,6 @@ index 86c6dc7..4e085be 100644
 +            log_err("failed to setgid (%ld: %s)\n", httpgid, cmd);
 +            exit(109);
 +        }
-+
-+        if ((setuid(httpuid)) != 0) {
-+            log_err("failed to setuid (%ld: %s)\n", uid, cmd);
-+            exit(110);
-+        }
-     }
-+    else {
-+    
-+        if (((setgid(gid)) != 0) || (initgroups(actual_uname, gid) != 0)) {
-+            log_err("failed to setgid (%ld: %s)\n", gid, cmd);
-+            exit(109);
-+        }
  
 -    /*
 -     * setuid() to the target user.  Error out on fail.
@@ -98,6 +87,18 @@ index 86c6dc7..4e085be 100644
 -    if ((setuid(uid)) != 0) {
 -        log_err("failed to setuid (%lu: %s)\n", (unsigned long)uid, cmd);
 -        exit(110);
++        if ((setuid(httpuid)) != 0) {
++            log_err("failed to setuid (%ld: %s)\n", uid, cmd);
++            exit(110);
++        }
++    }
++    else {
++    
++        if (((setgid(gid)) != 0) || (initgroups(actual_uname, gid) != 0)) {
++            log_err("failed to setgid (%ld: %s)\n", gid, cmd);
++            exit(109);
++        }
++
 +        /*
 +         * setuid() to the target user.  Error out on fail.
 +         */
