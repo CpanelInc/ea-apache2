@@ -1,0 +1,267 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Rishwanth Yeddula <rish@cpanel.net>
+Date: Thu, 19 Jul 2018 16:10:17 -0500
+Subject: [PATCH 17/17] EA-7715: Revert mod_ratelimit back to the 2.3.33
+ version
+
+This is to ensure that it emits proper chunks, as there are several
+issues with the 2.3.34 version.
+---
+ modules/filters/mod_ratelimit.c | 139 ++++++++++++++++++--------------
+ 1 file changed, 77 insertions(+), 62 deletions(-)
+
+diff --git a/modules/filters/mod_ratelimit.c b/modules/filters/mod_ratelimit.c
+index cf79973..64283c7 100644
+--- a/modules/filters/mod_ratelimit.c
++++ b/modules/filters/mod_ratelimit.c
+@@ -26,6 +26,7 @@
+ 
+ typedef enum rl_state_e
+ {
++    RATE_ERROR,
+     RATE_LIMIT,
+     RATE_FULLSPEED
+ } rl_state_e;
+@@ -35,7 +36,6 @@ typedef struct rl_ctx_t
+     int speed;
+     int chunk_size;
+     int burst;
+-    int do_sleep;
+     rl_state_e state;
+     apr_bucket_brigade *tmpbb;
+     apr_bucket_brigade *holdingbb;
+@@ -57,11 +57,20 @@ static void brigade_dump(request_rec *r, apr_bucket_brigade *bb)
+ #endif /* RLFDEBUG */
+ 
+ static apr_status_t
+-rate_limit_filter(ap_filter_t *f, apr_bucket_brigade *bb)
++rate_limit_filter(ap_filter_t *f, apr_bucket_brigade *input_bb)
+ {
+     apr_status_t rv = APR_SUCCESS;
+     rl_ctx_t *ctx = f->ctx;
++    apr_bucket *fb;
++    int do_sleep = 0;
+     apr_bucket_alloc_t *ba = f->r->connection->bucket_alloc;
++    apr_bucket_brigade *bb = input_bb;
++
++    if (f->c->aborted) {
++        ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, f->r, APLOGNO(01454) "rl: conn aborted");
++        apr_brigade_cleanup(bb);
++        return APR_ECONNABORTED;
++    }
+ 
+     /* Set up our rl_ctx_t on first use */
+     if (ctx == NULL) {
+@@ -111,7 +120,6 @@ rate_limit_filter(ap_filter_t *f, apr_bucket_brigade *bb)
+         ctx->state = RATE_LIMIT;
+         ctx->speed = ratelimit;
+         ctx->burst = burst;
+-        ctx->do_sleep = 0;
+ 
+         /* calculate how many bytes / interval we want to send */
+         /* speed is bytes / second, so, how many  (speed / 1000 % interval) */
+@@ -119,49 +127,79 @@ rate_limit_filter(ap_filter_t *f, apr_bucket_brigade *bb)
+         ctx->tmpbb = apr_brigade_create(f->r->pool, ba);
+         ctx->holdingbb = apr_brigade_create(f->r->pool, ba);
+     }
+-    else {
+-        APR_BRIGADE_PREPEND(bb, ctx->holdingbb);
+-    }
+ 
+-    while (!APR_BRIGADE_EMPTY(bb)) {
++    while (ctx->state != RATE_ERROR &&
++           (!APR_BRIGADE_EMPTY(bb) || !APR_BRIGADE_EMPTY(ctx->holdingbb))) {
+         apr_bucket *e;
+ 
+-        if (ctx->state == RATE_FULLSPEED) {
++        if (!APR_BRIGADE_EMPTY(ctx->holdingbb)) {
++            APR_BRIGADE_CONCAT(bb, ctx->holdingbb);
++        }
++
++        while (ctx->state == RATE_FULLSPEED && !APR_BRIGADE_EMPTY(bb)) {
+             /* Find where we 'stop' going full speed. */
+             for (e = APR_BRIGADE_FIRST(bb);
+                  e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
+                 if (AP_RL_BUCKET_IS_END(e)) {
+-                    apr_brigade_split_ex(bb, e, ctx->holdingbb);
++                    apr_bucket *f;
++                    f = APR_RING_LAST(&bb->list);
++                    APR_RING_UNSPLICE(e, f, link);
++                    APR_RING_SPLICE_TAIL(&ctx->holdingbb->list, e, f,
++                                         apr_bucket, link);
+                     ctx->state = RATE_LIMIT;
+                     break;
+                 }
+             }
+ 
+-            e = apr_bucket_flush_create(ba);
+-            APR_BRIGADE_INSERT_TAIL(bb, e);
++            if (f->c->aborted) {
++                apr_brigade_cleanup(bb);
++                ctx->state = RATE_ERROR;
++                break;
++            }
++
++            fb = apr_bucket_flush_create(ba);
++            APR_BRIGADE_INSERT_TAIL(bb, fb);
+             rv = ap_pass_brigade(f->next, bb);
+-            apr_brigade_cleanup(bb);
+ 
+             if (rv != APR_SUCCESS) {
++                ctx->state = RATE_ERROR;
+                 ap_log_rerror(APLOG_MARK, APLOG_TRACE1, rv, f->r, APLOGNO(01455)
+                               "rl: full speed brigade pass failed.");
+-                return rv;
+             }
+         }
+-        else {
++
++        while (ctx->state == RATE_LIMIT && !APR_BRIGADE_EMPTY(bb)) {
+             for (e = APR_BRIGADE_FIRST(bb);
+                  e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
+                 if (AP_RL_BUCKET_IS_START(e)) {
+-                    apr_brigade_split_ex(bb, e, ctx->holdingbb);
++                    apr_bucket *f;
++                    f = APR_RING_LAST(&bb->list);
++                    APR_RING_UNSPLICE(e, f, link);
++                    APR_RING_SPLICE_TAIL(&ctx->holdingbb->list, e, f,
++                                         apr_bucket, link);
+                     ctx->state = RATE_FULLSPEED;
+                     break;
+                 }
+             }
+ 
+             while (!APR_BRIGADE_EMPTY(bb)) {
+-                apr_off_t len = ctx->chunk_size + ctx->burst;
++                apr_bucket *stop_point;
++                apr_off_t len = 0;
+ 
+-                APR_BRIGADE_CONCAT(ctx->tmpbb, bb);
++                if (f->c->aborted) {
++                    apr_brigade_cleanup(bb);
++                    ctx->state = RATE_ERROR;
++                    break;
++                }
++
++                if (do_sleep) {
++                    apr_sleep(RATE_INTERVAL_MS * 1000);
++                }
++                else {
++                    do_sleep = 1;
++                }
++
++                apr_brigade_length(bb, 1, &len);
+ 
+                 /*
+                  * Pull next chunk of data; the initial amount is our
+@@ -170,29 +208,38 @@ rate_limit_filter(ap_filter_t *f, apr_bucket_brigade *bb)
+                  * burst amounts we have left (in case not done in the
+                  * first bucket).
+                  */
+-                rv = apr_brigade_partition(ctx->tmpbb, len, &e);
++                rv = apr_brigade_partition(bb,
++                    ctx->chunk_size + ctx->burst, &stop_point);
+                 if (rv != APR_SUCCESS && rv != APR_INCOMPLETE) {
++                    ctx->state = RATE_ERROR;
+                     ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, f->r, APLOGNO(01456)
+                                   "rl: partition failed.");
+-                    return rv;
++                    break;
+                 }
+-                /* Send next metadata now if any */
+-                while (e != APR_BRIGADE_SENTINEL(ctx->tmpbb)
+-                       && APR_BUCKET_IS_METADATA(e)) {
+-                    e = APR_BUCKET_NEXT(e);
+-                }
+-                if (e != APR_BRIGADE_SENTINEL(ctx->tmpbb)) {
+-                    apr_brigade_split_ex(ctx->tmpbb, e, bb);
++
++                if (stop_point != APR_BRIGADE_SENTINEL(bb)) {
++                    apr_bucket *f;
++                    apr_bucket *e = APR_BUCKET_PREV(stop_point);
++                    f = APR_RING_FIRST(&bb->list);
++                    APR_RING_UNSPLICE(f, e, link);
++                    APR_RING_SPLICE_HEAD(&ctx->tmpbb->list, f, e, apr_bucket,
++                                         link);
+                 }
+                 else {
+-                    apr_brigade_length(ctx->tmpbb, 1, &len);
++                    APR_BRIGADE_CONCAT(ctx->tmpbb, bb);
+                 }
+ 
++                fb = apr_bucket_flush_create(ba);
++
++                APR_BRIGADE_INSERT_TAIL(ctx->tmpbb, fb);
++
+                 /*
+                  * Adjust the burst amount depending on how much
+                  * we've done up to now.
+                  */
+                 if (ctx->burst) {
++                    len = ctx->burst;
++                    apr_brigade_length(ctx->tmpbb, 1, &len);
+                     ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, f->r,
+                         APLOGNO(03485) "rl: burst %d; len %"APR_OFF_T_FMT, ctx->burst, len);
+                     if (len < ctx->burst) {
+@@ -203,58 +250,26 @@ rate_limit_filter(ap_filter_t *f, apr_bucket_brigade *bb)
+                     }
+                 }
+ 
+-                e = APR_BRIGADE_LAST(ctx->tmpbb);
+-                if (APR_BUCKET_IS_EOS(e)) {
+-                    ap_remove_output_filter(f);
+-                }
+-                else if (!APR_BUCKET_IS_FLUSH(e)) {
+-                    if (APR_BRIGADE_EMPTY(bb)) {
+-                        /* Wait for more (or next call) */
+-                        break;
+-                    }
+-                    e = apr_bucket_flush_create(ba);
+-                    APR_BRIGADE_INSERT_TAIL(ctx->tmpbb, e);
+-                }
+-
+ #if defined(RLFDEBUG)
+                 brigade_dump(f->r, ctx->tmpbb);
+                 brigade_dump(f->r, bb);
+ #endif /* RLFDEBUG */
+ 
+-                if (ctx->do_sleep) {
+-                    apr_sleep(RATE_INTERVAL_MS * 1000);
+-                }
+-                else {
+-                    ctx->do_sleep = 1;
+-                }
+-
+                 rv = ap_pass_brigade(f->next, ctx->tmpbb);
+                 apr_brigade_cleanup(ctx->tmpbb);
+ 
+                 if (rv != APR_SUCCESS) {
+                     /* Most often, user disconnects from stream */
++                    ctx->state = RATE_ERROR;
+                     ap_log_rerror(APLOG_MARK, APLOG_TRACE1, rv, f->r, APLOGNO(01457)
+                                   "rl: brigade pass failed.");
+-                    return rv;
++                    break;
+                 }
+             }
+         }
+-
+-        if (!APR_BRIGADE_EMPTY(ctx->holdingbb)) {
+-            /* Any rate-limited data in tmpbb is sent unlimited along
+-             * with the rest.
+-             */
+-            APR_BRIGADE_CONCAT(bb, ctx->tmpbb);
+-            APR_BRIGADE_CONCAT(bb, ctx->holdingbb);
+-        }
+     }
+ 
+-#if defined(RLFDEBUG)
+-    brigade_dump(f->r, ctx->tmpbb);
+-#endif /* RLFDEBUG */
+-
+-    /* Save remaining tmpbb with the correct lifetime for the next call */
+-    return ap_save_brigade(f, &ctx->holdingbb, &ctx->tmpbb, f->r->pool);
++    return rv;
+ }
+ 
+ 
