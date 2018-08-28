@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.34
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -81,7 +81,7 @@ Patch401: 0015-Increase-random-seed-size.patch
 Patch403: 0016-Downgrade-loglevel-for-long-lost-pid-warnings.patch
 
 # cPanel Security Patches
-Patch500: 0017-EA-7715-Revert-mod_ratelimit-back-to-the-2.3.33-vers.patch
+Patch500: 0017-Apply-mod_ratelimit-fix-from-trunk.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1946,6 +1946,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Aug 24 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.34-3
+- EA-7802: Restore mod_ratelimit back to the 2.3.34 version. Apply
+upstream fixes for it from trunk.
+
 * Thu Jul 19 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.34-2
 - EA-7715: Revert mod_ratelimit back to the 2.3.33 version.
   This is to ensure that it emits proper chunks, as there are several
