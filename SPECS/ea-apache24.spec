@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.34
+Version: 2.4.35
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -81,7 +81,7 @@ Patch401: 0015-Increase-random-seed-size.patch
 Patch403: 0016-Downgrade-loglevel-for-long-lost-pid-warnings.patch
 
 # cPanel Security Patches
-Patch500: 0017-Apply-mod_ratelimit-fix-from-trunk.patch
+# removed: fixed upstream Patch500: 0017-Apply-mod_ratelimit-fix-from-trunk.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1279,8 +1279,6 @@ mod_watchdog hooks.
 %patch401 -p1 -b .randomsstartupperformance
 %patch403 -p1 -b .longlostpids
 
-%patch500 -p1 -b .fix_modratelimit
-
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -1946,6 +1944,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Sep 28 2018 Cory McIntire <cory@cpanel.net> - 2.4.35-1
+- EA-7871: Update to v2.4.35, drop v2.4.34
+  Remove Patch500: 0017-Apply-mod_ratelimit-fix-from-trunk.patch as it
+  was implemented upstream.
+
 * Fri Aug 24 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.34-3
 - EA-7802: Restore mod_ratelimit back to the 2.3.34 version. Apply
 upstream fixes for it from trunk.
