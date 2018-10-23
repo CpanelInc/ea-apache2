@@ -22,7 +22,7 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.35
+Version: 2.4.37
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -1944,6 +1944,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Oct 23 2018 Cory McIntire <cory@cpanel.net> - 2.4.37-1
+- EA-7941: Update to v2.4.37, drop v2.4.35
+
 * Fri Sep 28 2018 Cory McIntire <cory@cpanel.net> - 2.4.35-1
 - EA-7871: Update to v2.4.35, drop v2.4.34
   Remove Patch500: 0017-Apply-mod_ratelimit-fix-from-trunk.patch as it
