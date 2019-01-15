@@ -1944,7 +1944,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
-* Tue Jan 15 2018 Cory McIntire <cory@cpanel.net> - 2.4.37-2
+* Tue Jan 15 2019 Cory McIntire <cory@cpanel.net> - 2.4.37-2
 - EA-7518: Add systemd directives to ensure network is up before starting
 
 * Tue Oct 23 2018 Cory McIntire <cory@cpanel.net> - 2.4.37-1
