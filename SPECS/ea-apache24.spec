@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.37
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1944,6 +1944,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Jan 15 2018 Cory McIntire <cory@cpanel.net> - 2.4.37-2
+- EA-7518: Add systemd directives to ensure network is up before starting
+
 * Tue Oct 23 2018 Cory McIntire <cory@cpanel.net> - 2.4.37-1
 - EA-7941: Update to v2.4.37, drop v2.4.35
 
