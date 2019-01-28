@@ -3,6 +3,8 @@ Description=Apache web server managed by cPanel EasyApache
 ConditionPathExists=!/etc/httpddisable
 ConditionPathExists=!/etc/apachedisable
 ConditionPathExists=!/etc/httpdisable
+After=network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
 
 [Service]
 Type=forking
