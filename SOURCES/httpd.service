@@ -12,6 +12,7 @@ ExecStart=/usr/local/cpanel/scripts/restartsrv_httpd --no-verbose
 ExecStop=/usr/local/cpanel/scripts/restartsrv_httpd stop --no-verbose
 ExecReload=/usr/local/cpanel/scripts/restartsrv_httpd --no-verbose
 PIDFile=/run/apache2/httpd.pid
+TimeoutSec=5m
 
 [Install]
 WantedBy=multi-user.target
