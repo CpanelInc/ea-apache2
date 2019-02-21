@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.38
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1944,6 +1944,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Feb 29 2019 Tim Mullin <tim@cpanel.net> - 2.4.38-2
+- EA-7318: Increase service timeout to handle a large httpd.conf
+
 * Thu Jan 24 2019 Cory McIntire <cory@cpanel.net> - 2.4.38-1
 - EA-8165: Apache Update: Drop 2.4.37, update to 2.4.38
 
