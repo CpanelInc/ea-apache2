@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.38
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1772,7 +1772,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/apache2/conf/magic
 %config(noreplace) %{_sysconfdir}/apache2/conf/mime.types
 
-%config(noreplace) %{_initrddir}/httpd
+%config %{_initrddir}/httpd
 %{_initrddir}/htcacheclean
 
 %dir %{_sysconfdir}/apache2/conf.d
@@ -1944,6 +1944,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Mar 07 2019 Cory McIntire <cory@cpanel.net> - 2.4.38-3
+- EA-8279: Take out noreplace from old EA3 init script so it will be removed
+  now that EA3 is EOL
+
 * Tue Feb 29 2019 Tim Mullin <tim@cpanel.net> - 2.4.38-2
 - EA-7318: Increase service timeout to handle a large httpd.conf
 
