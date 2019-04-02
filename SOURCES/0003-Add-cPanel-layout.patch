@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:14:33 -0500
-Subject: [PATCH 03/17] Add cPanel layout
+Subject: [PATCH 03/16] Add cPanel layout
 
 ---
  config.layout | 24 ++++++++++++++++++++++++
  1 file changed, 24 insertions(+)
 
 diff --git a/config.layout b/config.layout
-index 76612db..ae4f468 100644
+index 8579587..58ab393 100644
 --- a/config.layout
 +++ b/config.layout
 @@ -394,3 +394,27 @@
