@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.38
+Version: 2.4.39
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1150,6 +1150,15 @@ The mod_socache_memcache module is a shared object cache provider
 which provides for creation and access to a cache backed by the
 memcached high-performance, distributed memory object caching system.
 
+%package -n ea-apache24-mod_socache_redis
+Group: System Environment/Daemons
+Summary: shared object cache provider which provides access to a cache backed by Redis
+Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
+
+%description -n ea-apache24-mod_socache_redis
+mod_socache_redis is a shared object cache provider which provides for creation
+and access to a cache backed by the Redis high-performance, distributed memory object caching system.
+
 %package -n ea-apache24-mod_speling
 Group: System Environment/Daemons
 Summary: URL fallback module for the Apache HTTP Server
@@ -1571,7 +1580,7 @@ for mod in \
   proxy_express proxy_fcgi proxy_fdpass proxy_ftp proxy_http proxy_scgi \
   proxy_wstunnel proxy_uwsgi ratelimit reflector remoteip reqtimeout request rewrite \
   sed setenvif slotmem_plain slotmem_shm socache_dbm socache_memcache \
-  socache_shmcb speling status substitute suexec unique_id unixd userdir \
+  socache_shmcb socache_redis speling status substitute suexec unique_id unixd userdir \
   usertrack version vhost_alias watchdog heartbeat heartmonitor \
   ssl \
 %if %{with_http2}
@@ -1649,7 +1658,7 @@ cat files.access_compat files.actions files.alias files.auth_basic \
   files.autoindex files.dir files.filter files.include \
   files.log_config files.logio files.mime files.negotiation \
   files.rewrite files.setenvif files.slotmem_shm files.socache_dbm \
-  files.socache_shmcb files.status files.unixd \
+  files.socache_shmcb files.socache_redis files.status files.unixd \
   files.userdir > files.httpd
 
 # Remove unpackaged files
@@ -1919,6 +1928,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n ea-apache24-mod_session -f files.session
 %files -n ea-apache24-mod_slotmem_plain -f files.slotmem_plain
 %files -n ea-apache24-mod_socache_memcache -f files.socache_memcache
+%files -n ea-apache24-mod_socache_redis -f files.socache_redis
 %files -n ea-apache24-mod_speling -f files.speling
 %files -n ea-apache24-mod_ssl -f files.ssl
 %if %{with_http2}
@@ -1944,11 +1954,20 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Apr 02 2019 Cory McIntire <cory@cpanel.net> - 2.4.39-1
+- EA-8307: Update to 2.4.39, drop 2.4.38
+  CVE-2019-0211: Apache HTTP Server privilege escalation from modules' scripts
+  CVE-2019-0196: mod_http2, read-after-free on a string compare
+  CVE-2019-0197: mod_http2, possible crash on late upgrade
+  CVE-2019-0215: mod_ssl access control bypass
+  CVE-2019-0217: mod_auth_digest access control bypass
+  CVE-2019-0220: URL normalization inconsistincies
+
 * Thu Mar 07 2019 Cory McIntire <cory@cpanel.net> - 2.4.38-3
 - EA-8279: Take out noreplace from old EA3 init script so it will be removed
   now that EA3 is EOL
 
-* Tue Feb 29 2019 Tim Mullin <tim@cpanel.net> - 2.4.38-2
+* Tue Feb 26 2019 Tim Mullin <tim@cpanel.net> - 2.4.38-2
 - EA-7318: Increase service timeout to handle a large httpd.conf
 
 * Thu Jan 24 2019 Cory McIntire <cory@cpanel.net> - 2.4.38-1
@@ -1985,7 +2004,7 @@ upstream fixes for it from trunk.
 * Thu May 31 2018 Cory McIntire <cory@cpanel.net> - 2.4.33-7
 - EA-7487: Add ExecReload to httpd.service file
 
-* Mon May 29 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-6
+* Tue May 29 2018 Rishwanth Yeddula <rish@cpanel.net> - 2.4.33-6
 - EA-7468: Ensure dependency resolution picks /usr/bin/perl instead
   of /bin/perl. This helps downstream users of our RPMs as their
   build environments can be simplified.

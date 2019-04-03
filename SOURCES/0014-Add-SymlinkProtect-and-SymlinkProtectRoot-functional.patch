@@ -1,23 +1,41 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:50:51 -0500
-Subject: [PATCH 14/17] Add SymlinkProtect and SymlinkProtectRoot functionality
+Subject: [PATCH 14/16] Add SymlinkProtect and SymlinkProtectRoot functionality
 
 ---
- include/http_core.h             |   6 ++
+ include/http_core.h             |  10 +++-
  modules/mappers/mod_userdir.c   |  31 +++++++---
  modules/mappers/mod_userdir.dep |   1 +
  server/core.c                   | 103 ++++++++++++++++++++++++++++++++
- 4 files changed, 133 insertions(+), 8 deletions(-)
+ 4 files changed, 135 insertions(+), 10 deletions(-)
 
 diff --git a/include/http_core.h b/include/http_core.h
-index 35df5dc..cafba23 100644
+index 8e10988..857f2dc 100644
 --- a/include/http_core.h
 +++ b/include/http_core.h
+@@ -500,7 +500,7 @@ typedef unsigned long etag_components_t;
+ #define AP_CORE_MERGE_FLAG(field, to, base, over) to->field = \
+                over->field != AP_CORE_CONFIG_UNSET            \
+                ? over->field                                  \
+-               : base->field                                   
++               : base->field
+ 
+ /**
+  * @brief Server Signature Enumeration
+@@ -663,7 +663,7 @@ typedef struct {
+ #define AP_CGI_PASS_AUTH_UNSET   (2)
+     /** CGIPassAuth: Whether HTTP authorization headers will be passed to
+      * scripts as CGI variables; affects all modules calling
+-     * ap_add_common_vars(), as well as any others using this field as 
++     * ap_add_common_vars(), as well as any others using this field as
+      * advice
+      */
+     unsigned int cgi_pass_auth : 2;
 @@ -741,6 +741,12 @@ typedef struct {
  #define AP_HTTP_METHODS_REGISTERED    2
      char http_methods;
- 
+     unsigned int merge_slashes;
 +    /* symlink protection */
 +#define AP_SYMLINK_PROTECT_UNSET   0
 +#define AP_SYMLINK_PROTECT_ENABLE  1
@@ -122,7 +140,7 @@ index 2aff834..fa229b1 100644
  	"..\..\include\http_request.h"\
  	"..\..\include\httpd.h"\
 diff --git a/server/core.c b/server/core.c
-index c8fbf43..43b3247 100644
+index b6371d0..c77e410 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -21,6 +21,8 @@
@@ -142,7 +160,7 @@ index c8fbf43..43b3247 100644
          conf->access_name = DEFAULT_ACCESS_FNAME;
  
          /* A mapping only makes sense in the global context */
-@@ -508,6 +511,9 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
+@@ -509,6 +512,9 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
      if (virt->ap_document_root)
          conf->ap_document_root = virt->ap_document_root;
  
@@ -152,7 +170,7 @@ index c8fbf43..43b3247 100644
      if (virt->access_name)
          conf->access_name = virt->access_name;
  
-@@ -554,6 +560,10 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
+@@ -555,6 +561,10 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
                             ? virt->merge_trailers
                             : base->merge_trailers;
  
@@ -163,7 +181,7 @@ index c8fbf43..43b3247 100644
      conf->protocols = ((virt->protocols->nelts > 0)? 
                         virt->protocols : base->protocols);
      conf->protocols_honor_order = ((virt->protocols_honor_order < 0)?
-@@ -4281,6 +4291,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
+@@ -4293,6 +4303,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
      return NULL;
  }
  
@@ -194,7 +212,7 @@ index c8fbf43..43b3247 100644
  /* Note --- ErrorDocument will now work from .htaccess files.
   * The AllowOverride of Fileinfo allows webmasters to turn it off
   */
-@@ -4548,6 +4582,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
+@@ -4560,6 +4594,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
  AP_INIT_TAKE1("EnableExceptionHook", ap_mpm_set_exception_hook, NULL, RSRC_CONF,
                "Controls whether exception hook may be called after a crash"),
  #endif
@@ -205,7 +223,7 @@ index c8fbf43..43b3247 100644
  AP_INIT_TAKE1("TraceEnable", set_trace_enable, NULL, RSRC_CONF,
                "'on' (default), 'off' or 'extended' to trace request body content"),
  AP_INIT_FLAG("MergeTrailers", set_merge_trailers, NULL, RSRC_CONF,
-@@ -4709,6 +4747,9 @@ static int default_handler(request_rec *r)
+@@ -4725,6 +4763,9 @@ static int default_handler(request_rec *r)
      int errstatus;
      apr_file_t *fd = NULL;
      apr_status_t status;
@@ -215,7 +233,7 @@ index c8fbf43..43b3247 100644
      /* XXX if/when somebody writes a content-md5 filter we either need to
       *     remove this support or coordinate when to use the filter vs.
       *     when to use this code
-@@ -4719,6 +4760,13 @@ static int default_handler(request_rec *r)
+@@ -4735,6 +4776,13 @@ static int default_handler(request_rec *r)
      int bld_content_md5;
  
      d = (core_dir_config *)ap_get_core_module_config(r->per_dir_config);
@@ -229,7 +247,7 @@ index c8fbf43..43b3247 100644
      bld_content_md5 = (d->content_md5 == AP_CONTENT_MD5_ON)
                        && r->output_filters->frec->ftype != AP_FTYPE_RESOURCE;
  
-@@ -4792,6 +4840,61 @@ static int default_handler(request_rec *r)
+@@ -4808,6 +4856,61 @@ static int default_handler(request_rec *r)
              return HTTP_FORBIDDEN;
          }
  
