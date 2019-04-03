@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:38:46 -0500
-Subject: [PATCH 08/17] BUG: r1556473 Avoid additional checks for
+Subject: [PATCH 08/16] BUG: r1556473 Avoid additional checks for
  SSLCompression
 
 ---
@@ -9,10 +9,10 @@ Subject: [PATCH 08/17] BUG: r1556473 Avoid additional checks for
  1 file changed, 2 insertions(+), 13 deletions(-)
 
 diff --git a/modules/ssl/ssl_engine_config.c b/modules/ssl/ssl_engine_config.c
-index 195380e..72138e0 100644
+index 6c10bb5..9eea0f8 100644
 --- a/modules/ssl/ssl_engine_config.c
 +++ b/modules/ssl/ssl_engine_config.c
-@@ -813,20 +813,9 @@ const char *ssl_cmd_SSLCompression(cmd_parms *cmd, void *dcfg, int flag)
+@@ -832,20 +832,9 @@ const char *ssl_cmd_SSLCompression(cmd_parms *cmd, void *dcfg, int flag)
  #ifndef SSL_OP_NO_COMPRESSION
      const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
      if (err)
