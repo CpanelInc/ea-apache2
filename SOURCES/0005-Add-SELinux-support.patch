@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:21:51 -0500
-Subject: [PATCH 05/16] Add SELinux support
+Subject: [PATCH 05/17] Add SELinux support
 
 ---
  configure.in  |  5 +++++
@@ -9,7 +9,7 @@ Subject: [PATCH 05/16] Add SELinux support
  2 files changed, 31 insertions(+)
 
 diff --git a/configure.in b/configure.in
-index 82bfeef..5dc3f05 100644
+index a3a479f..2517801 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -483,6 +483,11 @@ getloadavg
@@ -25,7 +25,7 @@ index 82bfeef..5dc3f05 100644
  [AC_TRY_RUN(#define _GNU_SOURCE
  #include <unistd.h>
 diff --git a/server/core.c b/server/core.c
-index 7aa841f..b6371d0 100644
+index 7aa841f..79f34db 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -59,6 +59,10 @@
@@ -47,18 +47,18 @@ index 7aa841f..b6371d0 100644
 +    {
 +        static int already_warned = 0;
 +        int is_enabled = is_selinux_enabled() > 0;
-+        
++
 +        if (is_enabled && !already_warned) {
 +            security_context_t con;
-+            
++
 +            if (getcon(&con) == 0) {
-+                
++
 +                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
 +                             "SELinux policy enabled; "
 +                             "httpd running as context %s", con);
-+                
++
 +                already_warned = 1;
-+                
++
 +                freecon(con);
 +            }
 +        }

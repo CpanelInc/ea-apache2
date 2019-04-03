@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:13:26 -0500
-Subject: [PATCH 02/16] Remove --libs dependency in AP_LIBS
+Subject: [PATCH 02/17] Remove --libs dependency in AP_LIBS
 
 ---
  configure.in | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure.in b/configure.in
-index 9feaceb..82bfeef 100644
+index 9feaceb..a3a479f 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -784,9 +784,9 @@ APACHE_SUBST(INSTALL_SUEXEC)
@@ -19,7 +19,7 @@ index 9feaceb..82bfeef 100644
 +  AP_LIBS="$AP_LIBS `$apu_config --avoid-ldap --link-libtool`"
  fi
 -AP_LIBS="$AP_LIBS `$apr_config --link-libtool --libs`" 
-+AP_LIBS="$AP_LIBS `$apr_config --link-libtool`" 
++AP_LIBS="$AP_LIBS `$apr_config --link-libtool`"
  APACHE_SUBST(AP_LIBS)
  APACHE_SUBST(AP_BUILD_SRCLIB_DIRS)
  APACHE_SUBST(AP_CLEAN_SRCLIB_DIRS)
