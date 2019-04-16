@@ -1,0 +1,56 @@
+#!/usr/local/cpanel/3rdparty/bin/perl
+# cpanel - find-latest-version                  Copyright(c) 2019 cPanel, L.L.C.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+# This code is subject to the cPanel license. Unauthorized copying is prohibited
+#
+# This provides incremental updates to existing packages in EasyApache4.
+package ea_apache2::find_latest_version;
+
+use strict;
+use warnings;
+
+use lib "../ea-tools/lib/ea4_tool";    # assumes ea-tools is checked out next to this repo
+use ea4_tool::util ();
+
+ea4_tool::util::find_latest_version( \&_get_required, \&_add_sum ) if !caller();
+
+###############
+#### helpers ##
+###############
+
+sub _get_required {
+    my ($http) = @_;
+
+    my $listing_url = "http://www.apache.org/dist/httpd/";
+    my $res         = $http->get($listing_url);
+    if ( !$res->{success} ) {
+        die "Could not GET apache dist page ($res->{status} $res->{reason})\n";
+    }
+
+    my @apache_24 = sort { $b <=> $a } ( $res->{content} =~ m/href="httpd-2\.4\.([0-9]+)\.tar\.bz2"/g );
+    if ( !@apache_24 ) {
+        die "Could not find Apache versions ($res->{status} $res->{reason}\n";
+    }
+
+    my $version = "2.4.$apache_24[0]";
+    my $name    = "httpd-$version.tar.bz2";
+    my $url     = "$listing_url/$name";
+
+    return ( $version, $url, $name );
+}
+
+sub _add_sum {
+    my ( $http, $hr ) = @_;
+
+    my $res = $http->get( $hr->{tarball}{url} . ".sha256" );
+    if ( !$res->{success} ) {
+        die "Could not GET sha256 ($res->{status} $res->{reason})\n";
+    }
+
+    $hr->{tarball}{sum}{type} = "sha256";
+    $hr->{tarball}{sum}{hex}  = $res->{content};
+    $hr->{tarball}{sum}{hex} =~ s/ .*$//s;
+
+    return 1;
+}
