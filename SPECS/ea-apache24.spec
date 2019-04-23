@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.39
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -82,6 +82,7 @@ Patch403: 0016-Downgrade-loglevel-for-long-lost-pid-warnings.patch
 
 # cPanel Security Patches
 # removed: fixed upstream Patch500: 0017-Apply-mod_ratelimit-fix-from-trunk.patch
+Patch500: 0017-Ensure-that-Paths-configured-as-Aliases-are-exempt-f.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1288,6 +1289,8 @@ mod_watchdog hooks.
 %patch401 -p1 -b .randomsstartupperformance
 %patch403 -p1 -b .longlostpids
 
+%patch500 -p1 -b .aliassymlink
+
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -1954,6 +1957,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Apr 03 2019 Rishwanth Yeddula <rish@cpanel.net> - 2.4.39-2
+- CPANEL-22257: Ensure that Paths configured as Aliases are exempt
+  from symlink protection checks
+
 * Tue Apr 02 2019 Cory McIntire <cory@cpanel.net> - 2.4.39-1
 - EA-8307: Update to 2.4.39, drop 2.4.38
   CVE-2019-0211: Apache HTTP Server privilege escalation from modules' scripts
