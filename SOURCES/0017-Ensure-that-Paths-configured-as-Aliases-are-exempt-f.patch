@@ -8,10 +8,13 @@ Case CPANEL-22257: Paths that are configured via the "Alias" directive
 are now flagged as such in mod_alias. When processing requests for files
 in these locations, the symlink protection checks now make an exception
 and allow these files to be served successfully.
+
+Case CPANEL-27056: Fix bug in condition that allowed for non-user files
+to be served.
 ---
  modules/mappers/mod_alias.c | 1 +
- server/core.c               | 6 ++++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ server/core.c               | 5 +++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/modules/mappers/mod_alias.c b/modules/mappers/mod_alias.c
 index 79d58d8..4157dd7 100644
@@ -26,25 +29,17 @@ index 79d58d8..4157dd7 100644
              if (found) {
                  *status = alias->redir_status;
 diff --git a/server/core.c b/server/core.c
-index 449e283..7ac7a69 100644
+index 449e283..ba4450e 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -4865,6 +4865,8 @@ static int default_handler(request_rec *r)
-             apr_status_t post_dirstat_rv;
-             apr_status_t post_fdstat_rv;
- 
-+            const char *is_aliased_path = apr_table_get(r->notes, "is_aliased_path");
-+
-             if (strcmp(csconf->ap_document_root, csconf->symlink_protect_root) == 0
-                 && sp_docroot != NULL) {
-                 /* This request is from mod_userdir. We need to stat what was stored in SPT_DOCROOT. */
-@@ -4893,8 +4895,8 @@ static int default_handler(request_rec *r)
+@@ -4893,8 +4893,9 @@ static int default_handler(request_rec *r)
                  return HTTP_NOT_FOUND;
              }
  
 -
 -            if (apr_uid_compare(r->finfo.user, post_open_dirstat.user)
-+            if ( (is_aliased_path != NULL && strcmp(is_aliased_path, "true") != 0) &&
++            const char *is_aliased_path = apr_table_get(r->notes, "is_aliased_path");
++            if ( !(is_aliased_path != NULL && strcmp(is_aliased_path, "true") == 0 ) &&
 +                apr_uid_compare(r->finfo.user, post_open_dirstat.user)
                  != APR_SUCCESS || apr_uid_compare(post_open_finfo.user, r->finfo.user)
                  != APR_SUCCESS) {
