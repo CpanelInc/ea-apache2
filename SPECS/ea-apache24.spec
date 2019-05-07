@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.39
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1957,6 +1957,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Apr 26 2019 Rishwanth Yeddula <rish@cpanel.net> - 2.4.39-3
+- CPANEL-27056: Fix bug in condition that allowed for non-user files
+  to be served in certain situations when SymlinkProtection was
+  enabled.
+
 * Wed Apr 03 2019 Rishwanth Yeddula <rish@cpanel.net> - 2.4.39-2
 - CPANEL-22257: Ensure that Paths configured as Aliases are exempt
   from symlink protection checks
