@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.39
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1547,6 +1547,11 @@ do
 # Enable mod_${mod}
 LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
+    if [ "${mod}" = "mpm_prefork" ]; then
+        cat >> $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
+Mutex sysvsem
+EOF
+    fi
     cat > files.${mod} <<EOF
 %attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
 %config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
@@ -1957,6 +1962,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu May 30 2019 Tim Mullin <tim@cpanel.net> - 2.4.39-4
+- EA-8508: Appended "Mutex sysvsem" to 000_mod_mpm_prefork.conf
+
 * Fri Apr 26 2019 Rishwanth Yeddula <rish@cpanel.net> - 2.4.39-3
 - CPANEL-27056: Fix bug in condition that allowed for non-user files
   to be served in certain situations when SymlinkProtection was
