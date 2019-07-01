@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.39
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 4
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -97,7 +97,7 @@ BuildRequires: ea-libxml2 ea-libxml2-devel
 BuildRequires: ea-nghttp2 ea-libnghttp2
 %endif
 
-Requires: ea-apr%{?_isa} >= 1.6.3-1
+Requires: ea-apr%{?_isa} >= 1.7.0-1
 Requires: ea-apr-util%{?_isa} >= 1.6.1-1
 Requires: system-logos >= 7.92.1-1
 Requires: ea-apache24-mpm, ea-apache24-cgi
@@ -1962,6 +1962,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Jun 19 2019 Tim Mullin <tim@cpanel.net> - 2.4.39-5
+- EA-8533: Set Apache to depend on ea-apr >= 1.7.0-1
+
 * Thu May 30 2019 Tim Mullin <tim@cpanel.net> - 2.4.39-4
 - EA-8508: Appended "Mutex sysvsem" to 000_mod_mpm_prefork.conf
 
