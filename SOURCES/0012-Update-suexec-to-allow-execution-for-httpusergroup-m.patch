@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 62780e1e0fb0b04d1c3f41275ebe946309b3a505 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:46:51 -0500
 Subject: [PATCH 12/17] Update suexec to allow execution for httpusergroup
@@ -9,10 +9,10 @@ Subject: [PATCH 12/17] Update suexec to allow execution for httpusergroup
  1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index da8a4a8..891a44a 100644
+index e396df5..581c113 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
-@@ -269,6 +269,25 @@ static void clean_env(void)
+@@ -267,6 +267,25 @@ static void clean_env(void)
      environ = cleanenv;
  }
  
@@ -38,7 +38,7 @@ index da8a4a8..891a44a 100644
  int main(int argc, char *argv[])
  {
      int userdir = 0;        /* ~userdir flag             */
-@@ -280,6 +299,7 @@ int main(int argc, char *argv[])
+@@ -278,6 +297,7 @@ int main(int argc, char *argv[])
      char *target_uname;     /* target user name          */
      char *target_gname;     /* target group name         */
      char *target_homedir;   /* target home directory     */
@@ -46,7 +46,7 @@ index da8a4a8..891a44a 100644
      char *actual_uname;     /* actual user name          */
      char *actual_gname;     /* actual group name         */
      char *cmd;              /* command to be executed    */
-@@ -484,6 +504,7 @@ int main(int argc, char *argv[])
+@@ -482,6 +502,7 @@ int main(int argc, char *argv[])
      uid = pw->pw_uid;
      actual_uname = strdup(pw->pw_name);
      target_homedir = strdup(pw->pw_dir);
@@ -54,7 +54,7 @@ index da8a4a8..891a44a 100644
      if (actual_uname == NULL || target_homedir == NULL) {
          log_err("failed to alloc memory\n");
          exit(126);
-@@ -516,6 +537,14 @@ int main(int argc, char *argv[])
+@@ -514,6 +535,14 @@ int main(int argc, char *argv[])
          exit(108);
      }
  
@@ -69,7 +69,7 @@ index da8a4a8..891a44a 100644
      /*
       * Change UID/GID here so that the following tests work over NFS.
       *
-@@ -645,9 +674,9 @@ int main(int argc, char *argv[])
+@@ -643,9 +672,9 @@ int main(int argc, char *argv[])
       * the name/group of the cwd or the program.
       */
      if ((uid != dir_info.st_uid) ||
@@ -81,3 +81,6 @@ index da8a4a8..891a44a 100644
  #ifdef TRUSTED_USERS_SCRIPTS
          /*
           * Check if we're using a "shared" script
+-- 
+2.21.0
+

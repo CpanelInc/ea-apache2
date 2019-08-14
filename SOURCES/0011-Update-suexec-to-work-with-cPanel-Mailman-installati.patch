@@ -1,17 +1,17 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From d690eb176e0e91244f87d2032bfcd623e680e905 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:45:12 -0500
 Subject: [PATCH 11/17] Update suexec to work with cPanel Mailman installations
 
 ---
- support/suexec.c | 74 +++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 61 insertions(+), 13 deletions(-)
+ support/suexec.c | 72 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 60 insertions(+), 12 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index 86c6dc7..da8a4a8 100644
+index a8cc2f4..e396df5 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
-@@ -272,8 +272,11 @@ static void clean_env(void)
+@@ -270,8 +270,11 @@ static void clean_env(void)
  int main(int argc, char *argv[])
  {
      int userdir = 0;        /* ~userdir flag             */
@@ -23,7 +23,7 @@ index 86c6dc7..da8a4a8 100644
      char *target_uname;     /* target user name          */
      char *target_gname;     /* target group name         */
      char *target_homedir;   /* target home directory     */
-@@ -286,6 +289,7 @@ int main(int argc, char *argv[])
+@@ -284,6 +287,7 @@ int main(int argc, char *argv[])
      struct group *gr;       /* group entry holder        */
      struct stat dir_info;   /* directory info holder     */
      struct stat prg_info;   /* program info holder       */
@@ -31,7 +31,7 @@ index 86c6dc7..da8a4a8 100644
  
      /*
       * Start with a "clean" environment
-@@ -296,7 +300,8 @@ int main(int argc, char *argv[])
+@@ -294,7 +298,8 @@ int main(int argc, char *argv[])
       * Check existence/validity of the UID of the user
       * running this program.  Error out if invalid.
       */
@@ -41,7 +41,7 @@ index 86c6dc7..da8a4a8 100644
      if ((pw = getpwuid(uid)) == NULL) {
          log_err("crit: invalid uid: (%lu)\n", (unsigned long)uid);
          exit(102);
-@@ -395,6 +400,20 @@ int main(int argc, char *argv[])
+@@ -393,6 +398,20 @@ int main(int argc, char *argv[])
          userdir = 1;
      }
  
@@ -62,14 +62,13 @@ index 86c6dc7..da8a4a8 100644
      /*
       * Error out if the target username is invalid.
       */
-@@ -503,17 +522,36 @@ int main(int argc, char *argv[])
+@@ -501,17 +520,36 @@ int main(int argc, char *argv[])
       * Initialize the group access list for the target user,
       * and setgid() to the target group. If unsuccessful, error out.
       */
 -    if (((setgid(gid)) != 0) || (initgroups(actual_uname, gid) != 0)) {
 -        log_err("failed to setgid (%lu: %s)\n", (unsigned long)gid, cmd);
 -        exit(109);
--    }
 +    if (mailman) {
 +        /*
 +         * Mailman runs with the permissions of the webserver as if suexec
@@ -80,6 +79,13 @@ index 86c6dc7..da8a4a8 100644
 +            log_err("failed to setgid (%ld: %s)\n", httpgid, cmd);
 +            exit(109);
 +        }
++
++        if ((setuid(httpuid)) != 0) {
++            log_err("failed to setuid (%ld: %s)\n", uid, cmd);
++            exit(110);
++        }
+     }
++    else {
  
 -    /*
 -     * setuid() to the target user.  Error out on fail.
@@ -87,13 +93,6 @@ index 86c6dc7..da8a4a8 100644
 -    if ((setuid(uid)) != 0) {
 -        log_err("failed to setuid (%lu: %s)\n", (unsigned long)uid, cmd);
 -        exit(110);
-+        if ((setuid(httpuid)) != 0) {
-+            log_err("failed to setuid (%ld: %s)\n", uid, cmd);
-+            exit(110);
-+        }
-+    }
-+    else {
-+
 +        if (((setgid(gid)) != 0) || (initgroups(actual_uname, gid) != 0)) {
 +            log_err("failed to setgid (%ld: %s)\n", gid, cmd);
 +            exit(109);
@@ -109,7 +108,7 @@ index 86c6dc7..da8a4a8 100644
      }
  
      /*
-@@ -563,7 +601,7 @@ int main(int argc, char *argv[])
+@@ -561,7 +599,7 @@ int main(int argc, char *argv[])
      /*
       * Error out if cwd is writable by others.
       */
@@ -118,7 +117,7 @@ index 86c6dc7..da8a4a8 100644
          log_err("directory is writable by others: (%s)\n", cwd);
          exit(116);
      }
-@@ -586,12 +624,22 @@ int main(int argc, char *argv[])
+@@ -584,12 +622,22 @@ int main(int argc, char *argv[])
  
      /*
       * Error out if the file is setuid or setgid.
@@ -142,3 +141,6 @@ index 86c6dc7..da8a4a8 100644
      /*
       * Error out if the target name/group is different from
       * the name/group of the cwd or the program.
+-- 
+2.21.0
+

@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 73c6e4627b24ef8f03bb69f4d0d183acb48d9dfd Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:21:51 -0500
 Subject: [PATCH 05/17] Add SELinux support
@@ -25,7 +25,7 @@ index a3a479f..2517801 100644
  [AC_TRY_RUN(#define _GNU_SOURCE
  #include <unistd.h>
 diff --git a/server/core.c b/server/core.c
-index 7aa841f..79f34db 100644
+index 090f503..0ee952c 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -59,6 +59,10 @@
@@ -68,3 +68,6 @@ index 7aa841f..79f34db 100644
      return OK;
  }
  
+-- 
+2.21.0
+

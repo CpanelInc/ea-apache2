@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From d0710e887d8921255379aad5b794eb91d2cf98eb Mon Sep 17 00:00:00 2001
 From: Rishwanth Yeddula <rish@cpanel.net>
 Date: Tue, 26 Mar 2019 13:52:34 -0500
 Subject: [PATCH 17/17] Ensure that Paths configured as Aliases are exempt from
@@ -29,7 +29,7 @@ index 79d58d8..4157dd7 100644
              if (found) {
                  *status = alias->redir_status;
 diff --git a/server/core.c b/server/core.c
-index 449e283..ba4450e 100644
+index 38b1d8c..f4c867a 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -4893,8 +4893,9 @@ static int default_handler(request_rec *r)
@@ -44,3 +44,6 @@ index 449e283..ba4450e 100644
                  != APR_SUCCESS || apr_uid_compare(post_open_finfo.user, r->finfo.user)
                  != APR_SUCCESS) {
                  /* Then we've caught a race condition abuser. */
+-- 
+2.21.0
+
