@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.39
+Version: 2.4.41
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 6
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1967,6 +1967,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Aug 14 2019 Cory McIntire <cory@cpanel.net> - 2.4.41-1
+- EA-8612: Update ea-apache2 from v2.4.39 to v2.4.41
+
 * Thu Aug 08 2019 Tim Mullin <tim@cpanel.net> - 2.4.39-6
 - EA-8588: Added default RequestReadTimeout for mod_reqtimeout
 
