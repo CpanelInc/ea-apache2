@@ -1,4 +1,4 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 52f9ce964667efe81221d7ea67befbff8e8cdba8 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:51:37 -0500
 Subject: [PATCH 15/17] Increase random seed size
@@ -8,7 +8,7 @@ Subject: [PATCH 15/17] Increase random seed size
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/server/core.c b/server/core.c
-index afb5b11..449e283 100644
+index 3ddf7ab..38b1d8c 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -5356,7 +5356,7 @@ AP_CORE_DECLARE(void) ap_random_parent_after_fork(void)
@@ -20,3 +20,6 @@ index afb5b11..449e283 100644
      apr_status_t rv;
      rng = apr_random_standard_new(p);
      do {
+-- 
+2.21.0
+
