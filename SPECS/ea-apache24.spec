@@ -94,7 +94,7 @@ BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: ea-apr-devel >= 1.6.3-1, ea-apr-util-devel >= 1.6.1-1
 BuildRequires: pcre-devel >= 5.0
-BuildRequires: ea-openssl >= %{ea_openssl_ver}, ea-openssl-devel >= %{ea_openssl_ver}
+BuildRequires: ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
 BuildRequires: ea-libxml2 ea-libxml2-devel
 %if %{with_http2}
 BuildRequires: ea-nghttp2 ea-libnghttp2
@@ -161,7 +161,7 @@ also be found at http://httpd.apache.org/docs/2.4/.
 %package -n ea-apache24-mod_http2
 Group: System Environment/Daemons
 Summary: HTTP2 module for Apache HTTP Server
-BuildRequires: ea-libnghttp2-devel ea-openssl >= %{ea_openssl_ver}, ea-openssl-devel >= %{ea_openssl_ver}
+BuildRequires: ea-libnghttp2-devel ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
 Requires: ea-nghttp2
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Conflicts: ea-apache24-mod_mpm_itk, ea-apache24-mod_mpm_prefork
@@ -1182,8 +1182,8 @@ names which were matched using this strategy.
 %package -n ea-apache24-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
-BuildRequires: ea-openssl-devel >= %{ea_openssl_ver}
-Requires(post): ea-openssl >= %{ea_openssl_ver}, /bin/cat
+BuildRequires: ea-openssl11-devel >= %{ea_openssl_ver}
+Requires(post): ea-openssl11 >= %{ea_openssl_ver}, /bin/cat
 Requires(pre): ea-apache24
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl, mod_ssl
@@ -1362,7 +1362,7 @@ export LYNX_PATH=/usr/bin/links
     --with-pcre \
     --enable-mods-shared=all \
 %if %{with_http2}
-    --enable-ssl --with-ssl=/opt/cpanel/ea-openssl/ \
+    --enable-ssl --with-ssl=/opt/cpanel/ea-openssl11/ \
     --enable-ssl-staticlib-deps \
     --with-nghttp2=/opt/cpanel/nghttp2/ \
     --enable-nghttp2-staticlib-deps \
@@ -1388,10 +1388,10 @@ export LYNX_PATH=/usr/bin/links
     MOD_PROXY_HTML_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_XML2ENC_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_BROTLI_LDADD="-L/opt/cpanel/ea-brotli/lib -R/opt/cpanel/ea-brotli/lib" \
-    MOD_SSL_LDADD="-L/opt/cpanel/ea-openssl/%{_lib} -R/opt/cpanel/ea-openssl/%{_lib}" \
-    UTIL_LDFLAGS="-L/opt/cpanel/ea-openssl/%{_lib} -R/opt/cpanel/ea-openssl/%{_lib}" \
+    MOD_SSL_LDADD="-L/opt/cpanel/ea-openssl11/%{_lib} -R/opt/cpanel/ea-openssl11/%{_lib}" \
+    UTIL_LDFLAGS="-L/opt/cpanel/ea-openssl11/%{_lib} -R/opt/cpanel/ea-openssl11/%{_lib}" \
 %if %{with_http2}
-    MOD_HTTP2_LDADD="-L/opt/cpanel/ea-openssl/%{_lib} -R/opt/cpanel/ea-openssl/%{_lib}" \
+    MOD_HTTP2_LDADD="-L/opt/cpanel/ea-openssl11/%{_lib} -R/opt/cpanel/ea-openssl11/%{_lib}" \
 %endif
     $*
 make %{?_smp_mflags}
