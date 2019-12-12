@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.41
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -83,6 +83,9 @@ Patch403: 0016-Downgrade-loglevel-for-long-lost-pid-warnings.patch
 # cPanel Security Patches
 # removed: fixed upstream Patch500: 0017-Apply-mod_ratelimit-fix-from-trunk.patch
 Patch500: 0017-Ensure-that-Paths-configured-as-Aliases-are-exempt-f.patch
+
+# Performance Patches
+Patch600: 0018-Optimizing-finding-directives-when-parsing-the-confi.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1290,6 +1293,7 @@ mod_watchdog hooks.
 %patch403 -p1 -b .longlostpids
 
 %patch500 -p1 -b .aliassymlink
+%patch600 -p1 -b .speedupmodulefind
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1967,6 +1971,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Dec 12 2019 J. Nick Koston <nick@cpanel.net> - 2.4.41-2
+- COBRA-10665: Optimizing finding directives when parsing the configuration
+
 * Wed Aug 14 2019 Cory McIntire <cory@cpanel.net> - 2.4.41-1
 - EA-8612: Update ea-apache2 from v2.4.39 to v2.4.41
 
