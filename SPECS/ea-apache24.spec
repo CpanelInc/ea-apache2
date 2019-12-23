@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.41
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1971,6 +1971,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Dec 23 2019 Daniel Muey <dan@cpanel.net> - 2.4.41-5
+- ZC-4361: bump release prefix past 4 so these will be newest (4 was added and disappeared due to a faulty revert)
+
 * Wed Dec 18 2019 Daniel Muey <dan@cpanel.net> - 2.4.41-3
 - ZC-4361: Update ea-openssl requirement to v1.1.1 (ZC-5583)
 
