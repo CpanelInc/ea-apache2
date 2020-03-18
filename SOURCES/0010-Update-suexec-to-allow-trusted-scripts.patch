@@ -1,7 +1,7 @@
-From 9b73a9c48c076bb7beb380f95985ba1549d4864c Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:44:16 -0500
-Subject: [PATCH 10/17] Update suexec to allow "trusted scripts"
+Subject: [PATCH 10/20] Update suexec to allow "trusted scripts"
 
 ---
  support/suexec.c | 25 ++++++++++++++++++++++---
@@ -91,6 +91,3 @@ index 07bb7bb..2d371e8 100644
  /*
   * UID_MIN -- Define this as the lowest UID allowed to be a target user
   *            for suEXEC.  For most systems, 500 or 100 is common.
--- 
-2.21.0
-
