@@ -1,7 +1,7 @@
-From 0b390a8d9a755322b920ffe10f49a31ac36b95a5 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:38:46 -0500
-Subject: [PATCH 08/17] BUG: r1556473 Avoid additional checks for
+Subject: [PATCH 08/20] BUG: r1556473 Avoid additional checks for
  SSLCompression
 
 ---
@@ -35,6 +35,3 @@ index 6c10bb5..9eea0f8 100644
      sc->compression = flag ? TRUE : FALSE;
      return NULL;
  #else
--- 
-2.21.0
-

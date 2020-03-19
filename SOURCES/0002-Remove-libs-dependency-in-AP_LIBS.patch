@@ -1,7 +1,7 @@
-From 58e8d362b02178bc45df136f8a97d8694b70f2ff Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:13:26 -0500
-Subject: [PATCH 02/17] Remove --libs dependency in AP_LIBS
+Subject: [PATCH 02/20] Remove --libs dependency in AP_LIBS
 
 ---
  configure.in | 4 ++--
@@ -23,6 +23,3 @@ index 9feaceb..a3a479f 100644
  APACHE_SUBST(AP_LIBS)
  APACHE_SUBST(AP_BUILD_SRCLIB_DIRS)
  APACHE_SUBST(AP_CLEAN_SRCLIB_DIRS)
--- 
-2.21.0
-
