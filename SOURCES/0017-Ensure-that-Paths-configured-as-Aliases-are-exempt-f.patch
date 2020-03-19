@@ -1,7 +1,7 @@
-From d0710e887d8921255379aad5b794eb91d2cf98eb Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Rishwanth Yeddula <rish@cpanel.net>
 Date: Tue, 26 Mar 2019 13:52:34 -0500
-Subject: [PATCH 17/17] Ensure that Paths configured as Aliases are exempt from
+Subject: [PATCH 17/20] Ensure that Paths configured as Aliases are exempt from
  the symlink protection checks.
 
 Case CPANEL-22257: Paths that are configured via the "Alias" directive
@@ -44,6 +44,3 @@ index 38b1d8c..f4c867a 100644
                  != APR_SUCCESS || apr_uid_compare(post_open_finfo.user, r->finfo.user)
                  != APR_SUCCESS) {
                  /* Then we've caught a race condition abuser. */
--- 
-2.21.0
-
