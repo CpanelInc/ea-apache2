@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tim Mullin <tim@cpanel.net>
 Date: Wed, 18 Mar 2020 17:49:41 -0500
-Subject: [PATCH 20/20] Fix OCSP Stapling bug
+Subject: [PATCH 20/21] Fix OCSP Stapling bug
 
 OCSP Stapling doesn't handle Keep-Alive responses properly,
 causing delays/timeouts.
