@@ -1,7 +1,7 @@
-From 190cbbf7aca1a26305ccbba0bb24b1344529cf0e Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:31:51 -0500
-Subject: [PATCH 06/17] Update Icon configuration in autoindex.conf
+Subject: [PATCH 06/21] Update Icon configuration in autoindex.conf
 
 ---
  docs/conf/extra/httpd-autoindex.conf.in | 4 ++--
@@ -29,6 +29,3 @@ index 51b02ed..0e8b626 100644
  
  AddIcon /icons/back.gif ..
  AddIcon /icons/hand.right.gif README
--- 
-2.21.0
-

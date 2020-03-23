@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tim Mullin <tim@cpanel.net>
+Date: Wed, 18 Mar 2020 17:49:41 -0500
+Subject: [PATCH 20/21] Fix OCSP Stapling bug
+
+OCSP Stapling doesn't handle Keep-Alive responses properly,
+causing delays/timeouts.
+This fix was applied to Apache 2.5.1 here:
+https://svn.apache.org/viewvc?view=revision&revision=1874007
+---
+ modules/ssl/ssl_util_ocsp.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/modules/ssl/ssl_util_ocsp.c b/modules/ssl/ssl_util_ocsp.c
+index b66e151..b9c8a0b 100644
+--- a/modules/ssl/ssl_util_ocsp.c
++++ b/modules/ssl/ssl_util_ocsp.c
+@@ -46,6 +46,7 @@ static BIO *serialize_request(OCSP_REQUEST *req, const apr_uri_t *uri,
+     BIO_printf(bio, "%s%s%s HTTP/1.0\r\n"
+                "Host: %s:%d\r\n"
+                "Content-Type: application/ocsp-request\r\n"
++               "Connection: close\r\n"
+                "Content-Length: %d\r\n"
+                "\r\n",
+                uri->path ? uri->path : "/",

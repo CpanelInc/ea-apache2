@@ -1,7 +1,7 @@
-From 8b9067f77574a055c60cae127e241015fc9695d1 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:50:51 -0500
-Subject: [PATCH 14/17] Add SymlinkProtect and SymlinkProtectRoot functionality
+Subject: [PATCH 14/21] Add SymlinkProtect and SymlinkProtectRoot functionality
 
 ---
  include/http_core.h             |  10 +++-
@@ -309,6 +309,3 @@ index 0ee952c..3ddf7ab 100644
          ap_update_mtime(r, r->finfo.mtime);
          ap_set_last_modified(r);
          ap_set_etag(r);
--- 
-2.21.0
-

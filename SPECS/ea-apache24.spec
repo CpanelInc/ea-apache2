@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.41
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 6
+%define release_prefix 9
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -88,6 +88,9 @@ Patch500: 0017-Ensure-that-Paths-configured-as-Aliases-are-exempt-f.patch
 Patch600: 0018-Optimizing-finding-directives-when-parsing-the-confi.patch
 Patch601: 0019-Optimize-finding-a-module.-ap_find_linked_module-was.patch
 
+Patch700: 0020-Fix-OCSP-Stapling-bug.patch
+Patch701: 0021-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
+
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -112,6 +115,7 @@ Requires: ea-apache24-config
 Requires: ea-apache24-config-runtime
 Requires: ea-apache24-mod_bwlimited
 Requires: ea-apache24-mod_proxy_wstunnel
+Requires: ea-apache24-mod_headers
 
 Obsoletes: httpd-suexec
 Conflicts: httpd-mmn
@@ -1297,6 +1301,9 @@ mod_watchdog hooks.
 %patch600 -p1 -b .speedupmodulefind
 %patch601 -p1 -b .speedupmodulelookup
 
+%patch700 -p1 -b .ocspstapling
+%patch701 -p1 -b .apxsfixtopbuilddir
+
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -1973,6 +1980,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Mar 19 2020 Tim Mullin <tim@cpanel.net> - 2.4.41-9
+- A-8786: Patch apxs to use the correct value for top_builddir
+
+* Wed Mar 18 2020 Tim Mullin <tim@cpanel.net> - 2.4.41-8
+- EA-8927: Patch apache 2.4.x httpd for OCSP stapling bug
+
+* Mon Mar 16 2020 Tim Mullin <tim@cpanel.net> - 2.4.41-7
+- EA-8876: Made ea-apache24 require ea-apache24-mod_headers
+
 * Tue Jan 14 2020 J. Nick Koston <nick@cpanel.net> - 2.4.41-6
 - COBRA-10700: Optimizing finding modules
 

@@ -1,7 +1,7 @@
-From 73c6e4627b24ef8f03bb69f4d0d183acb48d9dfd Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:21:51 -0500
-Subject: [PATCH 05/17] Add SELinux support
+Subject: [PATCH 05/21] Add SELinux support
 
 ---
  configure.in  |  5 +++++
@@ -68,6 +68,3 @@ index 090f503..0ee952c 100644
      return OK;
  }
  
--- 
-2.21.0
-

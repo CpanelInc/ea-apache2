@@ -1,7 +1,7 @@
-From d690eb176e0e91244f87d2032bfcd623e680e905 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:45:12 -0500
-Subject: [PATCH 11/17] Update suexec to work with cPanel Mailman installations
+Subject: [PATCH 11/21] Update suexec to work with cPanel Mailman installations
 
 ---
  support/suexec.c | 72 ++++++++++++++++++++++++++++++++++++++++--------
@@ -141,6 +141,3 @@ index a8cc2f4..e396df5 100644
      /*
       * Error out if the target name/group is different from
       * the name/group of the cwd or the program.
--- 
-2.21.0
-

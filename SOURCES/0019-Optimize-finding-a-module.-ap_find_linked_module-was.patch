@@ -1,11 +1,11 @@
-From f7ddc0c0ddae00847bb4b5118b4b45da6ad1db22 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "J. Nick Koston" <nick@cpanel.net>
 Date: Fri, 13 Dec 2019 10:57:41 -0600
-Subject: [PATCH] Optimize finding a module.  ap_find_linked_module was not
- performing well when there a lot of IfModule statements in httpd.conf.  This
- change uses a hash to keep track of modules which cut the startup time from
- 3s to 1.5s on a large configuration file.  This also makes find_module module
- simpler.
+Subject: [PATCH 19/21] Optimize finding a module. ap_find_linked_module was
+ not performing well when there a lot of IfModule statements in httpd.conf.
+ This change uses a hash to keep track of modules which cut the startup time
+ from 3s to 1.5s on a large configuration file. This also makes find_module
+ module simpler.
 
 ---
  server/config.c | 37 +++++++++++++++++++++++++++++--------
@@ -13,7 +13,7 @@ Subject: [PATCH] Optimize finding a module.  ap_find_linked_module was not
  2 files changed, 30 insertions(+), 49 deletions(-)
 
 diff --git a/server/config.c b/server/config.c
-index 838d49b774..427fabd231 100644
+index 8ca4ad4..3e03b43 100644
 --- a/server/config.c
 +++ b/server/config.c
 @@ -230,6 +230,7 @@ AP_DECLARE_DATA module *ap_top_module = NULL;
@@ -109,10 +109,10 @@ index 838d49b774..427fabd231 100644
  
  /*****************************************************************
 diff --git a/server/core.c b/server/core.c
-index 6de5892a21..ec332bde35 100644
+index f4c867a..0184ecc 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -2837,47 +2837,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
+@@ -2690,47 +2690,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
  
  static module *find_module(server_rec *s, const char *name)
  {
@@ -161,6 +161,3 @@ index 6de5892a21..ec332bde35 100644
  }
  
  /* Callback function type used by start_cond_section. */
--- 
-2.24.0
-
