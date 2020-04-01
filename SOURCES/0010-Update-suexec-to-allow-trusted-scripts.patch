@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:44:16 -0500
-Subject: [PATCH 10/21] Update suexec to allow "trusted scripts"
+Subject: [PATCH 10/19] Update suexec to allow "trusted scripts"
 
 ---
  support/suexec.c | 25 ++++++++++++++++++++++---
@@ -9,7 +9,7 @@ Subject: [PATCH 10/21] Update suexec to allow "trusted scripts"
  2 files changed, 43 insertions(+), 3 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index e2a2558..a8cc2f4 100644
+index ee2dd4b..83c0dbe 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
 @@ -146,11 +146,11 @@ static const char *const safe_env_lst[] =

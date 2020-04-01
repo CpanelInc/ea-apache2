@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:21:51 -0500
-Subject: [PATCH 05/21] Add SELinux support
+Subject: [PATCH 05/19] Add SELinux support
 
 ---
  configure.in  |  5 +++++
@@ -9,7 +9,7 @@ Subject: [PATCH 05/21] Add SELinux support
  2 files changed, 31 insertions(+)
 
 diff --git a/configure.in b/configure.in
-index a3a479f..2517801 100644
+index bf94474..11456d6 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -483,6 +483,11 @@ getloadavg
@@ -25,7 +25,7 @@ index a3a479f..2517801 100644
  [AC_TRY_RUN(#define _GNU_SOURCE
  #include <unistd.h>
 diff --git a/server/core.c b/server/core.c
-index 090f503..0ee952c 100644
+index 19a7462..46d0063 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -59,6 +59,10 @@
@@ -39,7 +39,7 @@ index 090f503..0ee952c 100644
  /* LimitRequestBody handling */
  #define AP_LIMIT_REQ_BODY_UNSET         ((apr_off_t) -1)
  #define AP_DEFAULT_LIMIT_REQ_BODY       ((apr_off_t) 0)
-@@ -4984,6 +4988,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+@@ -4991,6 +4995,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
  #endif
  

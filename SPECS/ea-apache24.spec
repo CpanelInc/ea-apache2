@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.41
+Version: 2.4.43
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 9
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -85,11 +85,9 @@ Patch403: 0016-Downgrade-loglevel-for-long-lost-pid-warnings.patch
 Patch500: 0017-Ensure-that-Paths-configured-as-Aliases-are-exempt-f.patch
 
 # Performance Patches
-Patch600: 0018-Optimizing-finding-directives-when-parsing-the-confi.patch
-Patch601: 0019-Optimize-finding-a-module.-ap_find_linked_module-was.patch
+Patch601: 0018-Optimize-finding-a-module.-ap_find_linked_module-was.patch
 
-Patch700: 0020-Fix-OCSP-Stapling-bug.patch
-Patch701: 0021-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
+Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1298,10 +1296,8 @@ mod_watchdog hooks.
 %patch403 -p1 -b .longlostpids
 
 %patch500 -p1 -b .aliassymlink
-%patch600 -p1 -b .speedupmodulefind
 %patch601 -p1 -b .speedupmodulelookup
 
-%patch700 -p1 -b .ocspstapling
 %patch701 -p1 -b .apxsfixtopbuilddir
 
 # Patch in the vendor string and the release string
@@ -1980,6 +1976,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Apr 01 2020 Tim Mullin <tim@cpanel.net> - 2.4.43-1
+- EA-8958: Update ea-apache2 from v2.4.41 to v2.4.43
+
 * Thu Mar 19 2020 Tim Mullin <tim@cpanel.net> - 2.4.41-9
 - A-8786: Patch apxs to use the correct value for top_builddir
 

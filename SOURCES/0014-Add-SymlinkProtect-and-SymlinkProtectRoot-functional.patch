@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:50:51 -0500
-Subject: [PATCH 14/21] Add SymlinkProtect and SymlinkProtectRoot functionality
+Subject: [PATCH 14/19] Add SymlinkProtect and SymlinkProtectRoot functionality
 
 ---
  include/http_core.h             |  10 +++-
@@ -140,7 +140,7 @@ index 2aff834..fa229b1 100644
  	"..\..\include\http_request.h"\
  	"..\..\include\httpd.h"\
 diff --git a/server/core.c b/server/core.c
-index 0ee952c..3ddf7ab 100644
+index 46d0063..f4934dd 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -21,6 +21,8 @@
@@ -181,7 +181,7 @@ index 0ee952c..3ddf7ab 100644
      conf->protocols = ((virt->protocols->nelts > 0)? 
                         virt->protocols : base->protocols);
      conf->protocols_honor_order = ((virt->protocols_honor_order < 0)?
-@@ -4293,6 +4303,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
+@@ -4300,6 +4310,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
      return NULL;
  }
  
@@ -212,7 +212,7 @@ index 0ee952c..3ddf7ab 100644
  /* Note --- ErrorDocument will now work from .htaccess files.
   * The AllowOverride of Fileinfo allows webmasters to turn it off
   */
-@@ -4560,6 +4594,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
+@@ -4567,6 +4601,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
  AP_INIT_TAKE1("EnableExceptionHook", ap_mpm_set_exception_hook, NULL, RSRC_CONF,
                "Controls whether exception hook may be called after a crash"),
  #endif
@@ -223,7 +223,7 @@ index 0ee952c..3ddf7ab 100644
  AP_INIT_TAKE1("TraceEnable", set_trace_enable, NULL, RSRC_CONF,
                "'on' (default), 'off' or 'extended' to trace request body content"),
  AP_INIT_FLAG("MergeTrailers", set_merge_trailers, NULL, RSRC_CONF,
-@@ -4725,6 +4763,9 @@ static int default_handler(request_rec *r)
+@@ -4732,6 +4770,9 @@ static int default_handler(request_rec *r)
      int errstatus;
      apr_file_t *fd = NULL;
      apr_status_t status;
@@ -233,7 +233,7 @@ index 0ee952c..3ddf7ab 100644
      /* XXX if/when somebody writes a content-md5 filter we either need to
       *     remove this support or coordinate when to use the filter vs.
       *     when to use this code
-@@ -4735,6 +4776,13 @@ static int default_handler(request_rec *r)
+@@ -4742,6 +4783,13 @@ static int default_handler(request_rec *r)
      int bld_content_md5;
  
      d = (core_dir_config *)ap_get_core_module_config(r->per_dir_config);
@@ -247,7 +247,7 @@ index 0ee952c..3ddf7ab 100644
      bld_content_md5 = (d->content_md5 == AP_CONTENT_MD5_ON)
                        && r->output_filters->frec->ftype != AP_FTYPE_RESOURCE;
  
-@@ -4808,6 +4856,61 @@ static int default_handler(request_rec *r)
+@@ -4815,6 +4863,61 @@ static int default_handler(request_rec *r)
              return HTTP_FORBIDDEN;
          }
  
