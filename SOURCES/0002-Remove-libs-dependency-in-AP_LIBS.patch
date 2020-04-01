@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:13:26 -0500
-Subject: [PATCH 02/21] Remove --libs dependency in AP_LIBS
+Subject: [PATCH 02/19] Remove --libs dependency in AP_LIBS
 
 ---
  configure.in | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure.in b/configure.in
-index 9feaceb..a3a479f 100644
+index f8f9442..bf94474 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -784,9 +784,9 @@ APACHE_SUBST(INSTALL_SUEXEC)
+@@ -786,9 +786,9 @@ APACHE_SUBST(INSTALL_SUEXEC)
  
  dnl APR should go after the other libs, so the right symbols can be picked up
  if test x${apu_found} != xobsolete; then

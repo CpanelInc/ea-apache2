@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:20:28 -0500
-Subject: [PATCH 04/21] Bump coresize limit if coredumpdirectory is configured
+Subject: [PATCH 04/19] Bump coresize limit if coredumpdirectory is configured
 
 ---
  server/core.c | 19 +++++++++++++++++++
  1 file changed, 19 insertions(+)
 
 diff --git a/server/core.c b/server/core.c
-index 02aadd5..090f503 100644
+index 3db9d61..19a7462 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -4965,6 +4965,25 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+@@ -4972,6 +4972,25 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
      apr_pool_cleanup_register(pconf, NULL, ap_mpm_end_gen_helper,
                                apr_pool_cleanup_null);
