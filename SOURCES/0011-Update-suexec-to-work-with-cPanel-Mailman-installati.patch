@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:45:12 -0500
-Subject: [PATCH 11/21] Update suexec to work with cPanel Mailman installations
+Subject: [PATCH 11/19] Update suexec to work with cPanel Mailman installations
 
 ---
  support/suexec.c | 72 ++++++++++++++++++++++++++++++++++++++++--------
  1 file changed, 60 insertions(+), 12 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index a8cc2f4..e396df5 100644
+index 83c0dbe..b356b8c 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
 @@ -270,8 +270,11 @@ static void clean_env(void)
