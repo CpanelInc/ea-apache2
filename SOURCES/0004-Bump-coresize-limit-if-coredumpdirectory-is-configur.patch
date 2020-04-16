@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:20:28 -0500
-Subject: [PATCH 04/19] Bump coresize limit if coredumpdirectory is configured
+Subject: [PATCH 04/20] Bump coresize limit if coredumpdirectory is configured
 
 ---
  server/core.c | 19 +++++++++++++++++++
