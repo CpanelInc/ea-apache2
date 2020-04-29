@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.43
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1752,7 +1752,7 @@ if [ -f %{sslkey} -o -f %{sslcert} ]; then
 fi
 
 if [ ! -f %{sslkey} ] ; then
-%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 2048 > %{sslkey} 2> /dev/null
+/opt/cpanel/ea-openssl11/bin/openssl genrsa -rand /dev/urandom:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/uptime 2048 > %{sslkey} 2> /dev/null
 fi
 
 FQDN=`hostname`
@@ -1761,7 +1761,7 @@ if [ "x${FQDN}" = "x" ]; then
 fi
 
 if [ ! -f %{sslcert} ] ; then
-cat << EOF | %{_bindir}/openssl req -new -key %{sslkey} \
+cat << EOF | /opt/cpanel/ea-openssl11/bin/openssl req -new -key %{sslkey} \
          -x509 -sha256 -days 365 -set_serial $RANDOM -extensions v3_req \
          -out %{sslcert} 2>/dev/null
 --
@@ -1982,6 +1982,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Apr 29 2020 Cory McIntire <cory@cpanel.net> - 2.4.43-4
+- EA-9047: Remove proc randoms that could not be found in POSTRANS
+- Switch to our ea-openssl11
+
 * Tue Apr 28 2020 Cory McIntire <cory@cpanel.net> - 2.4.43-3
 - EA-9042: Do not install init.d/httpd files on C7 and above
 
