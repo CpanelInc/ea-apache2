@@ -37,10 +37,10 @@ index c6ac3ea..f5fb106 100644
 +    MAX_FD_LIMIT=16384
 +fi
 +
-+while [ $MIN_FD_LIMIT -lt $MAX_FD_LIMIT ]; do
-+    MIN_FD_LIMIT=$(($MIN_FD_LIMIT * 2))
++while [ $MIN_FD_LIMIT -le $MAX_FD_LIMIT ]; do
 +    ulimit -H -n $MIN_FD_LIMIT 2>/dev/null
 +    ulimit -S -n $MIN_FD_LIMIT 2>/dev/null
++    MIN_FD_LIMIT=$(($MIN_FD_LIMIT * 2))
 +done
 +
  # --------------------                              --------------------

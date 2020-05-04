@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.43
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 4
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1982,6 +1982,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Apr 30 2020 Tim Mullin <tim@cpanel.net> - 2.4.43-5
+- EA-8809: Ensure that MAX_FD_LIMIT is not exceeded
+
 * Wed Apr 29 2020 Cory McIntire <cory@cpanel.net> - 2.4.43-4
 - EA-9047: Remove proc randoms that could not be found in POSTRANS
 - Switch to our ea-openssl11
