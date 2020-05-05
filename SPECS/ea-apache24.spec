@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.43
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1411,12 +1411,14 @@ make DESTDIR=$RPM_BUILD_ROOT install
 # install the forensic script
 install -m 755 support/check_forensic $RPM_BUILD_ROOT%{_sbindir}
 
+%if 0%{?rhel} < 7
 # install SYSV init stuff
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 for s in httpd htcacheclean; do
     install -p -m 755 $RPM_SOURCE_DIR/${s}.init \
         $RPM_BUILD_ROOT%{_initrddir}/${s}
 done
+%endif
 
 # install systemd service file for CentOS 7 and up
 %if 0%{?rhel} >= 7
@@ -1750,7 +1752,7 @@ if [ -f %{sslkey} -o -f %{sslcert} ]; then
 fi
 
 if [ ! -f %{sslkey} ] ; then
-%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 2048 > %{sslkey} 2> /dev/null
+/opt/cpanel/ea-openssl11/bin/openssl genrsa -rand /dev/urandom:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/uptime 2048 > %{sslkey} 2> /dev/null
 fi
 
 FQDN=`hostname`
@@ -1759,7 +1761,7 @@ if [ "x${FQDN}" = "x" ]; then
 fi
 
 if [ ! -f %{sslcert} ] ; then
-cat << EOF | %{_bindir}/openssl req -new -key %{sslkey} \
+cat << EOF | /opt/cpanel/ea-openssl11/bin/openssl req -new -key %{sslkey} \
          -x509 -sha256 -days 365 -set_serial $RANDOM -extensions v3_req \
          -out %{sslcert} 2>/dev/null
 --
@@ -1805,8 +1807,10 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/apache2/conf/magic
 %config(noreplace) %{_sysconfdir}/apache2/conf/mime.types
 
+%if 0%{?rhel} < 7
 %config %{_initrddir}/httpd
 %{_initrddir}/htcacheclean
+%endif
 
 %dir %{_sysconfdir}/apache2/conf.d
 %dir %{_sysconfdir}/apache2/conf.d/includes
@@ -1978,6 +1982,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Apr 30 2020 Tim Mullin <tim@cpanel.net> - 2.4.43-5
+- EA-8809: Ensure that MAX_FD_LIMIT is not exceeded
+
+* Wed Apr 29 2020 Cory McIntire <cory@cpanel.net> - 2.4.43-4
+- EA-9047: Remove proc randoms that could not be found in POSTRANS
+- Switch to our ea-openssl11
+
+* Tue Apr 28 2020 Cory McIntire <cory@cpanel.net> - 2.4.43-3
+- EA-9042: Do not install init.d/httpd files on C7 and above
+
 * Thu Apr 16 2020 Tim Mullin <tim@cpanel.net> - 2.4.43-2
 - EA-9010: Patch apache 2.4.43 to fix ssl stapling memory leak
 
