@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.43
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 5
+%define release_prefix 6
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1982,6 +1982,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon May 18 2020 Julian Brown <julian.brown@cpanel.net> - 2.4.43-6
+- ZC-6822: Build on CentOS 8
+
 * Thu Apr 30 2020 Tim Mullin <tim@cpanel.net> - 2.4.43-5
 - EA-8809: Ensure that MAX_FD_LIMIT is not exceeded
 
