@@ -121,7 +121,13 @@ Conflicts: httpd-mmn
 Provides: ea-webserver
 Provides: ea-apache24-suexec = %{version}-%{release}
 Provides: ea-apache24-mmn = %{mmn}, ea-apache24-mmn = %{mmnisa}
+
+%if 0%{?rhel} < 8
+# This is apparently a syntax error
+# 20120211-x86-64
 Provides: ea-apache24-mmn = %{oldmmnisa}
+%endif
+
 Requires: ea-apache24-tools = %{version}-%{release}
 Requires: ea-apache24-mod_proxy_http
 Requires: ea-apache24-mod_proxy
@@ -166,6 +172,7 @@ also be found at http://httpd.apache.org/docs/2.4/.
 Group: System Environment/Daemons
 Summary: HTTP2 module for Apache HTTP Server
 BuildRequires: ea-libnghttp2-devel ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
+
 Requires: ea-nghttp2
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Conflicts: ea-apache24-mod_mpm_itk, ea-apache24-mod_mpm_prefork
@@ -1373,8 +1380,6 @@ export LYNX_PATH=/usr/bin/links
     --enable-ssl-staticlib-deps \
     --with-nghttp2=/opt/cpanel/nghttp2/ \
     --enable-nghttp2-staticlib-deps \
-%else
-	--enable-ssl --with-ssl \
 %endif
     --disable-distcache \
     --enable-proxy \
@@ -1401,6 +1406,30 @@ export LYNX_PATH=/usr/bin/links
     MOD_HTTP2_LDADD="-L/opt/cpanel/ea-openssl11/%{_lib} -R/opt/cpanel/ea-openssl11/%{_lib}" \
 %endif
     $*
+
+%if 0%{?rhel} >= 8
+# This is ugly, very ugly.
+# ZC-6833 was created to eventually come up with a proper solution for these
+# linking issues.
+# But some of the command line programs of Apache, link with libdb, that is
+# Berkley DB.  And Berkley DB on CentOS 8, links against system openssl.
+# The key fix here is -rpath-link, telling the linker that sub programs can
+# link against the system directory, then -l:libcrypto.so.1.1 I am telling it
+# to link that particular library in.
+
+# I need to prepend this for later "sed"ing
+echo 'SYS_OPENSSL  = -Wl,-rpath=/opt/cpanel/ea-openssl11/lib -Wl,-rpath-link=/lib64 -L/lib64 -l:libcrypto.so.1.1' > support/Makefile.tmp
+cat support/Makefile >> support/Makefile.tmp
+cp -f support/Makefile.tmp support/Makefile
+
+# PROGRAM_LDADD will satisfy almost all of them
+sed -i '/^.*PROGRAM_LDADD[ \t]*=.*$/ s/$/ $(SYS_OPENSSL)/' support/Makefile
+
+# ab, does it's own thing so I need to do our thing
+sed -i '/^.*$(LT_LDFLAGS) $(ALL_LDFLAGS) -o $@ $(ab_LTFLAGS) $(ab_OBJECTS) $(ab_LDADD).*$/ s/$/ $(SYS_OPENSSL)/' support/Makefile
+%endif
+
+export LDFLAGS="-Wl,-z,relro,-z,now"
 make %{?_smp_mflags}
 
 %install
