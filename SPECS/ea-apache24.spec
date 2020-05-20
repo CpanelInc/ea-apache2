@@ -1431,7 +1431,6 @@ sed -i '/^.*PROGRAM_LDADD[ \t]*=.*$/ s/$/ $(SYS_OPENSSL)/' support/Makefile
 sed -i '/^.*$(LT_LDFLAGS) $(ALL_LDFLAGS) -o $@ $(ab_LTFLAGS) $(ab_OBJECTS) $(ab_LDADD).*$/ s/$/ $(SYS_OPENSSL)/' support/Makefile
 %endif
 
-export LDFLAGS="-Wl,-z,relro,-z,now"
 make %{?_smp_mflags}
 
 %install
