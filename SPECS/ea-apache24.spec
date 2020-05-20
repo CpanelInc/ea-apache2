@@ -1380,6 +1380,8 @@ export LYNX_PATH=/usr/bin/links
     --enable-ssl-staticlib-deps \
     --with-nghttp2=/opt/cpanel/nghttp2/ \
     --enable-nghttp2-staticlib-deps \
+%else
+    --enable-ssl --with-ssl \
 %endif
     --disable-distcache \
     --enable-proxy \
