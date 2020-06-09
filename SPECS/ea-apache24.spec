@@ -90,6 +90,8 @@ Patch601: 0018-Optimize-finding-a-module.-ap_find_linked_module-was.patch
 Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 Patch702: 0020-mod_ssl-Fix-memory-leak-in-stapling-code.-PR63687.patch
 
+Patch801: 0021-Add-instructions-to-install-elinks.patch
+
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -132,7 +134,9 @@ Requires: ea-apache24-tools = %{version}-%{release}
 Requires: ea-apache24-mod_proxy_http
 Requires: ea-apache24-mod_proxy
 Requires: ea-cpanel-tools
+%if 0%{?rhel} < 8
 Requires: elinks
+%endif
 Requires(post): chkconfig
 
 %description
@@ -1308,6 +1312,10 @@ mod_watchdog hooks.
 
 %patch701 -p1 -b .apxsfixtopbuilddir
 %patch702 -p1 -b .sslstaplingmemleak
+
+%if 0%{?rhel} >= 8
+%patch801 -p1 -b .instructaboutelinks
+%endif
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
