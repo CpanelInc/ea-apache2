@@ -108,7 +108,7 @@ BuildRequires: ea-nghttp2 ea-libnghttp2
 Requires: ea-apr%{?_isa} >= 1.7.0-1
 Requires: ea-apr-util%{?_isa} >= 1.6.1-1
 Requires: system-logos >= 7.92.1-1
-Requires: ea-apache24-mpm, ea-apache24-cgi
+Requires: ea-apache24-mpm
 Requires: ea-apache24-mod_ssl
 Requires: ea-documentroot
 Requires: ea-apache24-tools
