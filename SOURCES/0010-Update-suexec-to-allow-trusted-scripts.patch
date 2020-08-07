@@ -9,7 +9,7 @@ Subject: [PATCH 10/20] Update suexec to allow "trusted scripts"
  2 files changed, 43 insertions(+), 3 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index ee2dd4b..83c0dbe 100644
+index eb2d38a..3a1b8a4 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
 @@ -146,11 +146,11 @@ static const char *const safe_env_lst[] =
@@ -27,7 +27,7 @@ index ee2dd4b..83c0dbe 100644
      __attribute__((format(printf,2,0)));
  
  static void err_output(int is_error, const char *fmt, va_list ap)
-@@ -598,12 +598,31 @@ int main(int argc, char *argv[])
+@@ -600,12 +600,31 @@ int main(int argc, char *argv[])
          (gid != dir_info.st_gid) ||
          (uid != prg_info.st_uid) ||
          (gid != prg_info.st_gid)) {

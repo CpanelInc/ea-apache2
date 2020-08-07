@@ -25,7 +25,7 @@ index bf94474..11456d6 100644
  [AC_TRY_RUN(#define _GNU_SOURCE
  #include <unistd.h>
 diff --git a/server/core.c b/server/core.c
-index 19a7462..46d0063 100644
+index ef04235..5b5b57b 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -59,6 +59,10 @@
@@ -39,7 +39,7 @@ index 19a7462..46d0063 100644
  /* LimitRequestBody handling */
  #define AP_LIMIT_REQ_BODY_UNSET         ((apr_off_t) -1)
  #define AP_DEFAULT_LIMIT_REQ_BODY       ((apr_off_t) 0)
-@@ -4991,6 +4995,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+@@ -4993,6 +4997,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
  #endif
  
