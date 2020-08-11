@@ -9,7 +9,7 @@ Subject: [PATCH 09/20] Update Apachectl to reference cpanel.config;
  1 file changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/support/apachectl.in b/support/apachectl.in
-index c6ac3ea..f5fb106 100644
+index c6ac3ea..07c9912 100644
 --- a/support/apachectl.in
 +++ b/support/apachectl.in
 @@ -56,7 +56,8 @@ fi

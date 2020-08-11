@@ -8,10 +8,10 @@ Subject: [PATCH 15/20] Increase random seed size
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/server/core.c b/server/core.c
-index f4934dd..94b33f8 100644
+index 2ed3de0..e0e981f 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -5363,7 +5363,7 @@ AP_CORE_DECLARE(void) ap_random_parent_after_fork(void)
+@@ -5365,7 +5365,7 @@ AP_CORE_DECLARE(void) ap_random_parent_after_fork(void)
  
  AP_CORE_DECLARE(void) ap_init_rng(apr_pool_t *p)
  {

@@ -109,7 +109,7 @@ index 0380cbe..85ae3e9 100644
  
  /*****************************************************************
 diff --git a/server/core.c b/server/core.c
-index c13346c..8191961 100644
+index 33fcc2d..a8cb0c4 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -2690,47 +2690,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
