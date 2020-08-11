@@ -140,7 +140,7 @@ index 2aff834..fa229b1 100644
  	"..\..\include\http_request.h"\
  	"..\..\include\httpd.h"\
 diff --git a/server/core.c b/server/core.c
-index 46d0063..f4934dd 100644
+index 5b5b57b..2ed3de0 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -21,6 +21,8 @@

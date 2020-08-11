@@ -4,11 +4,11 @@ Date: Thu, 12 Jul 2018 15:45:12 -0500
 Subject: [PATCH 11/20] Update suexec to work with cPanel Mailman installations
 
 ---
- support/suexec.c | 72 ++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 60 insertions(+), 12 deletions(-)
+ support/suexec.c | 74 +++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 60 insertions(+), 14 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index 83c0dbe..b356b8c 100644
+index 3a1b8a4..b356b8c 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
 @@ -270,8 +270,11 @@ static void clean_env(void)
@@ -62,12 +62,13 @@ index 83c0dbe..b356b8c 100644
      /*
       * Error out if the target username is invalid.
       */
-@@ -501,17 +520,36 @@ int main(int argc, char *argv[])
+@@ -501,19 +520,36 @@ int main(int argc, char *argv[])
       * Initialize the group access list for the target user,
       * and setgid() to the target group. If unsuccessful, error out.
       */
 -    if (((setgid(gid)) != 0) || (initgroups(actual_uname, gid) != 0)) {
--        log_err("failed to setgid (%lu: %s)\n", (unsigned long)gid, cmd);
+-        log_err("failed to setgid/initgroups (%lu: %s): %s\n",
+-                (unsigned long)gid, cmd, strerror(errno));
 -        exit(109);
 +    if (mailman) {
 +        /*
@@ -91,7 +92,8 @@ index 83c0dbe..b356b8c 100644
 -     * setuid() to the target user.  Error out on fail.
 -     */
 -    if ((setuid(uid)) != 0) {
--        log_err("failed to setuid (%lu: %s)\n", (unsigned long)uid, cmd);
+-        log_err("failed to setuid (%lu: %s): %s\n",
+-                (unsigned long)uid, cmd, strerror(errno));
 -        exit(110);
 +        if (((setgid(gid)) != 0) || (initgroups(actual_uname, gid) != 0)) {
 +            log_err("failed to setgid (%ld: %s)\n", gid, cmd);
@@ -108,7 +110,7 @@ index 83c0dbe..b356b8c 100644
      }
  
      /*
-@@ -561,7 +599,7 @@ int main(int argc, char *argv[])
+@@ -563,7 +599,7 @@ int main(int argc, char *argv[])
      /*
       * Error out if cwd is writable by others.
       */
@@ -117,7 +119,7 @@ index 83c0dbe..b356b8c 100644
          log_err("directory is writable by others: (%s)\n", cwd);
          exit(116);
      }
-@@ -584,12 +622,22 @@ int main(int argc, char *argv[])
+@@ -586,12 +622,22 @@ int main(int argc, char *argv[])
  
      /*
       * Error out if the file is setuid or setgid.

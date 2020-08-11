@@ -17,10 +17,10 @@ to be served.
  2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/modules/mappers/mod_alias.c b/modules/mappers/mod_alias.c
-index 79d58d8..4157dd7 100644
+index 5ff937b..c55252e 100644
 --- a/modules/mappers/mod_alias.c
 +++ b/modules/mappers/mod_alias.c
-@@ -589,6 +589,7 @@ static char *try_alias_list(request_rec *r, apr_array_header_t *aliases,
+@@ -562,6 +562,7 @@ static char *try_alias_list(request_rec *r, apr_array_header_t *aliases,
               */
              if (!is_redir) {
                  found = ap_server_root_relative(r->pool, found);
@@ -29,7 +29,7 @@ index 79d58d8..4157dd7 100644
              if (found) {
                  *status = alias->redir_status;
 diff --git a/server/core.c b/server/core.c
-index 94b33f8..c13346c 100644
+index e0e981f..33fcc2d 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -4900,8 +4900,9 @@ static int default_handler(request_rec *r)
