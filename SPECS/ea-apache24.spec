@@ -99,11 +99,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
 Requires: ea-openssl11 >= %{ea_openssl_ver}
 %else
-#
-# We made a conscious decision to only use system openssl on C8.
-# See design doc:
-# https://enterprise.cpanel.net/projects/EA4/repos/ea-openssl11/DESIGN.md
-# 
+# In C8 we use system openssl. See DESIGN.md in ea-openssl11 git repo for details
 BuildRequires: openssl, openssl-devel
 Requires: openssl
 %endif
@@ -193,11 +189,7 @@ BuildRequires: ea-libnghttp2-devel
 BuildRequires: ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
 Requires: ea-openssl11 >= %{ea_openssl_ver}
 %else
-#
-# We made a conscious decision to only use system openssl on C8.
-# See design doc:
-# https://enterprise.cpanel.net/projects/EA4/repos/ea-openssl11/DESIGN.md
-# 
+# In C8 we use system openssl. See DESIGN.md in ea-openssl11 git repo for details
 BuildRequires: openssl, openssl-devel
 Requires: openssl
 %endif
@@ -1226,11 +1218,7 @@ Summary: SSL/TLS module for the Apache HTTP Server
 BuildRequires: ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
 Requires(post): ea-openssl11 >= %{ea_openssl_ver}
 %else
-#
-# We made a conscious decision to only use system openssl on C8.
-# See design doc:
-# https://enterprise.cpanel.net/projects/EA4/repos/ea-openssl11/DESIGN.md
-# 
+# In C8 we use system openssl. See DESIGN.md in ea-openssl11 git repo for details
 BuildRequires: openssl, openssl-devel
 Requires(post): openssl
 %endif
