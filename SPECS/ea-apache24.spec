@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.46
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 4
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -52,6 +52,9 @@ Source41: htcacheclean.sysconf
 # Systemd service file
 Source42: httpd.service
 Source45: htcacheclean.service
+%if 0%{?rhel} >=7
+Source46: 00-systemd.conf
+%endif
 
 # build/scripts patches
 Patch1: 0001-Apachectl-additions-and-options.patch
@@ -113,6 +116,10 @@ BuildRequires: ea-libxml2 ea-libxml2-devel
 BuildRequires: ea-nghttp2 ea-libnghttp2
 %endif
 
+%if 0%{?rhel} >=7
+BuildRequires: systemd-devel
+%endif
+
 Requires: ea-apr%{?_isa} >= 1.7.0-1
 Requires: ea-apr-util%{?_isa} >= 1.6.1-1
 Requires: system-logos >= 7.92.1-1
@@ -131,6 +138,12 @@ Conflicts: httpd-mmn
 Provides: ea-webserver
 Provides: ea-apache24-suexec = %{version}-%{release}
 Provides: ea-apache24-mmn = %{mmn}, ea-apache24-mmn = %{mmnisa}
+
+%if 0%{?rhel} >=7
+Requires(preun): systemd-units
+Requires(postun): systemd-units
+Requires(post): systemd-units
+%endif
 
 %if 0%{?rhel} < 8
 # This is apparently a syntax error
@@ -1407,6 +1420,9 @@ export LYNX_PATH=/usr/bin/links
     --enable-pie \
     --with-pcre \
     --enable-mods-shared=all \
+%if 0%{?rhel} >= 7
+    --enable-systemd \
+%endif
 %if %{with_http2}
 %if 0%{?rhel} < 8
     --enable-ssl --with-ssl=/opt/cpanel/ea-openssl11/ \
@@ -1953,6 +1969,10 @@ rm -rf $RPM_BUILD_ROOT
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/manual.conf
 
+%if 0%{?rhel} >=7
+/usr/lib64/apache2/modules/mod_systemd.so
+%endif
+
 %files -n ea-apache24-mod_mpm_event -f files.mpm_event
 %files -n ea-apache24-mod_mpm_prefork -f files.mpm_prefork
 %files -n ea-apache24-mod_mpm_worker -f files.mpm_worker
@@ -2059,6 +2079,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Jan 29 2021 Cory McIntire <cory@cpanel.net> - 2.4.46-5
+- EA-9463: Resolve Apache startup race conditions
+           Enable mod_systemd for further startup enhancements
+
 * Mon Jan 04 2021 Tim Mullin <tim@cpanel.net> - 2.4.46-4
 - EA-9506: Do not start htcacheclean service if mod_cache_disk module is not loaded
 
