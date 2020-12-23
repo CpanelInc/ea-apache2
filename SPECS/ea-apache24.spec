@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.46
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -94,11 +94,20 @@ Patch801: 0020-Add-instructions-to-install-elinks.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+
+%if 0%{?rhel} < 8
+BuildRequires: ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
+Requires: ea-openssl11 >= %{ea_openssl_ver}
+%else
+# In C8 we use system openssl. See DESIGN.md in ea-openssl11 git repo for details
+BuildRequires: openssl, openssl-devel
+Requires: openssl
+%endif
+
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: ea-apr-devel >= 1.6.3-1, ea-apr-util-devel >= 1.6.1-1
 BuildRequires: pcre-devel >= 5.0
-BuildRequires: ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
 BuildRequires: ea-libxml2 ea-libxml2-devel
 %if %{with_http2}
 BuildRequires: ea-nghttp2 ea-libnghttp2
@@ -174,7 +183,16 @@ also be found at http://httpd.apache.org/docs/2.4/.
 %package -n ea-apache24-mod_http2
 Group: System Environment/Daemons
 Summary: HTTP2 module for Apache HTTP Server
-BuildRequires: ea-libnghttp2-devel ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
+BuildRequires: ea-libnghttp2-devel
+
+%if 0%{?rhel} < 8
+BuildRequires: ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
+Requires: ea-openssl11 >= %{ea_openssl_ver}
+%else
+# In C8 we use system openssl. See DESIGN.md in ea-openssl11 git repo for details
+BuildRequires: openssl, openssl-devel
+Requires: openssl
+%endif
 
 Requires: ea-nghttp2
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
@@ -1196,8 +1214,16 @@ names which were matched using this strategy.
 %package -n ea-apache24-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
-BuildRequires: ea-openssl11-devel >= %{ea_openssl_ver}
-Requires(post): ea-openssl11 >= %{ea_openssl_ver}, /bin/cat
+%if 0%{?rhel} < 8
+BuildRequires: ea-openssl11 >= %{ea_openssl_ver}, ea-openssl11-devel >= %{ea_openssl_ver}
+Requires(post): ea-openssl11 >= %{ea_openssl_ver}
+%else
+# In C8 we use system openssl. See DESIGN.md in ea-openssl11 git repo for details
+BuildRequires: openssl, openssl-devel
+Requires(post): openssl
+%endif
+
+Requires(post): /bin/cat
 Requires(pre): ea-apache24
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl, mod_ssl
@@ -1382,7 +1408,11 @@ export LYNX_PATH=/usr/bin/links
     --with-pcre \
     --enable-mods-shared=all \
 %if %{with_http2}
+%if 0%{?rhel} < 8
     --enable-ssl --with-ssl=/opt/cpanel/ea-openssl11/ \
+%else
+    --enable-ssl --with-ssl \
+%endif
     --enable-ssl-staticlib-deps \
     --with-nghttp2=/opt/cpanel/nghttp2/ \
     --enable-nghttp2-staticlib-deps \
@@ -1408,10 +1438,12 @@ export LYNX_PATH=/usr/bin/links
     MOD_PROXY_HTML_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_XML2ENC_LDADD="-L/opt/cpanel/ea-libxml2/%{_lib} -R/opt/cpanel/ea-libxml2/%{_lib}" \
     MOD_BROTLI_LDADD="-L/opt/cpanel/ea-brotli/lib -R/opt/cpanel/ea-brotli/lib" \
+%if 0%{?rhel} < 8
     MOD_SSL_LDADD="-L/opt/cpanel/ea-openssl11/%{_lib} -R/opt/cpanel/ea-openssl11/%{_lib}" \
     UTIL_LDFLAGS="-L/opt/cpanel/ea-openssl11/%{_lib} -R/opt/cpanel/ea-openssl11/%{_lib}" \
 %if %{with_http2}
     MOD_HTTP2_LDADD="-L/opt/cpanel/ea-openssl11/%{_lib} -R/opt/cpanel/ea-openssl11/%{_lib}" \
+%endif
 %endif
     $*
 
@@ -1426,7 +1458,10 @@ export LYNX_PATH=/usr/bin/links
 # to link that particular library in.
 
 # I need to prepend this for later "sed"ing
+%if 0%{?rhel} < 8
 echo 'SYS_OPENSSL  = -Wl,-rpath=/opt/cpanel/ea-openssl11/lib -Wl,-rpath-link=/lib64 -L/lib64 -l:libcrypto.so.1.1' > support/Makefile.tmp
+%endif
+
 cat support/Makefile >> support/Makefile.tmp
 cp -f support/Makefile.tmp support/Makefile
 
@@ -1796,8 +1831,14 @@ if [ "x${FQDN}" = "x" ]; then
    FQDN=localhost.localdomain
 fi
 
+%if 0%{?rhel} < 8
+    export OPENSSL_BIN=/opt/cpanel/ea-openssl11/bin/openssl
+%else
+    export OPENSSL_BIN=/usr/bin/openssl
+%endif
+
 if [ ! -f %{sslcert} ] ; then
-cat << EOF | /opt/cpanel/ea-openssl11/bin/openssl req -new -key %{sslkey} \
+cat << EOF | $OPENSSL_BIN req -new -key %{sslkey} \
          -x509 -sha256 -days 365 -set_serial $RANDOM -extensions v3_req \
          -out %{sslcert} 2>/dev/null
 --
@@ -2018,6 +2059,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Nov 24 2020 Julian Brown <julian.brown@cpanel.net> - 2.4.46-3
+- ZC-8005: Replace ea-openssl11 with system openssl on C8
+
 * Thu Oct 15 2020 Hans Borresen <h.borresen@cpanel.net> - 2.4.46-2
 - EA-9374: Lower TimeoutStopSec for httpd.service
 
