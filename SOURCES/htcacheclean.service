@@ -1,6 +1,7 @@
 [Unit]
 Description=Disk Cache Cleaning Daemon for Apache HTTP Server
 After=httpd.service
+ConditionPathExists=/etc/apache2/modules/mod_cache_disk.so
 
 [Service]
 Type=forking

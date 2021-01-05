@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.46
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -2059,6 +2059,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Jan 04 2021 Tim Mullin <tim@cpanel.net> - 2.4.46-4
+- EA-9506: Do not start htcacheclean service if mod_cache_disk module is not loaded
+
 * Tue Nov 24 2020 Julian Brown <julian.brown@cpanel.net> - 2.4.46-3
 - ZC-8005: Replace ea-openssl11 with system openssl on C8
 
