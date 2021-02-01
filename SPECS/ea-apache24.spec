@@ -52,9 +52,6 @@ Source41: htcacheclean.sysconf
 # Systemd service file
 Source42: httpd.service
 Source45: htcacheclean.service
-%if 0%{?rhel} >=7
-Source46: 00-systemd.conf
-%endif
 
 # build/scripts patches
 Patch1: 0001-Apachectl-additions-and-options.patch
@@ -1639,6 +1636,22 @@ sed -i '/instdso/s,top_srcdir,top_builddir,' \
 # We'll number the conf.modules.d files, so we can force load order,
 # and since there's a lot of them, we'll use 3 digits
 
+# Systemd should be in the first batch to be loaded
+%if 0%{?rhel} >= 7
+for mod in systemd
+do
+    printf -v modname "000_mod_%s.conf" $mod
+    cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
+# Enable mod_${mod}
+LoadModule ${mod}_module modules/mod_${mod}.so
+EOF
+    cat > files.${mod} <<EOF
+%attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
+EOF
+done
+%endif
+
 # MPMs are mutually exclusive, and should be loaded first
 for mod in mpm_event mpm_prefork mpm_worker
 do
@@ -1773,6 +1786,10 @@ cat files.access_compat files.actions files.alias files.auth_basic \
   files.rewrite files.setenvif files.slotmem_shm files.socache_dbm \
   files.socache_shmcb files.socache_redis files.status files.unixd \
   files.userdir > files.httpd
+
+%if 0%{?rhel} >= 7
+cat files.systemd >> files.httpd
+%endif
 
 # Remove unpackaged files
 rm -vf \
@@ -1968,10 +1985,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/manual.conf
-
-%if 0%{?rhel} >=7
-/usr/lib64/apache2/modules/mod_systemd.so
-%endif
 
 %files -n ea-apache24-mod_mpm_event -f files.mpm_event
 %files -n ea-apache24-mod_mpm_prefork -f files.mpm_prefork
