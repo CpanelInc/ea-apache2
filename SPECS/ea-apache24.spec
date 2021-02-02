@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.46
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 4
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -113,6 +113,10 @@ BuildRequires: ea-libxml2 ea-libxml2-devel
 BuildRequires: ea-nghttp2 ea-libnghttp2
 %endif
 
+%if 0%{?rhel} >=7
+BuildRequires: systemd-devel
+%endif
+
 Requires: ea-apr%{?_isa} >= 1.7.0-1
 Requires: ea-apr-util%{?_isa} >= 1.6.1-1
 Requires: system-logos >= 7.92.1-1
@@ -131,6 +135,12 @@ Conflicts: httpd-mmn
 Provides: ea-webserver
 Provides: ea-apache24-suexec = %{version}-%{release}
 Provides: ea-apache24-mmn = %{mmn}, ea-apache24-mmn = %{mmnisa}
+
+%if 0%{?rhel} >=7
+Requires(preun): systemd-units
+Requires(postun): systemd-units
+Requires(post): systemd-units
+%endif
 
 %if 0%{?rhel} < 8
 # This is apparently a syntax error
@@ -1407,6 +1417,9 @@ export LYNX_PATH=/usr/bin/links
     --enable-pie \
     --with-pcre \
     --enable-mods-shared=all \
+%if 0%{?rhel} >= 7
+    --enable-systemd \
+%endif
 %if %{with_http2}
 %if 0%{?rhel} < 8
     --enable-ssl --with-ssl=/opt/cpanel/ea-openssl11/ \
@@ -1623,6 +1636,22 @@ sed -i '/instdso/s,top_srcdir,top_builddir,' \
 # We'll number the conf.modules.d files, so we can force load order,
 # and since there's a lot of them, we'll use 3 digits
 
+# Systemd should be in the first batch to be loaded
+%if 0%{?rhel} >= 7
+for mod in systemd
+do
+    printf -v modname "000_mod_%s.conf" $mod
+    cat > $RPM_BUILD_ROOT%{_sysconfdir}/apache2/conf.modules.d/${modname} <<EOF
+# Enable mod_${mod}
+LoadModule ${mod}_module modules/mod_${mod}.so
+EOF
+    cat > files.${mod} <<EOF
+%attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
+%config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
+EOF
+done
+%endif
+
 # MPMs are mutually exclusive, and should be loaded first
 for mod in mpm_event mpm_prefork mpm_worker
 do
@@ -1757,6 +1786,10 @@ cat files.access_compat files.actions files.alias files.auth_basic \
   files.rewrite files.setenvif files.slotmem_shm files.socache_dbm \
   files.socache_shmcb files.socache_redis files.status files.unixd \
   files.userdir > files.httpd
+
+%if 0%{?rhel} >= 7
+cat files.systemd >> files.httpd
+%endif
 
 # Remove unpackaged files
 rm -vf \
@@ -2059,6 +2092,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Jan 29 2021 Cory McIntire <cory@cpanel.net> - 2.4.46-5
+- EA-9463: Resolve Apache startup race conditions
+           Enable mod_systemd for further startup enhancements
+
 * Mon Jan 04 2021 Tim Mullin <tim@cpanel.net> - 2.4.46-4
 - EA-9506: Do not start htcacheclean service if mod_cache_disk module is not loaded
 
