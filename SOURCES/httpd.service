@@ -7,9 +7,10 @@ After=network-online.target remote-fs.target nss-lookup.target
 Wants=network-online.target
 
 [Service]
-Type=notify
-ExecStart=/usr/sbin/httpd -DFOREGROUND
-ExecReload=/usr/sbin/httpd -k graceful
+Type=forking
+ExecStart=/usr/local/cpanel/scripts/restartsrv_httpd --no-verbose
+ExecStop=/usr/local/cpanel/scripts/restartsrv_httpd stop --no-verbose
+ExecReload=/usr/local/cpanel/scripts/restartsrv_httpd --no-verbose
 PIDFile=/run/apache2/httpd.pid
 TimeoutStartSec=5m
 TimeoutStopSec=30s
