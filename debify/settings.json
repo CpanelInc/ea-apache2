@@ -1,0 +1,4 @@
+{
+    "source_tarball_regex": "httpd-",
+    "add_to_build_requires": [ "libcap2-bin" ]
+}
