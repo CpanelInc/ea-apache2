@@ -14,6 +14,7 @@
         "ea_apr_dir": "/opt/cpanel/ea-apr16",
         "ea_apu_dir": "/opt/cpanel/ea-apr16",
         "vmmn": "",
-        "ea_apr_config": "/opt/cpanel/ea-apr16/bin/apr-1-config"
+        "ea_apr_config": "/opt/cpanel/ea-apr16/bin/apr-1-config",
+        "_localstatedir": "/var"
     }
 }
