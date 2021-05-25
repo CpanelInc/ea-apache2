@@ -297,3 +297,4 @@ cp $buildroot/NOTICE $DEB_INSTALL_ROOT/usr/share/doc/$name-tools-$version/
 
 mkdir -p $DEB_INSTALL_ROOT/var/cache/apache2/ssl
 
+perl -pi -e 's{^#!/bin/sh}{#!/bin/bash}' $DEB_INSTALL_ROOT$_sbindir/apachectl
