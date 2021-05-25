@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.46
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 6
+%define release_prefix 7
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -2092,6 +2092,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue May 25 2021 Tim Mullin <tim@cpanel.net> - 2.4.46-7
+- EA-9784: Change Apache to be a systemd notify service
+
 * Wed Feb 03 2021 Cory McIntire <cory@cpanel.net> - 2.4.46-6
 - EA-9463: Revert Apache startup changes.
 
