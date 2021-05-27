@@ -23,26 +23,26 @@ for s in httpd.service htcacheclean.service; do
                     $DEB_INSTALL_ROOT$_unitdir/${s}
 done
 # install conf file/directory
-mkdir $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.d \
-      $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.modules.d \
-      $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.d/includes \
-      $DEB_INSTALL_ROOT$_sysconfdir/apache2/bin
+mkdir $DEB_INSTALL_ROOT/etc/apache2/conf.d \
+      $DEB_INSTALL_ROOT/etc/apache2/conf.modules.d \
+      $DEB_INSTALL_ROOT/etc/apache2/conf.d/includes \
+      $DEB_INSTALL_ROOT/etc/apache2/bin
 install -m 644 $RPM_SOURCE_DIR/README.confd \
-    $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.d/README
+    $DEB_INSTALL_ROOT/etc/apache2/conf.d/README
 for f in brotli.conf cgid.conf manual.conf cperror.conf autoindex.conf ; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
-        $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.d/$f
+        $DEB_INSTALL_ROOT/etc/apache2/conf.d/$f
 done
-install -m 644 -p $RPM_SOURCE_DIR/http2.conf $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.d/http2.conf
+install -m 644 -p $RPM_SOURCE_DIR/http2.conf $DEB_INSTALL_ROOT/etc/apache2/conf.d/http2.conf
 # Extra config trimmed:
 rm -v docs/conf/extra/httpd-{ssl,userdir}.conf
-rm $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf/*.conf
+rm $DEB_INSTALL_ROOT/etc/apache2/conf/*.conf
 install -m 644 -p $RPM_SOURCE_DIR/httpd.conf \
-   $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf/httpd.conf
-mkdir $DEB_INSTALL_ROOT$_sysconfdir/sysconfig
+   $DEB_INSTALL_ROOT/etc/apache2/conf/httpd.conf
+mkdir $DEB_INSTALL_ROOT/etc/sysconfig
 for s in httpd htcacheclean; do
   install -m 644 -p $RPM_SOURCE_DIR/${s}.sysconf \
-                    $DEB_INSTALL_ROOT$_sysconfdir/sysconfig/${s}
+                    $DEB_INSTALL_ROOT/etc/sysconfig/${s}
 done
 # tmpfiles.d configuration
 mkdir -p $DEB_INSTALL_ROOT$_prefix/lib/tmpfiles.d
@@ -57,8 +57,8 @@ mkdir -p $DEB_INSTALL_ROOT$_localstatedir/cache/apache2 \
          $DEB_INSTALL_ROOT$_localstatedir/cache/apache2/ssl
 # Make the MMN accessible to module packages
 echo $mmnisa > $DEB_INSTALL_ROOT$_includedir/apache2/.mmn
-mkdir -p $DEB_INSTALL_ROOT$_sysconfdir/rpm
-cat > $DEB_INSTALL_ROOT$_sysconfdir/rpm/macros.apache2 <<EOF
+mkdir -p $DEB_INSTALL_ROOT/etc/rpm
+cat > $DEB_INSTALL_ROOT/etc/rpm/macros.apache2 <<EOF
 EOF
 # Handle contentdir
 mkdir $DEB_INSTALL_ROOT$contentdir/noindex
@@ -89,8 +89,8 @@ ln -s ../noindex/images/poweredby.png \
 ln -s ../..$_localstatedir/log/apache2 $DEB_INSTALL_ROOT/etc/apache2/logs
 ln -s ../..$_localstatedir/run/apache2 $DEB_INSTALL_ROOT/etc/apache2/run
 ln -s ../..$_libdir/apache2/modules $DEB_INSTALL_ROOT/etc/apache2/modules
-mkdir -p $DEB_INSTALL_ROOT/$_sysconfdir/apache2/logs
-touch $DEB_INSTALL_ROOT/$_sysconfdir/apache2/logs/suexec_log
+mkdir -p $DEB_INSTALL_ROOT//etc/apache2/logs
+touch $DEB_INSTALL_ROOT//etc/apache2/logs/suexec_log
 touch $DEB_INSTALL_ROOT/var/log/apache2/suexec_log
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/apache2/conf/httpd.conf|" \
@@ -115,7 +115,7 @@ sed -i '/instdso/s,top_srcdir,top_builddir,' \
 for mod in systemd
 do
     printf -v modname "000_mod_%s.conf" $mod
-    cat > $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.modules.d/${modname} <<EOF
+    cat > $DEB_INSTALL_ROOT/etc/apache2/conf.modules.d/${modname} <<EOF
 # Enable mod_${mod}
 LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
@@ -126,12 +126,12 @@ done
 for mod in mpm_event mpm_prefork mpm_worker
 do
     printf -v modname "000_mod_%s.conf" $mod
-    cat > $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.modules.d/${modname} <<EOF
+    cat > $DEB_INSTALL_ROOT/etc/apache2/conf.modules.d/${modname} <<EOF
 # Enable mod_${mod}
 LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
     if [ "${mod}" = "mpm_prefork" ]; then
-        cat >> $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.modules.d/${modname} <<EOF
+        cat >> $DEB_INSTALL_ROOT/etc/apache2/conf.modules.d/${modname} <<EOF
 Mutex sysvsem
 EOF
     fi
@@ -142,7 +142,7 @@ done
 for mod in cgi cgid
 do
     printf -v modname "005_mod_%s.conf" $mod
-    cat > $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.modules.d/${modname} <<EOF
+    cat > $DEB_INSTALL_ROOT/etc/apache2/conf.modules.d/${modname} <<EOF
 # Enable mod_${mod}
 LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
@@ -175,7 +175,7 @@ do
     printf -v modname "%03d_mod_%s.conf" $modnum $mod
     # add to the condition to have comment-disabled modules
     if [ "${mod}" = "info" ]; then
-      cat > $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.modules.d/${modname} <<EOF
+      cat > $DEB_INSTALL_ROOT/etc/apache2/conf.modules.d/${modname} <<EOF
 # Once mod_info is loaded into the server, its handler capability is available
 # in all configuration files, including per-directory files (e.g., .htaccess).
 # This may have security-related ramifications for your server. In particular,
@@ -188,7 +188,7 @@ do
 #LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
     elif [ "${mod}" = "lua" ]; then
-      cat > $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.modules.d/${modname} <<EOF
+      cat > $DEB_INSTALL_ROOT/etc/apache2/conf.modules.d/${modname} <<EOF
 # This module holds a great deal of power over httpd, which is both a strength
 # and a potential security risk. It is not recommended that you use this module
 # on a server that is shared with users you do not trust, as it can be abused
@@ -198,13 +198,13 @@ EOF
 #LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
     else
-      cat > $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.modules.d/${modname} <<EOF
+      cat > $DEB_INSTALL_ROOT/etc/apache2/conf.modules.d/${modname} <<EOF
 # Enable mod_${mod}
 LoadModule ${mod}_module modules/mod_${mod}.so
 EOF
     fi
     if [ "${mod}" = "reqtimeout" ]; then
-      cat >> $DEB_INSTALL_ROOT$_sysconfdir/apache2/conf.modules.d/${modname} <<EOF
+      cat >> $DEB_INSTALL_ROOT/etc/apache2/conf.modules.d/${modname} <<EOF
 RequestReadTimeout handshake=0 header=20-40,MinRate=500 body=20,MinRate=500
 EOF
     fi
