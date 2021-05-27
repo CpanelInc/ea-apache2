@@ -10,10 +10,10 @@ Subject: [PATCH 16/20] Downgrade loglevel for long lost pid warnings
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/server/mpm/event/event.c b/server/mpm/event/event.c
-index 1cba5d4..467a329 100644
+index 6ba0157..8ccdb6a 100644
 --- a/server/mpm/event/event.c
 +++ b/server/mpm/event/event.c
-@@ -2985,7 +2985,7 @@ static void server_main_loop(int remaining_children_to_start, int num_buckets)
+@@ -2972,7 +2972,7 @@ static void server_main_loop(int remaining_children_to_start, int num_buckets)
                  /* Great, we've probably just lost a slot in the
                   * scoreboard.  Somehow we don't know about this child.
                   */
@@ -23,7 +23,7 @@ index 1cba5d4..467a329 100644
                               "long lost child came home! (pid %ld)",
                               (long) pid.pid);
 diff --git a/server/mpm/prefork/prefork.c b/server/mpm/prefork/prefork.c
-index 9934cfc..55257f8 100644
+index 183ef93..db562e0 100644
 --- a/server/mpm/prefork/prefork.c
 +++ b/server/mpm/prefork/prefork.c
 @@ -986,7 +986,7 @@ static int prefork_run(apr_pool_t *_pconf, apr_pool_t *plog, server_rec *s)
@@ -36,7 +36,7 @@ index 9934cfc..55257f8 100644
                              "long lost child came home! (pid %ld)", (long)pid.pid);
              }
 diff --git a/server/mpm/worker/worker.c b/server/mpm/worker/worker.c
-index 316ebfe..eb9b53b 100644
+index d44190b..a22c7e0 100644
 --- a/server/mpm/worker/worker.c
 +++ b/server/mpm/worker/worker.c
 @@ -1649,7 +1649,7 @@ static void server_main_loop(int remaining_children_to_start, int num_buckets)

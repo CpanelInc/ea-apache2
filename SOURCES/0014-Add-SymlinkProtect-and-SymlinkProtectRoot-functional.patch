@@ -11,10 +11,10 @@ Subject: [PATCH 14/20] Add SymlinkProtect and SymlinkProtectRoot functionality
  4 files changed, 135 insertions(+), 10 deletions(-)
 
 diff --git a/include/http_core.h b/include/http_core.h
-index 8e10988..857f2dc 100644
+index 110c9eb..0fb1802 100644
 --- a/include/http_core.h
 +++ b/include/http_core.h
-@@ -500,7 +500,7 @@ typedef unsigned long etag_components_t;
+@@ -508,7 +508,7 @@ typedef unsigned long etag_components_t;
  #define AP_CORE_MERGE_FLAG(field, to, base, over) to->field = \
                 over->field != AP_CORE_CONFIG_UNSET            \
                 ? over->field                                  \
@@ -23,7 +23,7 @@ index 8e10988..857f2dc 100644
  
  /**
   * @brief Server Signature Enumeration
-@@ -663,7 +663,7 @@ typedef struct {
+@@ -671,7 +671,7 @@ typedef struct {
  #define AP_CGI_PASS_AUTH_UNSET   (2)
      /** CGIPassAuth: Whether HTTP authorization headers will be passed to
       * scripts as CGI variables; affects all modules calling
@@ -32,7 +32,7 @@ index 8e10988..857f2dc 100644
       * advice
       */
      unsigned int cgi_pass_auth : 2;
-@@ -741,6 +741,12 @@ typedef struct {
+@@ -751,6 +751,12 @@ typedef struct {
  #define AP_HTTP_METHODS_REGISTERED    2
      char http_methods;
      unsigned int merge_slashes;
@@ -42,9 +42,9 @@ index 8e10988..857f2dc 100644
 +#define AP_SYMLINK_PROTECT_DISABLE 2
 +    int symlink_protect;
 +    const char *symlink_protect_root;
- } core_server_config;
- 
- /* for AddOutputFiltersByType in core.c */
+  
+     apr_size_t   flush_max_threshold;
+     apr_int32_t  flush_max_pipelined;
 diff --git a/modules/mappers/mod_userdir.c b/modules/mappers/mod_userdir.c
 index 1ec0e90..6a0f44d 100644
 --- a/modules/mappers/mod_userdir.c
@@ -140,7 +140,7 @@ index 2aff834..fa229b1 100644
  	"..\..\include\http_request.h"\
  	"..\..\include\httpd.h"\
 diff --git a/server/core.c b/server/core.c
-index 5b5b57b..2ed3de0 100644
+index e94d65e..0ac567d 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -21,6 +21,8 @@
@@ -150,9 +150,9 @@ index 5b5b57b..2ed3de0 100644
 +#include "apr_env.h"
 +#include "apr_file_io.h"
  
- #define APR_WANT_IOVEC
- #define APR_WANT_STRFUNC
-@@ -451,6 +453,7 @@ static void *create_core_server_config(apr_pool_t *a, server_rec *s)
+ #include "apr_version.h"
+ #if APR_MAJOR_VERSION < 2
+@@ -471,6 +473,7 @@ static void *create_core_server_config(apr_pool_t *a, server_rec *s)
  
      if (!is_virtual) {
          conf->ap_document_root = DOCUMENT_LOCATION;
@@ -160,7 +160,7 @@ index 5b5b57b..2ed3de0 100644
          conf->access_name = DEFAULT_ACCESS_FNAME;
  
          /* A mapping only makes sense in the global context */
-@@ -509,6 +512,9 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
+@@ -528,6 +531,9 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
      if (virt->ap_document_root)
          conf->ap_document_root = virt->ap_document_root;
  
@@ -170,7 +170,7 @@ index 5b5b57b..2ed3de0 100644
      if (virt->access_name)
          conf->access_name = virt->access_name;
  
-@@ -555,6 +561,10 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
+@@ -574,6 +580,10 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
                             ? virt->merge_trailers
                             : base->merge_trailers;
  
@@ -181,7 +181,7 @@ index 5b5b57b..2ed3de0 100644
      conf->protocols = ((virt->protocols->nelts > 0)? 
                         virt->protocols : base->protocols);
      conf->protocols_honor_order = ((virt->protocols_honor_order < 0)?
-@@ -4300,6 +4310,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
+@@ -4400,6 +4410,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
      return NULL;
  }
  
@@ -212,7 +212,7 @@ index 5b5b57b..2ed3de0 100644
  /* Note --- ErrorDocument will now work from .htaccess files.
   * The AllowOverride of Fileinfo allows webmasters to turn it off
   */
-@@ -4567,6 +4601,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
+@@ -4674,6 +4708,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
  AP_INIT_TAKE1("EnableExceptionHook", ap_mpm_set_exception_hook, NULL, RSRC_CONF,
                "Controls whether exception hook may be called after a crash"),
  #endif
@@ -223,7 +223,7 @@ index 5b5b57b..2ed3de0 100644
  AP_INIT_TAKE1("TraceEnable", set_trace_enable, NULL, RSRC_CONF,
                "'on' (default), 'off' or 'extended' to trace request body content"),
  AP_INIT_FLAG("MergeTrailers", set_merge_trailers, NULL, RSRC_CONF,
-@@ -4732,6 +4770,9 @@ static int default_handler(request_rec *r)
+@@ -4839,6 +4877,9 @@ static int default_handler(request_rec *r)
      int errstatus;
      apr_file_t *fd = NULL;
      apr_status_t status;
@@ -233,7 +233,7 @@ index 5b5b57b..2ed3de0 100644
      /* XXX if/when somebody writes a content-md5 filter we either need to
       *     remove this support or coordinate when to use the filter vs.
       *     when to use this code
-@@ -4742,6 +4783,13 @@ static int default_handler(request_rec *r)
+@@ -4849,6 +4890,13 @@ static int default_handler(request_rec *r)
      int bld_content_md5;
  
      d = (core_dir_config *)ap_get_core_module_config(r->per_dir_config);
@@ -247,7 +247,7 @@ index 5b5b57b..2ed3de0 100644
      bld_content_md5 = (d->content_md5 == AP_CONTENT_MD5_ON)
                        && r->output_filters->frec->ftype != AP_FTYPE_RESOURCE;
  
-@@ -4815,6 +4863,61 @@ static int default_handler(request_rec *r)
+@@ -4922,6 +4970,61 @@ static int default_handler(request_rec *r)
              return HTTP_FORBIDDEN;
          }
  
@@ -308,4 +308,4 @@ index 5b5b57b..2ed3de0 100644
 +
          ap_update_mtime(r, r->finfo.mtime);
          ap_set_last_modified(r);
-         ap_set_etag(r);
+         ap_set_etag_fd(r, fd);
