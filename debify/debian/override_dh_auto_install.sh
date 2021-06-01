@@ -89,8 +89,8 @@ ln -s ../noindex/images/poweredby.png \
 ln -s ../..$_localstatedir/log/apache2 $DEB_INSTALL_ROOT/etc/apache2/logs
 ln -s ../..$_localstatedir/run/apache2 $DEB_INSTALL_ROOT/etc/apache2/run
 ln -s ../..$_libdir/apache2/modules $DEB_INSTALL_ROOT/etc/apache2/modules
-mkdir -p $DEB_INSTALL_ROOT//etc/apache2/logs
-touch $DEB_INSTALL_ROOT//etc/apache2/logs/suexec_log
+mkdir -p $DEB_INSTALL_ROOT/etc/apache2/logs
+touch $DEB_INSTALL_ROOT/etc/apache2/logs/suexec_log
 touch $DEB_INSTALL_ROOT/var/log/apache2/suexec_log
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/apache2/conf/httpd.conf|" \
