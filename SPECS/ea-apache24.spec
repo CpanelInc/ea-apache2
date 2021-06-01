@@ -121,14 +121,14 @@ Requires: ea-apr%{?_isa} >= 1.7.0-1
 Requires: ea-apr-util%{?_isa} >= 1.6.1-1
 Requires: system-logos >= 7.92.1-1
 Requires: ea-apache24-mpm
-Requires: ea-apache24-mod-ssl
+Requires: ea-apache24-mod_ssl
 Requires: ea-documentroot
 Requires: ea-apache24-tools
 Requires: ea-apache24-config
 Requires: ea-apache24-config-runtime
-Requires: ea-apache24-mod-bwlimited
-Requires: ea-apache24-mod-proxy-wstunnel
-Requires: ea-apache24-mod-headers
+Requires: ea-apache24-mod_bwlimited
+Requires: ea-apache24-mod_proxy_wstunnel
+Requires: ea-apache24-mod_headers
 
 Obsoletes: httpd-suexec
 Conflicts: httpd-mmn
@@ -149,8 +149,8 @@ Provides: ea-apache24-mmn = %{oldmmnisa}
 %endif
 
 Requires: ea-apache24-tools = %{version}-%{release}
-Requires: ea-apache24-mod-proxy-http
-Requires: ea-apache24-mod-proxy
+Requires: ea-apache24-mod_proxy_http
+Requires: ea-apache24-mod_proxy
 Requires: ea-cpanel-tools
 %if 0%{?rhel} < 8
 Requires: elinks
@@ -190,8 +190,7 @@ reference guide for the Apache HTTP server. The information can
 also be found at http://httpd.apache.org/docs/2.4/.
 
 %if %{with_http2}
-%package -n ea-apache24-mod-http2
-Provides: ea-apache24-mod_http2
+%package -n ea-apache24-mod_http2
 Group: System Environment/Daemons
 Summary: HTTP2 module for Apache HTTP Server
 BuildRequires: ea-libnghttp2-devel
@@ -207,9 +206,9 @@ Requires: openssl
 
 Requires: ea-nghttp2
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Conflicts: ea-apache24-mod-mpm-itk, ea-apache24-mod-mpm-prefork
+Conflicts: ea-apache24-mod_mpm_itk, ea-apache24-mod_mpm_prefork
 
-%description -n ea-apache24-mod-http2
+%description -n ea-apache24-mod_http2
 This module sets up http2
 %endif
 
@@ -221,75 +220,69 @@ Summary: Tools for use with the Apache HTTP Server
 The ea-apache24-tools package contains tools which can be used with
 the Apache HTTP Server.
 
-%package -n ea-apache24-mod-mpm-event
-Provides: ea-apache24-mod_mpm_event
+%package -n ea-apache24-mod_mpm_event
 Group: System Environment/Daemons
 Summary: Threaded event Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
-Conflicts: ea-apache24-mpm = forked, ea-apache24-mod-mpm-worker, ea-apache24-mod-mpm-prefork
-Conflicts: ea-apache24-mod-cgi
-Requires: ea-apache24-mod-cgid
+Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_prefork
+Conflicts: ea-apache24-mod_cgi
+Requires: ea-apache24-mod_cgid
 
-%description -n ea-apache24-mod-mpm-event
+%description -n ea-apache24-mod_mpm_event
 The Event MPM provides a threaded model for workers, with the additional
 feature that all keepalive connections are handled by a single thread.
 
-%package -n ea-apache24-mod-mpm-prefork
-Provides: ea-apache24-mod_mpm_prefork
+%package -n ea-apache24-mod_mpm_prefork
 Group: System Environment/Daemons
 Summary: Prefork Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = forked
-Conflicts: ea-apache24-mpm = threaded, ea-apache24-mod-mpm-worker, ea-apache24-mod-mpm-event
-Conflicts: ea-apache24-mod-cgid, ea-apache24-mod-http2
-Requires: ea-apache24-mod-cgi
+Conflicts: ea-apache24-mpm = threaded, ea-apache24-mod_mpm_worker, ea-apache24-mod_mpm_event
+Conflicts: ea-apache24-mod_cgid, ea-apache24-mod_http2
+Requires: ea-apache24-mod_cgi
 
-%description -n ea-apache24-mod-mpm-prefork
+%description -n ea-apache24-mod_mpm_prefork
 The traditional forked worker model.
 
-%package -n ea-apache24-mod-mpm-worker
-Provides: ea-apache24-mod_mpm_worker
+%package -n ea-apache24-mod_mpm_worker
 Group: System Environment/Daemons
 Summary: Threaded worker Multi-Processing Module for Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-mpm = threaded
-Conflicts: ea-apache24-mpm = forked, ea-apache24-mod-mpm-event, ea-apache24-mod-mpm-prefork
-Conflicts: ea-apache24-mod-cgi
-Requires: ea-apache24-mod-cgid
+Conflicts: ea-apache24-mpm = forked, ea-apache24-mod_mpm_event, ea-apache24-mod_mpm_prefork
+Conflicts: ea-apache24-mod_cgi
+Requires: ea-apache24-mod_cgid
 
-%description -n ea-apache24-mod-mpm-worker
+%description -n ea-apache24-mod_mpm_worker
 The Worker MPM provides a threaded worker model.
 
-%package -n ea-apache24-mod-allowmethods
-Provides: ea-apache24-mod_allowmethods
+%package -n ea-apache24-mod_allowmethods
 Group: System Environment/Daemons
 Summary: HTTP request method restriction module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-allowmethods
+%description -n ea-apache24-mod_allowmethods
 The mod_allowmethods module makes it easy to restrict what HTTP
 methods can used on an server.
 
-%package -n ea-apache24-mod-asis
-Provides: ea-apache24-mod_asis
+%package -n ea-apache24-mod_asis
 Group: System Environment/Daemons
 Summary: As-is provider module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-asis
+%description -n ea-apache24-mod_asis
 The mod_asis module provides the handler send-as-is which causes
 Apache HTTP Server to send the document without adding most of the
 usual HTTP headers.
 
-%package -n ea-apache24-mod-auth-digest
-Provides: ea-apache24-mod_auth_digest
+%package -n ea-apache24-mod_auth_digest
 Group: System Environment/Daemons
 Summary: HTTP Digest Authentication module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-authn, ea-apache24-authz
 
-%description -n ea-apache24-mod-auth-digest
+%description -n ea-apache24-mod_auth_digest
 The mod_auth_digest module implements HTTP Digest Authentication
 (RFC2617), and provides an alternative to mod_auth_basic where the
 password is not transmitted as cleartext. However, this does not lead
@@ -302,14 +295,13 @@ a much better alternative.
 mod_auth_digest requires at least one authentication provider module,
 and one authorization provider module.
 
-%package -n ea-apache24-mod-authn-anon
-Provides: ea-apache24-mod_authn_anon
+%package -n ea-apache24-mod_authn_anon
 Group: System Environment/Daemons
 Summary: Anonymous-user authentication module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-authn = anon
 
-%description -n ea-apache24-mod-authn-anon
+%description -n ea-apache24-mod_authn_anon
 The mod_authn_anon module provides authentication front-ends such as
 mod_auth_basic to authenticate users similar to anonymous-ftp sites,
 i.e. have a 'magic' user id 'anonymous' and the email address as a
@@ -322,67 +314,62 @@ advantage of using Auth-based user tracking is that, unlike
 magic-cookies and funny URL pre/postfixes, it is completely browser
 independent and it allows users to share URLs.
 
-%package -n ea-apache24-mod-authn-dbd
-Provides: ea-apache24-mod_authn_dbd
+%package -n ea-apache24-mod_authn_dbd
 Group: System Environment/Daemons
 Summary: DBD-based authentication module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-dbd = 0:%{version}-%{release}
+Requires: ea-apache24-mod_dbd = 0:%{version}-%{release}
 Provides: ea-apache24-authn = dbd
 
-%description -n ea-apache24-mod-authn-dbd
+%description -n ea-apache24-mod_authn_dbd
 The mod_authn_dbd module provides authentication front-ends such as
 mod_auth_digest and mod_auth_basic to authenticate users by looking up
 users in SQL tables. Similar functionality is provided by, for
 example, mod_authn_file.
 
-%package -n ea-apache24-mod-authn-dbm
-Provides: ea-apache24-mod_authn_dbm
+%package -n ea-apache24-mod_authn_dbm
 Group: System Environment/Daemons
 Summary: DBM-based authentication module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-dbd = 0:%{version}-%{release}
+Requires: ea-apache24-mod_dbd = 0:%{version}-%{release}
 Provides: ea-apache24-authn = dbm
 
-%description -n ea-apache24-mod-authn-dbm
+%description -n ea-apache24-mod_authn_dbm
 The mod_authn_dbm module provides authentication front-ends such as
 mod_auth_digest and mod_auth_basic to authenticate users by looking up
 users in dbm password files. Similar functionality is provided by
 mod_authn_file.
 
-%package -n ea-apache24-mod-authn-socache
-Provides: ea-apache24-mod_authn_socache
+%package -n ea-apache24-mod_authn_socache
 Group: System Environment/Daemons
 Summary: Shared-memory authentication caching module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-authn
 
-%description -n ea-apache24-mod-authn-socache
+%description -n ea-apache24-mod_authn_socache
 The mod_authn_socache module maintains a cache of authentication
 credentials, so that a new backend lookup is not required for every
 authenticated request.
 
-%package -n ea-apache24-mod-authnz-ldap
-Provides: ea-apache24-mod_authnz_ldap
+%package -n ea-apache24-mod_authnz_ldap
 Group: System Environment/Daemons
 Summary: LDAP authentication/authorization module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-ldap = 0:%{version}-%{release}
+Requires: ea-apache24-mod_ldap = 0:%{version}-%{release}
 Provides: ea-apache24-authn = ldap, ea-apache24-authz = ldap
 
-%description -n ea-apache24-mod-authnz-ldap
+%description -n ea-apache24-mod_authnz_ldap
 The mod_authnz_ldap module allows authentication front-ends such as
 mod_auth_basic to authenticate users through an LDAP directory.
 
-%package -n ea-apache24-mod-authz-dbd
-Provides: ea-apache24-mod_authz_dbd
+%package -n ea-apache24-mod_authz_dbd
 Group: System Environment/Daemons
 Summary: DBD-based group authorization module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-dbd = 0:%{version}-%{release}
+Requires: ea-apache24-mod_dbd = 0:%{version}-%{release}
 Provides: ea-apache24-authz = dbd
 
-%description -n ea-apache24-mod-authz-dbd
+%description -n ea-apache24-mod_authz_dbd
 The mod_authz_dbd module provides authorization capabilities so that
 authenticated users can be allowed or denied access to portions of the
 web site by group membership. Similar functionality is provided by
@@ -390,53 +377,49 @@ mod_authz_groupfile and mod_authz_dbm, with the exception that this
 module queries a SQL database to determine whether a user is a member
 of a group.
 
-%package -n ea-apache24-mod-authz-dbm
-Provides: ea-apache24-mod_authz_dbm
+%package -n ea-apache24-mod_authz_dbm
 Group: System Environment/Daemons
 Summary: DBM-based group authorization module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-authz = dbm
 
-%description -n ea-apache24-mod-authz-dbm
+%description -n ea-apache24-mod_authz_dbm
 The mod_authz_dbm module provides authorization capabilities so that
 authenticated users can be allowed or denied access to portions of the
 web site by group membership. Similar functionality is provided by
 mod_authz_groupfile.
 
-%package -n ea-apache24-mod-authz-owner
-Provides: ea-apache24-mod_authz_owner
+%package -n ea-apache24-mod_authz_owner
 Group: System Environment/Daemons
 Summary: Ownership-based authorization module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-authz = owner
 
-%description -n ea-apache24-mod-authz-owner
+%description -n ea-apache24-mod_authz_owner
 The mod_authz_owner module authorizes access to files by comparing the
 userid used for HTTP authentication (the web userid) with the
 file-system owner or group of the requested file. The supplied
 username and password must be already properly verified by an
 authentication module, such as mod_auth_basic or mod_auth_digest.
 
-%package -n ea-apache24-mod-brotli
-Provides: ea-apache24-mod_brotli
+%package -n ea-apache24-mod_brotli
 Group: System Environment/Daemons
 Summary: Compress content via Brotli before it is delivered to the client
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-brotli
 BuildRequires: ea-brotli-devel
 
-%description -n ea-apache24-mod-brotli
+%description -n ea-apache24-mod_brotli
 The mod_brotli module provides the BROTLI_COMPRESS output filter that allows
 output from your server to be compressed using the brotli compression format
 before being sent to the client over the network.
 
-%package -n ea-apache24-mod-buffer
-Provides: ea-apache24-mod_buffer
+%package -n ea-apache24-mod_buffer
 Group: System Environment/Daemons
 Summary: Request buffering module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-buffer
+%description -n ea-apache24-mod_buffer
 The mod_buffer module provides the ability to buffer the input and
 output filter stacks.
 
@@ -453,13 +436,12 @@ buffering the response may allow the backend to complete processing
 and release resources sooner, depending on how the backend is
 designed.
 
-%package -n ea-apache24-mod-cache
-Provides: ea-apache24-mod_cache
+%package -n ea-apache24-mod_cache
 Group: System Environment/Daemons
 Summary: Content caching module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-cache
+%description -n ea-apache24-mod_cache
 The mod_cache module implements an RFC 2616 compliant HTTP content
 caching filter, with support for the caching of content negotiated
 responses containing the Vary header.
@@ -483,14 +465,13 @@ the client. In this mode of operation, mod_cache may be thought of as
 a caching proxy server bolted to the front of the webserver, while
 running within the webserver itself.
 
-%package -n ea-apache24-mod-cache-disk
-Provides: ea-apache24-mod_cache_disk
+%package -n ea-apache24-mod_cache_disk
 Group: System Environment/Daemons
 Summary: Disk-based caching module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-cache = 0:%{version}-%{release}
+Requires: ea-apache24-mod_cache = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-cache-disk
+%description -n ea-apache24-mod_cache_disk
 The mod_cache_disk module implements a disk based storage manager for
 mod_cache.
 
@@ -512,14 +493,13 @@ URLs, or to maintain the size of the disk cache within size and/or
 inode limits. The tool can be run on demand, or can be daemonized to
 offer continuous monitoring of directory sizes.
 
-%package -n ea-apache24-mod-cache-socache
-Provides: ea-apache24-mod_cache_socache
+%package -n ea-apache24-mod_cache_socache
 Group: System Environment/Daemons
 Summary: Shared-memory caching module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-cache = 0:%{version}-%{release}
+Requires: ea-apache24-mod_cache = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-cache-socache
+%description -n ea-apache24-mod_cache_socache
 The mod_cache_socache module implements a shared object cache
 (socache) based storage manager for mod_cache.
 
@@ -531,51 +511,47 @@ Multiple content negotiated responses can be stored concurrently,
 however the caching of partial content is not yet supported by this
 module.
 
-%package -n ea-apache24-mod-cgi
-Provides: ea-apache24-mod_cgi
+%package -n ea-apache24-mod_cgi
 Group: System Environment/Daemons
 Summary: CGI module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-mpm = forked
-Conflicts: ea-apache24-mod-cgid, ea-apache24-mod-mpm-event, ea-apache24-mod-mpm-worker
+Conflicts: ea-apache24-mod_cgid, ea-apache24-mod_mpm_event, ea-apache24-mod_mpm_worker
 Provides: ea-apache24-cgi
 
-%description -n ea-apache24-mod-cgi
+%description -n ea-apache24-mod_cgi
 The mod_cgi module adds a handler for executing CGI scripts. This
 module is meant for a forked MPM; for threaded MPMs, mod_cgid should
 be used.
 
-%package -n ea-apache24-mod-cgid
-Provides: ea-apache24-mod_cgid
+%package -n ea-apache24-mod_cgid
 Group: System Environment/Daemons
 Summary: CGI module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apache24-mpm = threaded
-Conflicts: ea-apache24-mod-cgi, ea-apache24-mod-mpm-prefork
+Conflicts: ea-apache24-mod_cgi, ea-apache24-mod_mpm_prefork
 Provides: ea-apache24-cgi
 
-%description -n ea-apache24-mod-cgid
+%description -n ea-apache24-mod_cgid
 The mod_cgid module adds a handler for executing CGI scripts. This
 module is meant for threaded MPMs; for forked MPMs, mod_cgi should be
 used.
 
-%package -n ea-apache24-mod-charset-lite
-Provides: ea-apache24-mod_charset_lite
+%package -n ea-apache24-mod_charset_lite
 Group: System Environment/Daemons
 Summary: Character set conversion module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-charset-lite
+%description -n ea-apache24-mod_charset_lite
 The mod_charset_lite module allows the server to change the character
 set of responses before sending them to the client.
 
-%package -n ea-apache24-mod-data
-Provides: ea-apache24-mod_data
+%package -n ea-apache24-mod_data
 Group: System Environment/Daemons
 Summary: RFC2379 data URL generation module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-data
+%description -n ea-apache24-mod_data
 The mod_data module provides the ability to convert a response into an
 RFC2397 data URL.
 
@@ -585,83 +561,76 @@ separate connections to fetch what may potentially be many small
 images. Data URLs may also be included into pages generated by
 scripting languages such as PHP.
 
-%package -n ea-apache24-mod-dav
-Provides: ea-apache24-mod_dav
+%package -n ea-apache24-mod_dav
 Group: System Environment/Daemons
 Summary: DAV module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-dav
+%description -n ea-apache24-mod_dav
 The mod_dav module provides class 1 and class 2 WebDAV ('Web-based
 Distributed Authoring and Versioning') functionality for Apache. This
 extension to the HTTP protocol allows creating, moving, copying, and
 deleting resources and collections on a remote web server.
 
-%package -n ea-apache24-mod-dav-fs
-Provides: ea-apache24-mod_dav_fs
+%package -n ea-apache24-mod_dav_fs
 Group: System Environment/Daemons
 Summary: DAV filesystem provider module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-dav = 0:%{version}-%{release}
+Requires: ea-apache24-mod_dav = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-dav-fs
+%description -n ea-apache24-mod_dav_fs
 The mod_dav_fs module acts as a support module for mod_dav and
 provides access to resources located in the file system.  The formal
 name of this provider is filesystem.
 
-%package -n ea-apache24-mod-dav-lock
-Provides: ea-apache24-mod_dav_lock
+%package -n ea-apache24-mod_dav_lock
 Group: System Environment/Daemons
 Summary: Generic DAV locking module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-dav = 0:%{version}-%{release}
+Requires: ea-apache24-mod_dav = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-dav-lock
+%description -n ea-apache24-mod_dav_lock
 The mod_dav_lock module implements a generic locking API which can be
 used by any backend provider of mod_dav.  Without a backend provider
 which makes use of it, however, it should not be loaded into the
 server.
 
-%package -n ea-apache24-mod-dbd
-Provides: ea-apache24-mod_dbd
+%package -n ea-apache24-mod_dbd
 Group: System Environment/Daemons
 Summary: Database connection module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-dbd
+%description -n ea-apache24-mod_dbd
 The mod_dbd module manages SQL database connections using APR. It
 provides database connections on request to modules requiring SQL
 database functions, and takes care of managing databases with optimal
 efficiency and scalability for both threaded and non-threaded MPMs.
 
-%package -n ea-apache24-mod-deflate
-Provides: ea-apache24-mod_deflate
+%package -n ea-apache24-mod_deflate
 Group: System Environment/Daemons
 Summary: Compression filter module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-deflate
+%description -n ea-apache24-mod_deflate
 The mod_deflate module provides the DEFLATE output filter that allows
 output from your server to be compressed before being sent to the
 client over the network.
 
-%package -n ea-apache24-mod-dialup
-Provides: ea-apache24-mod_dialup
+%package -n ea-apache24-mod_dialup
 Group: System Environment/Daemons
 Summary: Bandwidth rate limiting module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-dialup
+%description -n ea-apache24-mod_dialup
 It is a module that sends static content at a bandwidth rate limit,
 defined by the various old modem standards.
 
-%package -n ea-apache24-mod-dumpio
-Provides: ea-apache24-mod_dumpio
+%package -n ea-apache24-mod_dumpio
 Group: System Environment/Daemons
 Summary: Debug logging module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-dumpio
+%description -n ea-apache24-mod_dumpio
 The mod_dumpio module allows for the logging of all input received by
 Apache and/or all output sent by Apache to be logged (dumped) to the
 error.log file.
@@ -671,13 +640,12 @@ right before SSL encoding (for output). As can be expected, this can
 produce extreme volumes of data, and should only be used when
 debugging problems.
 
-%package -n ea-apache24-mod-env
-Provides: ea-apache24-mod_env
+%package -n ea-apache24-mod_env
 Group: System Environment/Daemons
 Summary: Environment variable module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-env
+%description -n ea-apache24-mod_env
 The mod_env module allows for control of internal environment
 variables that are used by various Apache HTTP Server modules. These
 variables are also provided to CGI scripts as native system
@@ -686,38 +654,35 @@ variables may be passed from the shell which invoked the httpd
 process. Alternatively, environment variables may be set or unset
 within the configuration process.
 
-%package -n ea-apache24-mod-expires
-Provides: ea-apache24-mod_expires
+%package -n ea-apache24-mod_expires
 Group: System Environment/Daemons
 Summary: Client-side cache control module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-expires
+%description -n ea-apache24-mod_expires
 The mod_expires module controls the setting of the Expires HTTP header
 and the max-age directive of the Cache-Control HTTP header in server
 responses. The expiration date can set to be relative to either the
 time the source file was last modified, or to the time of the client
 access.
 
-%package -n ea-apache24-mod-ext-filter
-Provides: ea-apache24-mod_ext_filter
+%package -n ea-apache24-mod_ext_filter
 Group: System Environment/Daemons
 Summary: Generic filter module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-ext-filter
+%description -n ea-apache24-mod_ext_filter
 The mod_ext_filter module presents a simple and familiar programming
 model for filters. With this module, a program which reads from stdin
 and writes to stdout (i.e., a Unix-style filter command) can be a
 filter for Apache.
 
-%package -n ea-apache24-mod-file-cache
-Provides: ea-apache24-mod_file_cache
+%package -n ea-apache24-mod_file_cache
 Group: System Environment/Daemons
 Summary: Static file caching module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-file-cache
+%description -n ea-apache24-mod_file_cache
 The mod_file_cache module provides two techniques for caching
 frequently requested static files. Through configuration directives,
 you can direct mod_file_cache to either open then mmap() a file, or to
@@ -731,25 +696,23 @@ are served by special content handlers. It can only be used for
 regular files which are usually served by the Apache core content
 handler.
 
-%package -n ea-apache24-mod-headers
-Provides: ea-apache24-mod_headers
+%package -n ea-apache24-mod_headers
 Group: System Environment/Daemons
 Summary: Header control module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-headers
+%description -n ea-apache24-mod_headers
 The mod_headers module provides directives to control and modify HTTP
 request and response headers. Headers can be merged, replaced or
 removed.
 
-%package -n ea-apache24-mod-heartbeat
-Provides: ea-apache24-mod_heartbeat
+%package -n ea-apache24-mod_heartbeat
 Group: System Environment/Daemons
 Summary: Status reporting module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-watchdog = 0:%{version}-%{release}
+Requires: ea-apache24-mod_watchdog = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-heartbeat
+%description -n ea-apache24-mod_heartbeat
 The mod_heartbeat module sends multicast messages to a
 mod_heartmonitor listener that advertises the servers current
 connection count. Usually, mod_heartmonitor will be running on a proxy
@@ -759,14 +722,13 @@ use the "heartbeat" lbmethod inside of ProxyPass.
 mod_heartbeat itself is loaded on the origin server(s) that serve
 requests through the proxy server(s).
 
-%package -n ea-apache24-mod-heartmonitor
-Provides: ea-apache24-mod_heartmonitor
+%package -n ea-apache24-mod_heartmonitor
 Group: System Environment/Daemons
 Summary: Heartbeat monitoring module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-watchdog = 0:%{version}-%{release}
+Requires: ea-apache24-mod_watchdog = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-heartmonitor
+%description -n ea-apache24-mod_heartmonitor
 The mod_heartmonitor module listens for server status messages
 generated by mod_heartbeat enabled origin servers and makes their
 status available to mod_lbmethod_heartbeat. This allows ProxyPass to
@@ -776,38 +738,35 @@ This module uses the services of mod_slotmem_shm when available
 instead of flat-file storage. No configuration is required to use
 mod_slotmem_shm.
 
-%package -n ea-apache24-mod-imagemap
-Provides: ea-apache24-mod_imagemap
+%package -n ea-apache24-mod_imagemap
 Group: System Environment/Daemons
 Summary: Server-side imagemap module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-imagemap
+%description -n ea-apache24-mod_imagemap
 The mod_imagemap module processes .map files, thereby replacing the
 functionality of the imagemap CGI program. Any directory or document
 type configured to use the handler imap-file (using either AddHandler
 or SetHandler) will be processed by this module.
 
-%package -n ea-apache24-mod-info
-Provides: ea-apache24-mod_info
+%package -n ea-apache24-mod_info
 Group: System Environment/Daemons
 Summary: Extension providing a comprehensive overview of server configuration (NOT RECOMMENDED FOR SHARED SERVERS)
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-info
+%description -n ea-apache24-mod_info
 The mod_info module adds a server-info handler to the apache configuration,
 allowing a detailed description of the current server configuration state.
 It is not appropriate for shared hosting systems.
 
-%package -n ea-apache24-mod-lbmethod-bybusyness
-Provides: ea-apache24-mod_lbmethod_bybusyness
+%package -n ea-apache24-mod_lbmethod_bybusyness
 Group: System Environment/Daemons
 Summary: Busyness load-balancing module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy-balancer = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy_balancer = 0:%{version}-%{release}
 Provides: ea-apache24-lbmethod = bybusyness
 
-%description -n ea-apache24-mod-lbmethod-bybusyness
+%description -n ea-apache24-mod_lbmethod_bybusyness
 The mod_lbmethod_bybusyness module keeps track of how many requests
 each worker is currently assigned at present. A new request is
 automatically assigned to the worker with the lowest number of active
@@ -816,44 +775,41 @@ requests independently of Apache, to ensure that queue length stays
 even and a request is always given to the worker most likely to
 service it the fastest and reduce latency.
 
-%package -n ea-apache24-mod-lbmethod-byrequests
-Provides: ea-apache24-mod_lbmethod_byrequests
+%package -n ea-apache24-mod_lbmethod_byrequests
 Group: System Environment/Daemons
 Summary: Request load-balancing module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy-balancer = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy_balancer = 0:%{version}-%{release}
 Provides: ea-apache24-lbmethod = byrequests
 
-%description -n ea-apache24-mod-lbmethod-byrequests
+%description -n ea-apache24-mod_lbmethod_byrequests
 The mod_lbmethod_byrequests module distributes requests among the
 various workers to ensure that each gets their configured share of the
 number of requests.
 
-%package -n ea-apache24-mod-lbmethod-bytraffic
-Provides: ea-apache24-mod_lbmethod_bytraffic
+%package -n ea-apache24-mod_lbmethod_bytraffic
 Group: System Environment/Daemons
 Summary: Traffic load-balancing module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy-balancer = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy_balancer = 0:%{version}-%{release}
 Provides: ea-apache24-lbmethod = bytraffic
 
-%description -n ea-apache24-mod-lbmethod-bytraffic
+%description -n ea-apache24-mod_lbmethod_bytraffic
 The mod_lbmethod_bytraffic module distributes requests among the
 various workers to ensure that each gets their configured share of the
 number of requests.  In contrast to mod_lbmethod_byrequests, which has
 a similar balancing logic, bytraffic weights each request by the
 number of bytes in the request.
 
-%package -n ea-apache24-mod-lbmethod-heartbeat
-Provides: ea-apache24-mod_lbmethod_heartbeat
+%package -n ea-apache24-mod_lbmethod_heartbeat
 Group: System Environment/Daemons
 Summary: Heartbeat load-balancing module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy-balancer = 0:%{version}-%{release}
-Requires: ea-apache24-mod-heartmonitor = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy_balancer = 0:%{version}-%{release}
+Requires: ea-apache24-mod_heartmonitor = 0:%{version}-%{release}
 Provides: ea-apache24-lbmethod = heartbeat
 
-%description -n ea-apache24-mod-lbmethod-heartbeat
+%description -n ea-apache24-mod_lbmethod_heartbeat
 The mod_lbmethod_heartbeat module uses the services of
 mod_heartmonitor to balance between origin servers that are providing
 heartbeat info via the mod_heartbeat module.
@@ -863,36 +819,33 @@ capacity over time, but does not select the server with the most ready
 capacity every time. Servers that have 0 active clients are penalized,
 with the assumption that they are not fully initialized.
 
-%package -n ea-apache24-mod-ldap
-Provides: ea-apache24-mod_ldap
+%package -n ea-apache24-mod_ldap
 Group: System Environment/Daemons
 Summary: LDAP connection-handling module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Requires: ea-apr-util-ldap
 
-%description -n ea-apache24-mod-ldap
+%description -n ea-apache24-mod_ldap
 The mod_ldap module was created to improve the performance of websites
 relying on backend connections to LDAP servers. In addition to the
 functions provided by the standard LDAP libraries, this module adds an
 LDAP connection pool and an LDAP shared memory cache.
 
-%package -n ea-apache24-mod-log-debug
-Provides: ea-apache24-mod_log_debug
+%package -n ea-apache24-mod_log_debug
 Group: System Environment/Daemons
 Summary: Debug logging module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-log-debug
+%description -n ea-apache24-mod_log_debug
 The mod_log_debug module provides a LogMessage directive which may be
 used to log arbitrary data.
 
-%package -n ea-apache24-mod-log-forensic
-Provides: ea-apache24-mod_log_forensic
+%package -n ea-apache24-mod_log_forensic
 Group: System Environment/Daemons
 Summary: Forensic logging module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-log-forensic
+%description -n ea-apache24-mod_log_forensic
 The mod_log_forensic module provides for forensic logging of client
 requests. Logging is done before and after processing a request, so
 the forensic log contains two log lines for each request. The forensic
@@ -907,13 +860,12 @@ logger is very strict, which means:
 The check_forensic script may be helpful in evaluating the forensic
 log output.
 
-%package -n ea-apache24-mod-lua
-Provides: ea-apache24-mod_lua
+%package -n ea-apache24-mod_lua
 Group: System Environment/Daemons
 Summary: Lua language extension module for the Apache HTTP Server (NOT RECOMMENDED FOR SHARED SERVERS)
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-lua
+%description -n ea-apache24-mod_lua
 The mod_lua module allows the server to be extended with scripts
 written in the Lua programming language. The extension points (hooks)
 available with mod_lua include many of the hooks available to natively
@@ -921,87 +873,80 @@ compiled Apache HTTP Server modules, such as mapping requests to
 files, generating dynamic responses, access control, authentication,
 and authorization
 
-%package -n ea-apache24-mod-macro
-Provides: ea-apache24-mod_macro
+%package -n ea-apache24-mod_macro
 Group: System Environment/Daemons
 Summary: Configuration macro module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-macro
+%description -n ea-apache24-mod_macro
 The mod_macro module provides macros within Apache httpd runtime
 configuration files, to ease the process of creating numerous similar
 configuration blocks. When the server starts up, the macros are
 expanded using the provided parameters, and the result is processed as
 along with the rest of the configuration file.
 
-%package -n ea-apache24-mod-mime-magic
-Provides: ea-apache24-mod_mime_magic
+%package -n ea-apache24-mod_mime_magic
 Group: System Environment/Daemons
 Summary: MIME-type autosensing module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-mime-magic
+%description -n ea-apache24-mod_mime_magic
 The mod_mime_magic module determines the MIME type of files in the
 same way the Unix file(1) command works: it looks at the first few
 bytes of the file. It is intended as a "second line of defense" for
 cases that mod_mime cannot resolve.
 
-%package -n ea-apache24-mod-proxy
-Provides: ea-apache24-mod_proxy
+%package -n ea-apache24-mod_proxy
 Group: System Environment/Daemons
 Summary: Proxy server module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-proxy
+%description -n ea-apache24-mod_proxy
 The mod_proxy module implements a proxy/gateway for Apache HTTP
 Server, supporting a number of popular protocols as well as several
 different load balancing algorithms. Third-party modules can add
 support for additional protocols and load balancing algorithms.
 
-%package -n ea-apache24-mod-proxy-ajp
-Provides: ea-apache24-mod_proxy_ajp
+%package -n ea-apache24-mod_proxy_ajp
 Group: System Environment/Daemons
 Summary: Apache JServ Protocol 1.3 proxy module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-ajp
+%description -n ea-apache24-mod_proxy_ajp
 The mod_proxy_ajp module provides proxy support for the Apache JServ
 Protocol version 1.3.
 
-%package -n ea-apache24-mod-proxy-balancer
-Provides: ea-apache24-mod_proxy_balancer
+%package -n ea-apache24-mod_proxy_balancer
 Group: System Environment/Daemons
 Summary: Load-balancing module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 Requires: ea-apache24-lbmethod
 
-%description -n ea-apache24-mod-proxy-balancer
+%description -n ea-apache24-mod_proxy_balancer
 The mod_proxy_balancer module provides load balancing support for
 HTTP, FTP and AJP13 protocols.  Load balancing scheduler algorithms
 are not provided by this module but by the mod_lbmethod_* modules.
 
-%package -n ea-apache24-mod-proxy-connect
-Provides: ea-apache24-mod_proxy_connect
+%package -n ea-apache24-mod_proxy_connect
 Group: System Environment/Daemons
 Summary: CONNECT HTTP method proxy module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-connect
+%description -n ea-apache24-mod_proxy_connect
 The mod_proxy_connect module provides support for the CONNECT HTTP
 method. This method is mainly used to tunnel SSL requests through
 proxy servers.
 
-%package -n ea-apache24-mod-proxy-express
-Provides: ea-apache24-mod_proxy_express
+%package -n ea-apache24-mod_proxy_express
 Group: System Environment/Daemons
 Summary: Dynamic reverse-proxy module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-express
+%description -n ea-apache24-mod_proxy_express
 The mod_proxy_express module creates dynamically configured mass
 reverse proxies, by mapping the Host: header of the HTTP request to a
 server name and backend URL stored in a DBM file. This allows for easy
@@ -1011,14 +956,13 @@ also provides dynamic growth, but is intended to handle much, much
 larger numbers of backends. It is ideally suited as a front-end HTTP
 switch.
 
-%package -n ea-apache24-mod-proxy-fcgi
-Provides: ea-apache24-mod_proxy_fcgi
+%package -n ea-apache24-mod_proxy_fcgi
 Group: System Environment/Daemons
 Summary: FastCGI proxy module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-fcgi
+%description -n ea-apache24-mod_proxy_fcgi
 The mod_proxy_fcgi module provides support for the FastCGI
 protocol. Unlike mod_fcgid and mod_fastcgi, mod_proxy_fcgi has no
 provision for starting the application process; fcgistarter is
@@ -1026,14 +970,13 @@ provided (on some platforms) for that purpose. Alternatively, external
 launching or process management may be available in the FastCGI
 application framework in use.
 
-%package -n ea-apache24-mod-proxy-fdpass
-Provides: ea-apache24-mod_proxy_fdpass
+%package -n ea-apache24-mod_proxy_fdpass
 Group: System Environment/Daemons
 Summary: File descriptor-passing proxy module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-fdpass
+%description -n ea-apache24-mod_proxy_fdpass
 The mod_proxy_fdpass module provides support for the passing the
 socket of the client to another process.
 
@@ -1053,125 +996,115 @@ allocated struct cmsghdr. Future versions of this module may include
 more data after the client socket, but this is not implemented at this
 time.
 
-%package -n ea-apache24-mod-proxy-ftp
-Provides: ea-apache24-mod_proxy_ftp
+%package -n ea-apache24-mod_proxy_ftp
 Group: System Environment/Daemons
 Summary: FTP proxy module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-ftp
+%description -n ea-apache24-mod_proxy_ftp
 The mod_proxy_ftp module provides support for the proxying FTP
 sites. Note that FTP support is currently limited to the GET method.
 
-%package -n ea-apache24-mod-proxy-hcheck
-Provides: ea-apache24-mod_proxy_hcheck
+%package -n ea-apache24-mod_proxy_hcheck
 Group: System Environment/Daemons
 Summary: Dynamic health check of Balancer members (workers) for mod_proxy
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
-Requires: ea-apache24-mod-watchdog = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_watchdog = 0:%{version}-%{release}
 Conflicts: ea-apache24-mpm = forked
 
-%description -n ea-apache24-mod-proxy-hcheck
+%description -n ea-apache24-mod_proxy_hcheck
 The mod_proxy_hcheck module provides support for dynamic health checking of
 balancer members (workers).  This can be enabled on a worker-by-worker basis.
 The health check is done independently of the actual revers proxy requests.
 
-%package -n ea-apache24-mod-proxy-html
-Provides: ea-apache24-mod_proxy_html
+%package -n ea-apache24-mod_proxy_html
 Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 BuildRequires: ea-libxml2 ea-libxml2-devel
 Obsoletes: mod_proxy_html
 
-%description -n ea-apache24-mod-proxy-html
+%description -n ea-apache24-mod_proxy_html
 The mod_proxy_html and mod_xml2enc modules provide filters which can
 transform and modify HTML and XML content.
 
-%package -n ea-apache24-mod-proxy-http
-Provides: ea-apache24-mod_proxy_http
+%package -n ea-apache24-mod_proxy_http
 Group: System Environment/Daemons
 Summary: HTTP/HTTPS proxy module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-http
+%description -n ea-apache24-mod_proxy_http
 The mod_proxy_http module provides the features used for proxying HTTP
 and HTTPS requests. mod_proxy_http supports HTTP/0.9, HTTP/1.0 and
 HTTP/1.1. It does not provide any caching abilities. If you want to
 set up a caching proxy, you might want to use the additional service
 of the mod_cache module.
 
-%package -n ea-apache24-mod-proxy-scgi
-Provides: ea-apache24-mod_proxy_scgi
+%package -n ea-apache24-mod_proxy_scgi
 Group: System Environment/Daemons
 Summary: SCGI module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-scgi
+%description -n ea-apache24-mod_proxy_scgi
 The mod_proxy_scgi module provides support for the SCGI protocol,
 version 1.
 
-%package -n ea-apache24-mod-proxy-wstunnel
-Provides: ea-apache24-mod_proxy_wstunnel
+%package -n ea-apache24-mod_proxy_wstunnel
 Group: System Environment/Daemons
 Summary: Websockets proxy module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-wstunnel
+%description -n ea-apache24-mod_proxy_wstunnel
 The mod_proxy_wstunnel module provides support for the tunnelling of
 web socket connections to a backend websockets server. The connection
 is automagically upgraded to a websocket connection.
 
-%package -n ea-apache24-mod-proxy-uwsgi
-Provides: ea-apache24-mod_proxy_uwsgi
+%package -n ea-apache24-mod_proxy_uwsgi
 Group: System Environment/Daemons
 Summary: Websockets proxy module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-proxy = 0:%{version}-%{release}
+Requires: ea-apache24-mod_proxy = 0:%{version}-%{release}
 
-%description -n ea-apache24-mod-proxy-uwsgi
+%description -n ea-apache24-mod_proxy_uwsgi
 The uWSGI project provides application servers (for various programming languages and protocols
 like perl (PSGI), python (WSGI), ruby (Rack), Lua WSAPI, CGI, PHP, and Go ... to name a few),
 proxies, process managers and monitors.
 All implemented using a common api and a common configuration style.
 
-%package -n ea-apache24-mod-ratelimit
-Provides: ea-apache24-mod_ratelimit
+%package -n ea-apache24-mod_ratelimit
 Group: System Environment/Daemons
 Summary: Client bandwidth limiting module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-ratelimit
+%description -n ea-apache24-mod_ratelimit
 The mod_ratelimit module provides a filter named RATE_LIMIT to limit
 client bandwidth. The connection speed to be simulated is specified,
 in KiB/s, using the environment variable rate-limit.
 
-%package -n ea-apache24-mod-reflector
-Provides: ea-apache24-mod_reflector
+%package -n ea-apache24-mod_reflector
 Group: System Environment/Daemons
 Summary: Filter-as-service module for the Apache HTTP server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-reflector
+%description -n ea-apache24-mod_reflector
 The mod_reflector module allows request bodies to be reflected back to
 the client, in the process passing the request through the output
 filter stack. A suitably configured chain of filters can be used to
 transform the request into a response. This module can be used to turn
 an output filter into an HTTP service.
 
-%package -n ea-apache24-mod-remoteip
-Provides: ea-apache24-mod_remoteip
+%package -n ea-apache24-mod_remoteip
 Group: System Environment/Daemons
 Summary: IP replacement module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-remoteip
+%description -n ea-apache24-mod_remoteip
 The mod_remoteip module is used to treat the useragent which initiated
 the request as the originating useragent as identified by httpd for
 the purposes of authorization and logging, even where that useragent
@@ -1187,35 +1120,32 @@ mod_status, and is recorded by mod_log_config %a and core %a format
 strings. The underlying client IP of the connection is available in
 the %{c}a format string.
 
-%package -n ea-apache24-mod-reqtimeout
-Provides: ea-apache24-mod_reqtimeout
+%package -n ea-apache24-mod_reqtimeout
 Group: System Environment/Daemons
 Summary: Request timeout module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-reqtimeout
+%description -n ea-apache24-mod_reqtimeout
 The mod_reqtimeout module can set various timeouts for receiving the
 request headers and the request body from the client. If the client
 fails to send headers or body within the configured time, a 408
 REQUEST TIME OUT error is sent.
 
-%package -n ea-apache24-mod-request
-Provides: ea-apache24-mod_request
+%package -n ea-apache24-mod_request
 Group: System Environment/Daemons
 Summary: Request body retention module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-request
+%description -n ea-apache24-mod_request
 The mod_request module makes request bodies available to applications,
 where they may normally be discarded, i.e. during GET requests.
 
-%package -n ea-apache24-mod-sed
-Provides: ea-apache24-mod_sed
+%package -n ea-apache24-mod_sed
 Group: System Environment/Daemons
 Summary: Regex replacement content filter module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-sed
+%description -n ea-apache24-mod_sed
 The mod_sed module is an in-process content filter. The mod_sed filter
 implements the sed editing commands implemented by the Solaris 10 sed
 program as described in the manual page. However, unlike sed, mod_sed
@@ -1236,56 +1166,51 @@ Both the input and output filters only process the data if newline
 characters are seen in the content. At the end of the data, the rest
 of the data is treated as the last line.
 
-%package -n ea-apache24-mod-session
-Provides: ea-apache24-mod_session
+%package -n ea-apache24-mod_session
 Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
-Requires: ea-apache24-mod-request
+Requires: ea-apache24-mod_request
 Requires: ea-apr-util-openssl
 
-%description -n ea-apache24-mod-session
+%description -n ea-apache24-mod_session
 The mod_session module and associated backends provide an abstract
 interface for storing and accessing per-user session data.
 
-%package -n ea-apache24-mod-slotmem-plain
-Provides: ea-apache24-mod_slotmem_plain
+%package -n ea-apache24-mod_slotmem_plain
 Group: System Environment/Daemons
 Summary: Slot-based memory module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-slotmem-plain
+%description -n ea-apache24-mod_slotmem_plain
 The mod_slotmem_plain module provides for creation and access to a
 plain memory segment in which the datasets are organized in "slots."
 
-%package -n ea-apache24-mod-socache-memcache
-Provides: ea-apache24-mod_socache_memcache
+%package -n ea-apache24-mod_socache_memcache
 Group: System Environment/Daemons
 Summary: Memcache-based object cache module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-socache-memcache
+%description -n ea-apache24-mod_socache_memcache
 The mod_socache_memcache module is a shared object cache provider
 which provides for creation and access to a cache backed by the
 memcached high-performance, distributed memory object caching system.
 
-%package -n ea-apache24-mod-socache-redis
-Provides: ea-apache24-mod_socache_redis
+%package -n ea-apache24-mod_socache_redis
 Group: System Environment/Daemons
 Summary: shared object cache provider which provides access to a cache backed by Redis
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-socache-redis
+%description -n ea-apache24-mod_socache_redis
 mod_socache_redis is a shared object cache provider which provides for creation
 and access to a cache backed by the Redis high-performance, distributed memory object caching system.
 
-%package -n ea-apache24-mod-speling
-Provides: ea-apache24-mod_speling
+%package -n ea-apache24-mod_speling
 Group: System Environment/Daemons
 Summary: URL fallback module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-speling
+%description -n ea-apache24-mod_speling
 The mod_speling module addresses the problem that requests to
 documents sometimes cannot be served by the core apache server because
 the request was misspelled or miscapitalized.  mod_speling tries to
@@ -1296,8 +1221,7 @@ and allowing up to one misspelling (character insertion / omission /
 transposition or wrong character). A list is built with all document
 names which were matched using this strategy.
 
-%package -n ea-apache24-mod-ssl
-Provides: ea-apache24-mod_ssl
+%package -n ea-apache24-mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 %if 0%{?rhel} < 8
@@ -1314,89 +1238,82 @@ Requires(pre): ea-apache24
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl, mod_ssl
 
-%description -n ea-apache24-mod-ssl
+%description -n ea-apache24-mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
-%package -n ea-apache24-mod-substitute
-Provides: ea-apache24-mod_substitute
+%package -n ea-apache24-mod_substitute
 Group: System Environment/Daemons
 Summary: Response body substitution module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-substitute
+%description -n ea-apache24-mod_substitute
 The mod_substitute module provides a mechanism to perform both regular
 expression and fixed string substitutions on response bodies.
 
-%package -n ea-apache24-mod-suexec
-Provides: ea-apache24-mod_suexec
+%package -n ea-apache24-mod_suexec
 Group: System Environment/Daemons
 Summary: Per-user/group execution module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 Provides: ea-apache24-exec_code_asuser
 
-%description -n ea-apache24-mod-suexec
+%description -n ea-apache24-mod_suexec
 The mod_suexec module allows CGI scripts to run as a specified user
 and group.  The suexec support program is contained within the
 ea-apache24 package.
 
-%package -n ea-apache24-mod-unique-id
-Provides: ea-apache24-mod_unique_id
+%package -n ea-apache24-mod_unique_id
 Group: System Environment/Daemons
 Summary: Unique request identifier module for the Apache HTTP Server (causes noticeable performance degradation)
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-unique-id
+%description -n ea-apache24-mod_unique_id
 The mod_unique_id module provides a magic token for each request which
 is guaranteed to be unique across all requests under very specific
 conditions. The unique identifier is even unique across multiple
 machines in a properly configured cluster of machines. The environment
 variable UNIQUE_ID is set to the identifier for each request.
 
-%package -n ea-apache24-mod-usertrack
-Provides: ea-apache24-mod_usertrack
+%package -n ea-apache24-mod_usertrack
 Group: System Environment/Daemons
 Summary: Cookie tracking module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-usertrack
+%description -n ea-apache24-mod_usertrack
 The mod_usertrack module provides tracking of a users through websites
 via browser cookies.
 
-%package -n ea-apache24-mod-version
-Provides: ea-apache24-mod_version
+%package -n ea-apache24-mod_version
 Group: System Environment/Daemons
 Summary: Version comparing module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-version
+%description -n ea-apache24-mod_version
 The mod_version module is designed for the use in test suites and
 large networks which have to deal with different httpd versions and
 different configurations. It provides a new container -- <IfVersion>,
 which allows a flexible version checking including numeric comparisons
 and regular expressions.
 
-%package -n ea-apache24-mod-vhost-alias
-Provides: ea-apache24-mod_vhost_alias
+%package -n ea-apache24-mod_vhost_alias
 Group: System Environment/Daemons
 Summary: Dynamic mass virtual hosting module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-vhost-alias
+%description -n ea-apache24-mod_vhost_alias
 The mod_vhost_alias module creates dynamically configured virtual
 hosts, by allowing the IP address and/or the Host: header of the HTTP
 request to be used as part of the pathname to determine what files to
 serve. This allows for easy use of a huge number of virtual hosts with
 similar configurations.
 
-%package -n ea-apache24-mod-watchdog
-Provides: ea-apache24-mod_watchdog
+%package -n ea-apache24-mod_watchdog
 Group: System Environment/Daemons
 Summary: Periodic task module for the Apache HTTP Server
 Requires: ea-apache24 = 0:%{version}-%{release}, ea-apache24-mmn = %{mmnisa}
 
-%description -n ea-apache24-mod-watchdog
+%description -n ea-apache24-mod_watchdog
 The mod_watchdog module defines programmatic hooks for other modules
 to periodically run tasks. These modules can register handlers for
 mod_watchdog hooks.
@@ -2069,100 +1986,100 @@ rm -rf $RPM_BUILD_ROOT
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/apache2/conf.d/manual.conf
 
-%files -n ea-apache24-mod-mpm-event -f files.mpm_event
-%files -n ea-apache24-mod-mpm-prefork -f files.mpm_prefork
-%files -n ea-apache24-mod-mpm-worker -f files.mpm_worker
+%files -n ea-apache24-mod_mpm_event -f files.mpm_event
+%files -n ea-apache24-mod_mpm_prefork -f files.mpm_prefork
+%files -n ea-apache24-mod_mpm_worker -f files.mpm_worker
 
-%files -n ea-apache24-mod-cgi -f files.cgi
-%files -n ea-apache24-mod-cgid -f files.cgid
+%files -n ea-apache24-mod_cgi -f files.cgi
+%files -n ea-apache24-mod_cgid -f files.cgid
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/apache2/conf.d/cgid.conf
 
-%files -n ea-apache24-mod-allowmethods -f files.allowmethods
-%files -n ea-apache24-mod-asis -f files.asis
-%files -n ea-apache24-mod-auth-digest -f files.auth_digest
-%files -n ea-apache24-mod-authn-anon -f files.authn_anon
-%files -n ea-apache24-mod-authn-dbd -f files.authn_dbd
-%files -n ea-apache24-mod-authn-dbm -f files.authn_dbm
-%files -n ea-apache24-mod-authn-socache -f files.authn_socache
-%files -n ea-apache24-mod-authnz-ldap -f files.authnz_ldap
-%files -n ea-apache24-mod-authz-dbd -f files.authz_dbd
-%files -n ea-apache24-mod-authz-dbm -f files.authz_dbm
-%files -n ea-apache24-mod-authz-owner -f files.authz_owner
-%files -n ea-apache24-mod-brotli -f files.brotli
+%files -n ea-apache24-mod_allowmethods -f files.allowmethods
+%files -n ea-apache24-mod_asis -f files.asis
+%files -n ea-apache24-mod_auth_digest -f files.auth_digest
+%files -n ea-apache24-mod_authn_anon -f files.authn_anon
+%files -n ea-apache24-mod_authn_dbd -f files.authn_dbd
+%files -n ea-apache24-mod_authn_dbm -f files.authn_dbm
+%files -n ea-apache24-mod_authn_socache -f files.authn_socache
+%files -n ea-apache24-mod_authnz_ldap -f files.authnz_ldap
+%files -n ea-apache24-mod_authz_dbd -f files.authz_dbd
+%files -n ea-apache24-mod_authz_dbm -f files.authz_dbm
+%files -n ea-apache24-mod_authz_owner -f files.authz_owner
+%files -n ea-apache24-mod_brotli -f files.brotli
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/apache2/conf.d/brotli.conf
 
-%files -n ea-apache24-mod-buffer -f files.buffer
-%files -n ea-apache24-mod-cache -f files.cache
-%files -n ea-apache24-mod-cache-disk -f files.cache_disk
-%files -n ea-apache24-mod-cache-socache -f files.cache_socache
-%files -n ea-apache24-mod-charset-lite -f files.charset_lite
-%files -n ea-apache24-mod-data -f files.data
-%files -n ea-apache24-mod-dav -f files.dav
+%files -n ea-apache24-mod_buffer -f files.buffer
+%files -n ea-apache24-mod_cache -f files.cache
+%files -n ea-apache24-mod_cache_disk -f files.cache_disk
+%files -n ea-apache24-mod_cache_socache -f files.cache_socache
+%files -n ea-apache24-mod_charset_lite -f files.charset_lite
+%files -n ea-apache24-mod_data -f files.data
+%files -n ea-apache24-mod_dav -f files.dav
 %attr(0700,nobody,nobody) %dir %{_localstatedir}/lib/dav
-%files -n ea-apache24-mod-dav-fs -f files.dav_fs
-%files -n ea-apache24-mod-dav-lock -f files.dav_lock
-%files -n ea-apache24-mod-dbd -f files.dbd
-%files -n ea-apache24-mod-deflate -f files.deflate
-%files -n ea-apache24-mod-dialup -f files.dialup
-%files -n ea-apache24-mod-dumpio -f files.dumpio
-%files -n ea-apache24-mod-env -f files.env
-%files -n ea-apache24-mod-expires -f files.expires
-%files -n ea-apache24-mod-ext-filter -f files.ext_filter
-%files -n ea-apache24-mod-file-cache -f files.file_cache
-%files -n ea-apache24-mod-headers -f files.headers
-%files -n ea-apache24-mod-heartbeat -f files.heartbeat
-%files -n ea-apache24-mod-heartmonitor -f files.heartmonitor
-%files -n ea-apache24-mod-imagemap -f files.imagemap
-%files -n ea-apache24-mod-info -f files.info
-%files -n ea-apache24-mod-lbmethod-bybusyness -f files.lbmethod_bybusyness
-%files -n ea-apache24-mod-lbmethod-byrequests -f files.lbmethod_byrequests
-%files -n ea-apache24-mod-lbmethod-bytraffic -f files.lbmethod_bytraffic
-%files -n ea-apache24-mod-lbmethod-heartbeat -f files.lbmethod_heartbeat
-%files -n ea-apache24-mod-ldap -f files.ldap
-%files -n ea-apache24-mod-log-debug -f files.log_debug
-%files -n ea-apache24-mod-log-forensic -f files.log_forensic
+%files -n ea-apache24-mod_dav_fs -f files.dav_fs
+%files -n ea-apache24-mod_dav_lock -f files.dav_lock
+%files -n ea-apache24-mod_dbd -f files.dbd
+%files -n ea-apache24-mod_deflate -f files.deflate
+%files -n ea-apache24-mod_dialup -f files.dialup
+%files -n ea-apache24-mod_dumpio -f files.dumpio
+%files -n ea-apache24-mod_env -f files.env
+%files -n ea-apache24-mod_expires -f files.expires
+%files -n ea-apache24-mod_ext_filter -f files.ext_filter
+%files -n ea-apache24-mod_file_cache -f files.file_cache
+%files -n ea-apache24-mod_headers -f files.headers
+%files -n ea-apache24-mod_heartbeat -f files.heartbeat
+%files -n ea-apache24-mod_heartmonitor -f files.heartmonitor
+%files -n ea-apache24-mod_imagemap -f files.imagemap
+%files -n ea-apache24-mod_info -f files.info
+%files -n ea-apache24-mod_lbmethod_bybusyness -f files.lbmethod_bybusyness
+%files -n ea-apache24-mod_lbmethod_byrequests -f files.lbmethod_byrequests
+%files -n ea-apache24-mod_lbmethod_bytraffic -f files.lbmethod_bytraffic
+%files -n ea-apache24-mod_lbmethod_heartbeat -f files.lbmethod_heartbeat
+%files -n ea-apache24-mod_ldap -f files.ldap
+%files -n ea-apache24-mod_log_debug -f files.log_debug
+%files -n ea-apache24-mod_log_forensic -f files.log_forensic
 %attr(0755,root,root) %{_sbindir}/check_forensic
-%files -n ea-apache24-mod-lua -f files.lua
-%files -n ea-apache24-mod-macro -f files.macro
-%files -n ea-apache24-mod-mime-magic -f files.mime_magic
-%files -n ea-apache24-mod-proxy -f files.proxy
-%files -n ea-apache24-mod-proxy-ajp -f files.proxy_ajp
-%files -n ea-apache24-mod-proxy-balancer -f files.proxy_balancer
-%files -n ea-apache24-mod-proxy-connect -f files.proxy_connect
-%files -n ea-apache24-mod-proxy-express -f files.proxy_express
-%files -n ea-apache24-mod-proxy-fcgi -f files.proxy_fcgi
+%files -n ea-apache24-mod_lua -f files.lua
+%files -n ea-apache24-mod_macro -f files.macro
+%files -n ea-apache24-mod_mime_magic -f files.mime_magic
+%files -n ea-apache24-mod_proxy -f files.proxy
+%files -n ea-apache24-mod_proxy_ajp -f files.proxy_ajp
+%files -n ea-apache24-mod_proxy_balancer -f files.proxy_balancer
+%files -n ea-apache24-mod_proxy_connect -f files.proxy_connect
+%files -n ea-apache24-mod_proxy_express -f files.proxy_express
+%files -n ea-apache24-mod_proxy_fcgi -f files.proxy_fcgi
 %attr(0755,root,root) %{_sbindir}/fcgistarter
-%files -n ea-apache24-mod-proxy-fdpass -f files.proxy_fdpass
-%files -n ea-apache24-mod-proxy-ftp -f files.proxy_ftp
-%files -n ea-apache24-mod-proxy-hcheck -f files.proxy_hcheck
-%files -n ea-apache24-mod-proxy-html -f files.proxy_html
-%files -n ea-apache24-mod-proxy-http -f files.proxy_http
-%files -n ea-apache24-mod-proxy-scgi -f files.proxy_scgi
-%files -n ea-apache24-mod-proxy-wstunnel -f files.proxy_wstunnel
-%files -n ea-apache24-mod-proxy-uwsgi -f files.proxy_uwsgi
-%files -n ea-apache24-mod-ratelimit -f files.ratelimit
-%files -n ea-apache24-mod-reflector -f files.reflector
-%files -n ea-apache24-mod-remoteip -f files.remoteip
-%files -n ea-apache24-mod-reqtimeout -f files.reqtimeout
-%files -n ea-apache24-mod-request -f files.request
-%files -n ea-apache24-mod-sed -f files.sed
-%files -n ea-apache24-mod-session -f files.session
-%files -n ea-apache24-mod-slotmem-plain -f files.slotmem_plain
-%files -n ea-apache24-mod-socache-memcache -f files.socache_memcache
-%files -n ea-apache24-mod-socache-redis -f files.socache_redis
-%files -n ea-apache24-mod-speling -f files.speling
-%files -n ea-apache24-mod-ssl -f files.ssl
+%files -n ea-apache24-mod_proxy_fdpass -f files.proxy_fdpass
+%files -n ea-apache24-mod_proxy_ftp -f files.proxy_ftp
+%files -n ea-apache24-mod_proxy_hcheck -f files.proxy_hcheck
+%files -n ea-apache24-mod_proxy_html -f files.proxy_html
+%files -n ea-apache24-mod_proxy_http -f files.proxy_http
+%files -n ea-apache24-mod_proxy_scgi -f files.proxy_scgi
+%files -n ea-apache24-mod_proxy_wstunnel -f files.proxy_wstunnel
+%files -n ea-apache24-mod_proxy_uwsgi -f files.proxy_uwsgi
+%files -n ea-apache24-mod_ratelimit -f files.ratelimit
+%files -n ea-apache24-mod_reflector -f files.reflector
+%files -n ea-apache24-mod_remoteip -f files.remoteip
+%files -n ea-apache24-mod_reqtimeout -f files.reqtimeout
+%files -n ea-apache24-mod_request -f files.request
+%files -n ea-apache24-mod_sed -f files.sed
+%files -n ea-apache24-mod_session -f files.session
+%files -n ea-apache24-mod_slotmem_plain -f files.slotmem_plain
+%files -n ea-apache24-mod_socache_memcache -f files.socache_memcache
+%files -n ea-apache24-mod_socache_redis -f files.socache_redis
+%files -n ea-apache24-mod_speling -f files.speling
+%files -n ea-apache24-mod_ssl -f files.ssl
 %if %{with_http2}
-%files -n ea-apache24-mod-http2 -f files.http2
+%files -n ea-apache24-mod_http2 -f files.http2
 %endif
 %attr(0700,nobody,root) %dir %{_localstatedir}/cache/apache2/ssl
-%files -n ea-apache24-mod-substitute -f files.substitute
-%files -n ea-apache24-mod-suexec -f files.suexec
-%files -n ea-apache24-mod-unique-id -f files.unique_id
-%files -n ea-apache24-mod-usertrack -f files.usertrack
-%files -n ea-apache24-mod-version -f files.version
-%files -n ea-apache24-mod-vhost-alias -f files.vhost_alias
-%files -n ea-apache24-mod-watchdog -f files.watchdog
+%files -n ea-apache24-mod_substitute -f files.substitute
+%files -n ea-apache24-mod_suexec -f files.suexec
+%files -n ea-apache24-mod_unique_id -f files.unique_id
+%files -n ea-apache24-mod_usertrack -f files.usertrack
+%files -n ea-apache24-mod_version -f files.version
+%files -n ea-apache24-mod_vhost_alias -f files.vhost_alias
+%files -n ea-apache24-mod_watchdog -f files.watchdog
 
 %files devel
 %defattr(-,root,root)

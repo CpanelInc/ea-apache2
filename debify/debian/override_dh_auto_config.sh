@@ -53,13 +53,13 @@ export LDFLAGS="-Wl,-z,relro,-z,now"
 export LYNX_PATH=/usr/bin/links
 # Build the daemon
 ./configure \
-    --prefix=$_sysconfdir/apache2 \
+    --prefix=/etc/apache2 \
     --exec-prefix=$_prefix \
     --bindir=$_bindir \
     --sbindir=$_sbindir \
     --mandir=$_mandir \
     --libdir=$_libdir \
-    --sysconfdir=$_sysconfdir/apache2/conf \
+    --sysconfdir=/etc/apache2/conf \
     --includedir=$_includedir/apache2 \
     --libexecdir=$_libdir/apache2/modules \
     --datadir=$contentdir \
@@ -71,7 +71,7 @@ export LYNX_PATH=/usr/bin/links
     --enable-suexec-capabilities \
     --with-suexec-caller=$suexec_caller \
     --with-suexec-docroot=/ \
-    --with-suexec-logfile=$_sysconfdir/apache2/logs/suexec_log \
+    --with-suexec-logfile=/etc/apache2/logs/suexec_log \
     --with-suexec-bin=$_sbindir/suexec \
     --with-suexec-uidmin=100 --with-suexec-gidmin=100 \
     --enable-pie \
