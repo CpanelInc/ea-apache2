@@ -29,10 +29,10 @@ index 5ff937b..c55252e 100644
              if (found) {
                  *status = alias->redir_status;
 diff --git a/server/core.c b/server/core.c
-index e0e981f..33fcc2d 100644
+index 9aa69fb..9b8e9e5 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -4900,8 +4900,9 @@ static int default_handler(request_rec *r)
+@@ -5007,8 +5007,9 @@ static int default_handler(request_rec *r)
                  return HTTP_NOT_FOUND;
              }
  
