@@ -1,0 +1,21 @@
+{
+    "source_tarball_regex": "httpd-",
+    "add_to_build_requires": [
+        "libcap2-bin",
+        "apt-file",
+        "libxml2-dev",
+        "ea-apr-util",
+        "ea-apr"
+    ],
+    "vars" : {
+        "RPM_OPT_FLAGS": "-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic",
+        "__perl": "/usr/bin/perl",
+        "ea_apr_name": "ea-apr16",
+        "ea_apr_dir": "/opt/cpanel/ea-apr16",
+        "ea_apu_dir": "/opt/cpanel/ea-apr16",
+        "vmmn": "",
+        "ea_apr_config": "/opt/cpanel/ea-apr16/bin/apr-1-config",
+        "_localstatedir": "/var",
+        "_scl_root": ""
+    }
+}
