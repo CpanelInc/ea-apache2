@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.48
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -2092,6 +2092,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Jun 02 2021 Cory McIntire <cory@cpanel.net> - 2.4.48-2
+- EA-9822: rollback systemd change
+
 * Wed May 26 2021 Cory McIntire <cory@cpanel.net> - 2.4.48-1
 - EA-9797: Update ea-apache2 from v2.4.46 to v2.4.48
 
