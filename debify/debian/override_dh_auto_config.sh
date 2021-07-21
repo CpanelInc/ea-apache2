@@ -22,8 +22,8 @@ echo "RPM_OPT_FLAGS :$RPM_OPT_FLAGS:"
 echo "RPM_BUILD_ROOT :$DEB_INSTALL_ROOT:"
 echo "RPM_SOURCE_DIR :$RPM_SOURCE_DIR:"
 # Patch in the vendor string and the release string
-sed -i '/^#define PLATFORM/s/Unix/$vstring/' os/unix/os.h
-sed -i 's/@RELEASE@/$release/' server/core.c
+sed -i "/^#define PLATFORM/s/Unix/$vstring/" os/unix/os.h
+sed -i "s/@RELEASE@/$release/" server/core.c
 # Prevent use of setcap in "install-suexec-caps" target.
 sed -i '/suexec/s,setcap ,echo Skipping setcap for ,' Makefile.in
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
@@ -33,7 +33,7 @@ if test "x${vmmn}" != "x$mmn"; then
    : Update the mmn macro and rebuild.
    exit 1
 fi
-: Building with MMN $mmn, MMN-ISA $mmnisa and vendor string '$vstring'
+: Building with MMN $mmn, MMN-ISA $mmnisa and vendor string $vstring
 echo "RPM_FLAGS BUILD"
 echo "RPM_OPT_FLAGS :$RPM_OPT_FLAGS:" 
 echo "RPM_BUILD_ROOT :$DEB_INSTALL_ROOT:"
