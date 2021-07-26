@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Make sure /etc/apache2 is not already there, as a symlink
+if [ -L /etc/apache2 ] ; then
+  rm -f /etc/apache2
+fi
