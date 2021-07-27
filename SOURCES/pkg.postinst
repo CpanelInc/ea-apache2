@@ -3,7 +3,7 @@
 if test -x "/usr/bin/apt"; then
     # we must manually set permissions on apt/deb based system because deb’s have no mechanism for permission.
     chown root:nobody /usr/sbin/suexec
-    chmod 4750 /usr/sbin/suexec
+    chmod 4755 /usr/sbin/suexec
 fi
 
 # We do not START these services here because we
