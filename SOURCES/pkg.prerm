@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# %systemd_preun httpd.service htcacheclean.service
+# https://fossies.org/linux/systemd/src/rpm/macros.systemd.in#l_57
+
+# Package removal, not upgrade
+if [[ "$1" == "0" || "$1" == "remove" ]]; then
+    # do not do --now if !-d /run/systemd/system? YAGNI
+    /bin/systemctl --no-reload disable --now httpd.service htcacheclean.service
+fi
