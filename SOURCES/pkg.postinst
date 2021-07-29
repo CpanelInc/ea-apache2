@@ -10,3 +10,10 @@ fi
 # We do not START these services here because we
 #   depend on the universal hook to do that for us.
 /bin/systemctl enable httpd.service >/dev/null 2>&1
+
+chmod 644 /etc/apache2/logs/suexec_log
+chown root:nobody /etc/apache2/logs/suexec_log
+
+# just in case they doof the symlink:
+chmod 644 /var/log/apache2/suexec_log
+chown root:nobody /var/log/apache2/suexec_log
