@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.48
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -52,6 +52,11 @@ Source41: htcacheclean.sysconf
 # Systemd service file
 Source42: httpd.service
 Source45: htcacheclean.service
+
+# Common pre/post scripts
+Source46: pkg.preinst
+Source47: pkg.postinst
+Source48: pkg.prerm
 
 # build/scripts patches
 Patch1: 0001-Apachectl-additions-and-options.patch
@@ -1805,16 +1810,11 @@ rm -vf \
 rm -rf $RPM_BUILD_ROOT/etc/apache2/conf/{original,extra}
 
 %pre
-# Make sure /etc/apache2 is not already there, as a symlink
-if [ -L /etc/apache2 ] ; then
-  rm -f /etc/apache2
-fi
+%include %{SOURCE46}
 
 %post
 %if 0%{?rhel} >= 7
-# NOTE: Can't use %%systemd_post here cause this service is not covered by the centos presets.
-# Additionally, We do not START these services here cause we depend on the yum hook to do that for us.
-/bin/systemctl enable httpd.service >/dev/null 2>&1 || :
+%include %{SOURCE47}
 %else
 # Register the httpd service
 /sbin/chkconfig --add httpd
@@ -1823,7 +1823,7 @@ fi
 
 %preun
 %if 0%{?rhel} >= 7
-%systemd_preun httpd.service htcacheclean.service
+%include %{SOURCE48}
 %else
 if [ $1 = 0 ]; then
         /sbin/service httpd stop > /dev/null 2>&1
@@ -1833,10 +1833,8 @@ if [ $1 = 0 ]; then
 fi
 %endif
 
-%if 0%{?rhel} >= 7
-%postun
-%systemd_postun
-%endif
+# no need for %systemd_postun in %postun when 0%{?rhel} >= 7
+# because it is a noop: https://fossies.org/linux/systemd/src/rpm/macros.systemd.in#l_77
 
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
@@ -2093,6 +2091,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Jul 26 2021 Daniel Muey <dan@cpanel.net> - 2.4.48-4
+- ZC-9091: Manage the `httpd` service via scripts shared w/ debs
+
 * Tue Jun 22 2021 Travis Holloway <t.holloway@cpanel.net> - 2.4.48-3
 - EA-9895: Ensure httpd is configured to start after reboot on chkconfig systems
 
