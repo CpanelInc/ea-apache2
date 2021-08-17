@@ -16,7 +16,7 @@ index 07c9912..2fed8a4 100644
  if [ "$LYNX" = "none" ]; then
     echo "The 'links' package is required for this functionality."
 +   echo "To use this feature, the typical way to add solve this would be to:"
-+   echo "dnf config-manager --set-enabled PowerTools"
++   echo "dnf config-manager --set-enabled powertools || dnf config-manager --set-enabled PowerTools"
 +   echo "dnf -y install elinks"
     exit 8
  fi
