@@ -24,6 +24,6 @@
         "_scl_root": ""
     },
     "remove_from_specific_install": {
-        "ea-apache24-mod-http2": [ "conf\\.d\\/http2\\.conf" ]
+        "ea-apache24": [ "conf\\.d\\/http2\\.conf" ]
     }
 }
