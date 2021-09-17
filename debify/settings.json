@@ -25,5 +25,8 @@
     },
     "remove_from_specific_install": {
         "ea-apache24": [ "conf\\.d\\/http2\\.conf" ]
+    },
+    "add_to_conflicts": {
+        "ea-apache24-mod-http2": [ "ea-apache24-mod-mpm-prefork" ]
     }
 }
