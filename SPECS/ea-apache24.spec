@@ -26,7 +26,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.49
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1771,7 +1771,6 @@ EOF
     	cat > files.${mod} <<EOF
 %attr(755,root,root) %{_libdir}/apache2/modules/mod_${mod}.so
 %config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.modules.d/${modname}
-%config(noreplace) %attr(644,root,root) %{_sysconfdir}/apache2/conf.d/http2.conf
 EOF
     else
         cat > files.${mod} <<EOF
@@ -2100,6 +2099,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Sep 28 2021 Daniel Muey <dan@cpanel.net> - 2.4.49-4
+- ZC-9300: ensure only one package owns http2.conf
+
 * Tue Sep 28 2021 Cory McIntire <cory@cpanel.net> - 2.4.49-3
 - EA-10152: Patch from upstream
 
