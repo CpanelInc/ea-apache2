@@ -11,7 +11,7 @@ Subject: [PATCH 14/20] Add SymlinkProtect and SymlinkProtectRoot functionality
  4 files changed, 135 insertions(+), 10 deletions(-)
 
 diff --git a/include/http_core.h b/include/http_core.h
-index 110c9eb..0fb1802 100644
+index 15c9bac..43594fe 100644
 --- a/include/http_core.h
 +++ b/include/http_core.h
 @@ -508,7 +508,7 @@ typedef unsigned long etag_components_t;
@@ -140,7 +140,7 @@ index 2aff834..fa229b1 100644
  	"..\..\include\http_request.h"\
  	"..\..\include\httpd.h"\
 diff --git a/server/core.c b/server/core.c
-index e94d65e..0ac567d 100644
+index ac3ae29..aa22538 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -21,6 +21,8 @@
@@ -160,7 +160,7 @@ index e94d65e..0ac567d 100644
          conf->access_name = DEFAULT_ACCESS_FNAME;
  
          /* A mapping only makes sense in the global context */
-@@ -528,6 +531,9 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
+@@ -530,6 +533,9 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
      if (virt->ap_document_root)
          conf->ap_document_root = virt->ap_document_root;
  
@@ -170,7 +170,7 @@ index e94d65e..0ac567d 100644
      if (virt->access_name)
          conf->access_name = virt->access_name;
  
-@@ -574,6 +580,10 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
+@@ -576,6 +582,10 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
                             ? virt->merge_trailers
                             : base->merge_trailers;
  
@@ -181,7 +181,7 @@ index e94d65e..0ac567d 100644
      conf->protocols = ((virt->protocols->nelts > 0)? 
                         virt->protocols : base->protocols);
      conf->protocols_honor_order = ((virt->protocols_honor_order < 0)?
-@@ -4400,6 +4410,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
+@@ -4408,6 +4418,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
      return NULL;
  }
  
@@ -212,7 +212,7 @@ index e94d65e..0ac567d 100644
  /* Note --- ErrorDocument will now work from .htaccess files.
   * The AllowOverride of Fileinfo allows webmasters to turn it off
   */
-@@ -4674,6 +4708,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
+@@ -4685,6 +4719,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
  AP_INIT_TAKE1("EnableExceptionHook", ap_mpm_set_exception_hook, NULL, RSRC_CONF,
                "Controls whether exception hook may be called after a crash"),
  #endif
@@ -223,7 +223,7 @@ index e94d65e..0ac567d 100644
  AP_INIT_TAKE1("TraceEnable", set_trace_enable, NULL, RSRC_CONF,
                "'on' (default), 'off' or 'extended' to trace request body content"),
  AP_INIT_FLAG("MergeTrailers", set_merge_trailers, NULL, RSRC_CONF,
-@@ -4839,6 +4877,9 @@ static int default_handler(request_rec *r)
+@@ -4850,6 +4888,9 @@ static int default_handler(request_rec *r)
      int errstatus;
      apr_file_t *fd = NULL;
      apr_status_t status;
@@ -233,7 +233,7 @@ index e94d65e..0ac567d 100644
      /* XXX if/when somebody writes a content-md5 filter we either need to
       *     remove this support or coordinate when to use the filter vs.
       *     when to use this code
-@@ -4849,6 +4890,13 @@ static int default_handler(request_rec *r)
+@@ -4860,6 +4901,13 @@ static int default_handler(request_rec *r)
      int bld_content_md5;
  
      d = (core_dir_config *)ap_get_core_module_config(r->per_dir_config);
@@ -247,7 +247,7 @@ index e94d65e..0ac567d 100644
      bld_content_md5 = (d->content_md5 == AP_CONTENT_MD5_ON)
                        && r->output_filters->frec->ftype != AP_FTYPE_RESOURCE;
  
-@@ -4922,6 +4970,61 @@ static int default_handler(request_rec *r)
+@@ -4933,6 +4981,61 @@ static int default_handler(request_rec *r)
              return HTTP_FORBIDDEN;
          }
  

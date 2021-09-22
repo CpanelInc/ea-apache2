@@ -109,10 +109,10 @@ index be889db..fc9010c 100644
  
  /*****************************************************************
 diff --git a/server/core.c b/server/core.c
-index 9b8e9e5..6060e5a 100644
+index 3972425..7c5c82d 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -2790,47 +2790,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
+@@ -2798,47 +2798,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
  
  static module *find_module(server_rec *s, const char *name)
  {
