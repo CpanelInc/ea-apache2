@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.49
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -95,6 +95,8 @@ Patch601: 0018-Optimize-finding-a-module.-ap_find_linked_module-was.patch
 Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 
 Patch801: 0020-Add-instructions-to-install-elinks.patch
+
+Patch901: 0021-Correctly-decrement-active_daemons-also-in-the-case-.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1356,6 +1358,8 @@ mod_watchdog hooks.
 %patch801 -p1 -b .instructaboutelinks
 %endif
 
+%patch901 -p1 -b .activedaemonsevent
+
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -2091,6 +2095,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Sep 23 2021 Travis Holloway <t.holloway@cpanel.net> - 2.4.49-2
+- EA-10123: Patch apache 2.4.49: Correctly decrement active_daemons also in the case that the child process decides on its own to die because of MaxRequestsPerChild.
+
 * Thu Sep 16 2021 Cory McIntire <cory@cpanel.net> - 2.4.49-1
 - EA-10107: Update ea-apache2 from v2.4.48 to v2.4.49
 
