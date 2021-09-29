@@ -1,3 +1,5 @@
+%define debug_package %{nil}
+
 %define contentdir %{_datadir}/apache2
 %define docroot /var/www
 %define suexec_caller nobody
@@ -24,7 +26,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.49
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -97,6 +99,8 @@ Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 Patch801: 0020-Add-instructions-to-install-elinks.patch
 
 Patch901: 0021-Correctly-decrement-active_daemons-also-in-the-case-.patch
+
+Patch902: 0022-new-patch-for-server_util.c.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1359,6 +1363,7 @@ mod_watchdog hooks.
 %endif
 
 %patch901 -p1 -b .activedaemonsevent
+%patch902 -p1 -b .serverutilpatch
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -2095,6 +2100,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Sep 28 2021 Cory McIntire <cory@cpanel.net> - 2.4.49-3
+- EA-10152: Patch from upstream
+
 * Thu Sep 23 2021 Travis Holloway <t.holloway@cpanel.net> - 2.4.49-2
 - EA-10123: Patch apache 2.4.49: Correctly decrement active_daemons also in the case that the child process decides on its own to die because of MaxRequestsPerChild.
 
