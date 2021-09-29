@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Tue, 28 Sep 2021 22:20:53 +0000
-Subject: [PATCH 22/22] new patch for server_util.c
+Subject: [PATCH 22/22] AP_NORMALIZE_DECODE_UNRESERVED should normalize the second encoded dot.
 
 ---
  server/util.c | 20 +++++++++++++++-----
@@ -18,7 +18,7 @@ index 2a7fdda..896574b 100644
 -    apr_size_t l = 1, w = 1;
 +    apr_size_t l = 1, w = 1, n;
 +    int decode_unreserved = (flags & AP_NORMALIZE_DECODE_UNRESERVED) != 0;
- 
+
      if (!IS_SLASH(path[0])) {
          /* Besides "OPTIONS *", a request-target should start with '/'
 @@ -529,7 +530,7 @@ AP_DECLARE(int) ap_normalize_path(char *path, unsigned int flags)
@@ -33,7 +33,7 @@ index 2a7fdda..896574b 100644
 @@ -567,8 +568,17 @@ AP_DECLARE(int) ap_normalize_path(char *path, unsigned int flags)
                      continue;
                  }
- 
+
 -                /* Remove /xx/../ segments */
 -                if (path[l + 1] == '.' && IS_SLASH_OR_NUL(path[l + 2])) {
 +                /* Remove /xx/../ segments (or /xx/.%2e/ when
@@ -52,7 +52,7 @@ index 2a7fdda..896574b 100644
                          do {
 @@ -585,7 +595,7 @@ AP_DECLARE(int) ap_normalize_path(char *path, unsigned int flags)
                      }
- 
+
                      /* Move l forward to the next segment */
 -                    l += 2;
 +                    l = n + 1;
