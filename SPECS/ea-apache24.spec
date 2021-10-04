@@ -24,9 +24,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.49
+Version: 2.4.50
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 4
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -97,10 +97,6 @@ Patch601: 0018-Optimize-finding-a-module.-ap_find_linked_module-was.patch
 Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 
 Patch801: 0020-Add-instructions-to-install-elinks.patch
-
-Patch901: 0021-Correctly-decrement-active_daemons-also-in-the-case-.patch
-
-Patch902: 0022-new-patch-for-server_util.c.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1362,9 +1358,6 @@ mod_watchdog hooks.
 %patch801 -p1 -b .instructaboutelinks
 %endif
 
-%patch901 -p1 -b .activedaemonsevent
-%patch902 -p1 -b .serverutilpatch
-
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -2099,6 +2092,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Oct 04 2021 Cory McIntire <cory@cpanel.net> - 2.4.50-1
+- EA-10157: Update ea-apache2 from v2.4.49 to v2.4.50
+
 * Tue Sep 28 2021 Daniel Muey <dan@cpanel.net> - 2.4.49-4
 - ZC-9300: ensure only one package owns http2.conf
 

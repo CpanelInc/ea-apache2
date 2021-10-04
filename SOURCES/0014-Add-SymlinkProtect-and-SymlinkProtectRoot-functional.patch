@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:50:51 -0500
-Subject: [PATCH 14/22] Add SymlinkProtect and SymlinkProtectRoot functionality
+Subject: [PATCH 14/20] Add SymlinkProtect and SymlinkProtectRoot functionality
 
 ---
  include/http_core.h             |  10 +++-
@@ -140,7 +140,7 @@ index 2aff834..fa229b1 100644
  	"..\..\include\http_request.h"\
  	"..\..\include\httpd.h"\
 diff --git a/server/core.c b/server/core.c
-index ac3ae29..aa22538 100644
+index 6cd8e81..c318c61 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -21,6 +21,8 @@
