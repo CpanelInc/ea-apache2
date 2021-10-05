@@ -57,7 +57,7 @@ Source45: htcacheclean.service
 
 # Common pre/post scripts
 Source46: pkg.preinst
-Source47: pkg.postinst
+Source47: pkg.ea-apache24.postinst
 Source48: pkg.prerm
 
 # build/scripts patches
