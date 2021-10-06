@@ -12,6 +12,9 @@
             "links"
         ]
     },
+    "install_directories" : {
+        "ea-apache24" : { "/var/log/apache2" : { "mode" : "0711" } }
+    },
     "vars" : {
         "RPM_OPT_FLAGS": "-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic",
         "__perl": "/usr/bin/perl",
@@ -22,5 +25,11 @@
         "ea_apr_config": "/opt/cpanel/ea-apr16/bin/apr-1-config",
         "_localstatedir": "/var",
         "_scl_root": ""
+    },
+    "remove_from_specific_install": {
+        "ea-apache24-mod-http2": [ "etc/apache2/conf\\.d/http2\\.conf" ]
+    },
+    "add_to_conflicts": {
+        "ea-apache24-mod-http2": [ "ea-apache24-mod-mpm-prefork" ]
     }
 }

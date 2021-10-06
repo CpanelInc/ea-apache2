@@ -82,6 +82,10 @@ set -x
 # Clean Document Root
 rm -v $DEB_INSTALL_ROOT$docroot/html/*.html \
       $DEB_INSTALL_ROOT$docroot/cgi-bin/*
+mkdir -p $DEB_INSTALL_ROOT/etc/apache2
+mkdir $DEB_INSTALL_ROOT/var/log/apache2
+chmod 711 $DEB_INSTALL_ROOT/var/log/apache2
+
 # Symlink for the powered-by-$DISTRO image:
 ln -s ../noindex/images/poweredby.png \
         $DEB_INSTALL_ROOT$contentdir/icons/poweredby.png
@@ -89,9 +93,10 @@ ln -s ../noindex/images/poweredby.png \
 ln -s ../..$_localstatedir/log/apache2 $DEB_INSTALL_ROOT/etc/apache2/logs
 ln -s ../..$_localstatedir/run/apache2 $DEB_INSTALL_ROOT/etc/apache2/run
 ln -s ../..$_libdir/apache2/modules $DEB_INSTALL_ROOT/etc/apache2/modules
-mkdir -p $DEB_INSTALL_ROOT/etc/apache2/logs
-touch $DEB_INSTALL_ROOT/etc/apache2/logs/suexec_log
 touch $DEB_INSTALL_ROOT/var/log/apache2/suexec_log
+chmod 644 $DEB_INSTALL_ROOT/var/log/apache2/suexec_log
+chown root:nobody $DEB_INSTALL_ROOT/var/log/apache2/suexec_log
+
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/apache2/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/mime.types|/etc/mime.types|" \
