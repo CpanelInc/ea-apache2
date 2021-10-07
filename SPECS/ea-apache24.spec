@@ -22,7 +22,7 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.50
+Version: 2.4.51
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -2090,6 +2090,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Oct 07 2021 Cory McIntire <cory@cpanel.net> - 2.4.51-1
+- EA-10179: Update ea-apache2 from v2.4.50 to v2.4.51
+
 * Mon Oct 04 2021 Cory McIntire <cory@cpanel.net> - 2.4.50-1
 - EA-10157: Update ea-apache2 from v2.4.49 to v2.4.50
 
