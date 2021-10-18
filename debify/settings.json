@@ -24,6 +24,8 @@
         "vmmn": "",
         "ea_apr_config": "/opt/cpanel/ea-apr16/bin/apr-1-config",
         "_localstatedir": "/var",
+        "a": "%a",
+        "c": "%{c}",
         "_scl_root": ""
     },
     "remove_from_specific_install": {
