@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:21:51 -0500
-Subject: [PATCH 05/21] Add SELinux support
+Subject: [PATCH 05/20] Add SELinux support
 
 ---
  configure.in  |  5 +++++
@@ -9,7 +9,7 @@ Subject: [PATCH 05/21] Add SELinux support
  2 files changed, 31 insertions(+)
 
 diff --git a/configure.in b/configure.in
-index c6f2cc1..eef0f20 100644
+index 081940c..917493f 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -484,6 +484,11 @@ getloadavg
