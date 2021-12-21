@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.51
+Version: 2.4.52
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -95,8 +95,6 @@ Patch601: 0018-Optimize-finding-a-module.-ap_find_linked_module-was.patch
 Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 
 Patch801: 0020-Add-instructions-to-install-elinks.patch
-
-Patch901: 0021-Patch-mod_http2-to-fix-issue-with-hanging-http2-thre.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1358,8 +1356,6 @@ mod_watchdog hooks.
 %patch801 -p1 -b .instructaboutelinks
 %endif
 
-%patch901 -p1 -b .fixmodhttp2
-
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -2094,6 +2090,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Dec 20 2021 Travis Holloway <t.holloway@cpanel.net> - 2.4.52-1
+- EA-10370: Update ea-apache2 from v2.4.51 to v2.4.52
+
 * Tue Nov 23 2021 Tim Mullin <tim@cpanel.net> - 2.4.51-2
 - EA-10258: Patch mod_http2 to fix issue with hanging http2 threads
 
