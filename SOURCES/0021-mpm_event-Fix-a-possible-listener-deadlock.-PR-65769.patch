@@ -1,0 +1,111 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yann Ylavic <ylavic.dev@gmail.com>
+Date: Wed, 29 Dec 2021 13:12:44 +0000
+Subject: [PATCH 21/21] mpm_event: Fix a possible listener deadlock.  PR 65769.
+
+When the listener starts accepting more connections than the number of workers
+already started (due to scheduling), the listening sockets gets disabled (per
+AH03269) but nothing was re-enabling them before the end of the connections,
+despite the creation of more idle/available workers in the meantime.
+In the wost case there is no idle worker when the listener accepts the first
+connection thus nothing to wake up the listener blocked in poll() with no
+socket, hence a deadlock.
+
+Fix this by waking up the listener when a worker becomes idle and this unblocks
+connections_above_limit(). This is also worthwhile when all the workers are
+started (fully initialized runtime) since the number of idle workers is a
+condition for connections_above_limit() anyway so the sooner the listeners are
+re-enabled the better (the other condition is the number of connections which
+is unblocked appropriately by decrement_connection_count() already).
+
+Also when a child exists with ps->quiescing == 1 and it's caught by
+server_main_loop() before perform_idle_server_maintenance(), active_daemons was
+not decrement as needed (including accross restarts), leading to an invalid
+active_daemons accounting.
+
+* server/mpm/event/event.c(should_enable_listensocks):
+  New helper that returns whether listenning sockets can be poll()ed again.
+
+* server/mpm/event/event.c(decrement_connection_count, listener_thread):
+  Use should_enable_listensocks() where previously open-coded.
+
+* server/mpm/event/event.c(worker_thread):
+  Wake up the listener when is_idle => 1 and should_enable_listensocks().
+  Have a single point of exit when workers_may_exit to make sure that the
+  wake always occurs (even when exiting).
+
+* server/mpm/event/event.c(server_main_loop):
+  Decrement active_daemons not only when !ps->quiescing but also when
+  ps->quiescing == 1, i.e. all the cases not handled by
+  perform_idle_server_maintenance() already.
+---
+ server/mpm/event/event.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/server/mpm/event/event.c b/server/mpm/event/event.c
+index a54f76a..6eabcf5 100644
+--- a/server/mpm/event/event.c
++++ b/server/mpm/event/event.c
+@@ -528,6 +528,11 @@ static APR_INLINE int connections_above_limit(int *busy)
+     return 1;
+ }
+ 
++static APR_INLINE int should_enable_listensocks(void)
++{
++    return !dying && listeners_disabled() && !connections_above_limit(NULL);
++}
++
+ static void close_socket_nonblocking_(apr_socket_t *csd,
+                                       const char *from, int line)
+ {
+@@ -774,7 +779,7 @@ static apr_status_t decrement_connection_count(void *cs_)
+     is_last_connection = !apr_atomic_dec32(&connection_count);
+     if (listener_is_wakeable
+             && ((is_last_connection && listener_may_exit)
+-                || (listeners_disabled() && !connections_above_limit(NULL)))) {
++                || should_enable_listensocks())) {
+         apr_pollset_wakeup(event_pollset);
+     }
+     if (dying) {
+@@ -2002,9 +2007,7 @@ do_maintenance:
+             }
+         }
+ 
+-        if (listeners_disabled()
+-                && !workers_were_busy
+-                && !connections_above_limit(NULL)) {
++        if (!workers_were_busy && should_enable_listensocks()) {
+             enable_listensocks();
+         }
+     } /* listener main loop */
+@@ -2066,7 +2069,7 @@ static void *APR_THREAD_FUNC worker_thread(apr_thread_t * thd, void *dummy)
+     ap_update_child_status_from_indexes(process_slot, thread_slot,
+                                         SERVER_STARTING, NULL);
+ 
+-    while (!workers_may_exit) {
++    for (;;) {
+         apr_socket_t *csd = NULL;
+         event_conn_state_t *cs;
+         timer_event_t *te = NULL;
+@@ -2081,6 +2084,12 @@ static void *APR_THREAD_FUNC worker_thread(apr_thread_t * thd, void *dummy)
+                 signal_threads(ST_GRACEFUL);
+                 break;
+             }
++            /* A new idler may have changed connections_above_limit(),
++             * let the listener know and decide.
++             */
++            if (listener_is_wakeable && should_enable_listensocks()) {
++                apr_pollset_wakeup(event_pollset);
++            }
+             is_idle = 1;
+         }
+ 
+@@ -3045,7 +3054,7 @@ static void server_main_loop(int remaining_children_to_start)
+ 
+                 event_note_child_killed(child_slot, 0, 0);
+                 ps = &ap_scoreboard_image->parent[child_slot];
+-                if (!ps->quiescing)
++                if (ps->quiescing != 2)
+                     retained->active_daemons--;
+                 ps->quiescing = 0;
+                 /* NOTE: We don't dec in the (child_slot < 0) case! */

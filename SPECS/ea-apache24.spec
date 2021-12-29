@@ -96,7 +96,7 @@ Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 
 Patch801: 0020-Add-instructions-to-install-elinks.patch
 
-Patch901: 0021-Active-daemons-accounting-fix-plus-idle-worker-wakin.patch
+Patch901: 0021-mpm_event-Fix-a-possible-listener-deadlock.-PR-65769.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1358,7 +1358,7 @@ mod_watchdog hooks.
 %patch801 -p1 -b .instructaboutelinks
 %endif
 
-%patch901 -p1 -b .activedaemonsplusidleworker
+%patch901 -p1 -b .mpmeventfixdeadlock
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -2094,7 +2094,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
-* Tue Dec 28 2021 Tim Mullin <tim@cpanel.net> - 2.4.52-2
+* Tue Dec 29 2021 Tim Mullin <tim@cpanel.net> - 2.4.52-2
 - EA-10391: Add patch to fix instability issues with Apache v2.4.52
 
 * Mon Dec 20 2021 Travis Holloway <t.holloway@cpanel.net> - 2.4.52-1
