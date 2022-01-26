@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.52
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -97,6 +97,8 @@ Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 Patch801: 0020-Add-instructions-to-install-elinks.patch
 
 Patch901: 0021-mpm_event-Fix-a-possible-listener-deadlock.-PR-65769.patch
+
+Patch902: 0022-Change-Accept-mutex-from-DEBUG-to-INFO-so-techs-can-.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1359,6 +1361,7 @@ mod_watchdog hooks.
 %endif
 
 %patch901 -p1 -b .mpmeventfixdeadlock
+%patch902 -p1 -b .changeacceptmutexloglevel
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -2094,6 +2097,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Jan 26 2022 Travis Holloway <t.holloway@cpanel.net> - 2.4.52-3
+- EA-10245: Add patch to change log level of accept mutex
+
 * Tue Dec 29 2021 Tim Mullin <tim@cpanel.net> - 2.4.52-2
 - EA-10391: Add patch to fix instability issues with Apache v2.4.52
 
