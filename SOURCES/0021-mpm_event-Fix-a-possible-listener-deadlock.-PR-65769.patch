@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Yann Ylavic <ylavic.dev@gmail.com>
 Date: Wed, 29 Dec 2021 13:12:44 +0000
-Subject: [PATCH 21/21] mpm_event: Fix a possible listener deadlock.  PR 65769.
+Subject: [PATCH 21/22] mpm_event: Fix a possible listener deadlock. PR 65769.
 
 When the listener starts accepting more connections than the number of workers
 already started (due to scheduling), the listening sockets gets disabled (per
