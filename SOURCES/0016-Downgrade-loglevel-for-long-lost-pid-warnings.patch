@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:52:51 -0500
-Subject: [PATCH 16/22] Downgrade loglevel for long lost pid warnings
+Subject: [PATCH 16/21] Downgrade loglevel for long lost pid warnings
 
 ---
  server/mpm/event/event.c     | 2 +-
@@ -10,10 +10,10 @@ Subject: [PATCH 16/22] Downgrade loglevel for long lost pid warnings
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/server/mpm/event/event.c b/server/mpm/event/event.c
-index c2d53ff..a54f76a 100644
+index 5b1604d..6ed53b9 100644
 --- a/server/mpm/event/event.c
 +++ b/server/mpm/event/event.c
-@@ -3073,7 +3073,7 @@ static void server_main_loop(int remaining_children_to_start)
+@@ -3097,7 +3097,7 @@ static void server_main_loop(int remaining_children_to_start)
                  /* Great, we've probably just lost a slot in the
                   * scoreboard.  Somehow we don't know about this child.
                   */
@@ -23,10 +23,10 @@ index c2d53ff..a54f76a 100644
                               "long lost child came home! (pid %ld)",
                               (long) pid.pid);
 diff --git a/server/mpm/prefork/prefork.c b/server/mpm/prefork/prefork.c
-index 0bdfd5a..6c033d8 100644
+index b5adb57..057472e 100644
 --- a/server/mpm/prefork/prefork.c
 +++ b/server/mpm/prefork/prefork.c
-@@ -1025,7 +1025,7 @@ static int prefork_run(apr_pool_t *_pconf, apr_pool_t *plog, server_rec *s)
+@@ -1042,7 +1042,7 @@ static int prefork_run(apr_pool_t *_pconf, apr_pool_t *plog, server_rec *s)
                   * scoreboard.  Somehow we don't know about this
                   * child.
                   */
@@ -36,10 +36,10 @@ index 0bdfd5a..6c033d8 100644
                              "long lost child came home! (pid %ld)", (long)pid.pid);
              }
 diff --git a/server/mpm/worker/worker.c b/server/mpm/worker/worker.c
-index 5cf8ead..2cf7f7d 100644
+index 7e3a554..decc771 100644
 --- a/server/mpm/worker/worker.c
 +++ b/server/mpm/worker/worker.c
-@@ -1661,7 +1661,7 @@ static void server_main_loop(int remaining_children_to_start)
+@@ -1676,7 +1676,7 @@ static void server_main_loop(int remaining_children_to_start)
                  /* Great, we've probably just lost a slot in the
                   * scoreboard.  Somehow we don't know about this child.
                   */

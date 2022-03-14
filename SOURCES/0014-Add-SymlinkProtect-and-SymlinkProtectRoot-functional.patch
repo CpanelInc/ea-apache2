@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:50:51 -0500
-Subject: [PATCH 14/22] Add SymlinkProtect and SymlinkProtectRoot functionality
+Subject: [PATCH 14/21] Add SymlinkProtect and SymlinkProtectRoot functionality
 
 ---
  include/http_core.h             |  10 +++-
@@ -140,7 +140,7 @@ index 2aff834..fa229b1 100644
  	"..\..\include\http_request.h"\
  	"..\..\include\httpd.h"\
 diff --git a/server/core.c b/server/core.c
-index 6cd8e81..c318c61 100644
+index 8fef5fd..405d754 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -21,6 +21,8 @@
@@ -152,7 +152,7 @@ index 6cd8e81..c318c61 100644
  
  #include "apr_version.h"
  #if APR_MAJOR_VERSION < 2
-@@ -471,6 +473,7 @@ static void *create_core_server_config(apr_pool_t *a, server_rec *s)
+@@ -473,6 +475,7 @@ static void *create_core_server_config(apr_pool_t *a, server_rec *s)
  
      if (!is_virtual) {
          conf->ap_document_root = DOCUMENT_LOCATION;
@@ -160,7 +160,7 @@ index 6cd8e81..c318c61 100644
          conf->access_name = DEFAULT_ACCESS_FNAME;
  
          /* A mapping only makes sense in the global context */
-@@ -530,6 +533,9 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
+@@ -532,6 +535,9 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
      if (virt->ap_document_root)
          conf->ap_document_root = virt->ap_document_root;
  
@@ -170,7 +170,7 @@ index 6cd8e81..c318c61 100644
      if (virt->access_name)
          conf->access_name = virt->access_name;
  
-@@ -576,6 +582,10 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
+@@ -578,6 +584,10 @@ static void *merge_core_server_configs(apr_pool_t *p, void *basev, void *virtv)
                             ? virt->merge_trailers
                             : base->merge_trailers;
  
@@ -181,7 +181,7 @@ index 6cd8e81..c318c61 100644
      conf->protocols = ((virt->protocols->nelts > 0)? 
                         virt->protocols : base->protocols);
      conf->protocols_honor_order = ((virt->protocols_honor_order < 0)?
-@@ -4408,6 +4418,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
+@@ -4417,6 +4427,30 @@ static const char *set_merge_trailers(cmd_parms *cmd, void *dummy, int arg)
      return NULL;
  }
  
@@ -212,7 +212,7 @@ index 6cd8e81..c318c61 100644
  /* Note --- ErrorDocument will now work from .htaccess files.
   * The AllowOverride of Fileinfo allows webmasters to turn it off
   */
-@@ -4685,6 +4719,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
+@@ -4694,6 +4728,10 @@ AP_INIT_TAKE1("ThreadStackSize", ap_mpm_set_thread_stacksize, NULL, RSRC_CONF,
  AP_INIT_TAKE1("EnableExceptionHook", ap_mpm_set_exception_hook, NULL, RSRC_CONF,
                "Controls whether exception hook may be called after a crash"),
  #endif
@@ -223,7 +223,7 @@ index 6cd8e81..c318c61 100644
  AP_INIT_TAKE1("TraceEnable", set_trace_enable, NULL, RSRC_CONF,
                "'on' (default), 'off' or 'extended' to trace request body content"),
  AP_INIT_FLAG("MergeTrailers", set_merge_trailers, NULL, RSRC_CONF,
-@@ -4850,6 +4888,9 @@ static int default_handler(request_rec *r)
+@@ -4859,6 +4897,9 @@ static int default_handler(request_rec *r)
      int errstatus;
      apr_file_t *fd = NULL;
      apr_status_t status;
@@ -233,7 +233,7 @@ index 6cd8e81..c318c61 100644
      /* XXX if/when somebody writes a content-md5 filter we either need to
       *     remove this support or coordinate when to use the filter vs.
       *     when to use this code
-@@ -4860,6 +4901,13 @@ static int default_handler(request_rec *r)
+@@ -4869,6 +4910,13 @@ static int default_handler(request_rec *r)
      int bld_content_md5;
  
      d = (core_dir_config *)ap_get_core_module_config(r->per_dir_config);
@@ -247,7 +247,7 @@ index 6cd8e81..c318c61 100644
      bld_content_md5 = (d->content_md5 == AP_CONTENT_MD5_ON)
                        && r->output_filters->frec->ftype != AP_FTYPE_RESOURCE;
  
-@@ -4933,6 +4981,61 @@ static int default_handler(request_rec *r)
+@@ -4942,6 +4990,61 @@ static int default_handler(request_rec *r)
              return HTTP_FORBIDDEN;
          }
  

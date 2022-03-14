@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:21:51 -0500
-Subject: [PATCH 05/22] Add SELinux support
+Subject: [PATCH 05/21] Add SELinux support
 
 ---
  configure.in  |  5 +++++
@@ -9,10 +9,10 @@ Subject: [PATCH 05/22] Add SELinux support
  2 files changed, 31 insertions(+)
 
 diff --git a/configure.in b/configure.in
-index 081940c..917493f 100644
+index 1bcfac9..52e1331 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -484,6 +484,11 @@ getloadavg
+@@ -507,6 +507,11 @@ getloadavg
  dnl confirm that a void pointer is large enough to store a long integer
  APACHE_CHECK_VOID_PTR_LEN
  
@@ -25,7 +25,7 @@ index 081940c..917493f 100644
  [AC_TRY_RUN(#define _GNU_SOURCE
  #include <unistd.h>
 diff --git a/server/core.c b/server/core.c
-index b2381d3..6cd8e81 100644
+index 3020090..8fef5fd 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -65,6 +65,10 @@
@@ -39,7 +39,7 @@ index b2381d3..6cd8e81 100644
  /* LimitRequestBody handling */
  #define AP_LIMIT_REQ_BODY_UNSET         ((apr_off_t) -1)
  #define AP_DEFAULT_LIMIT_REQ_BODY       ((apr_off_t) 0)
-@@ -5117,6 +5121,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+@@ -5126,6 +5130,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
  #endif
  
