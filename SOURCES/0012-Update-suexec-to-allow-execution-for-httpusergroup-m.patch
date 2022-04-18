@@ -9,7 +9,7 @@ Subject: [PATCH 12/21] Update suexec to allow execution for httpusergroup
  1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index b356b8c..be1b671 100644
+index 803981c..89ac7de 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
 @@ -267,6 +267,25 @@ static void clean_env(void)
@@ -46,7 +46,7 @@ index b356b8c..be1b671 100644
      char *actual_uname;     /* actual user name          */
      char *actual_gname;     /* actual group name         */
      char *cmd;              /* command to be executed    */
-@@ -482,6 +502,7 @@ int main(int argc, char *argv[])
+@@ -481,6 +501,7 @@ int main(int argc, char *argv[])
      uid = pw->pw_uid;
      actual_uname = strdup(pw->pw_name);
      target_homedir = strdup(pw->pw_dir);
@@ -54,7 +54,7 @@ index b356b8c..be1b671 100644
      if (actual_uname == NULL || target_homedir == NULL) {
          log_err("failed to alloc memory\n");
          exit(126);
-@@ -514,6 +535,14 @@ int main(int argc, char *argv[])
+@@ -513,6 +534,14 @@ int main(int argc, char *argv[])
          exit(108);
      }
  
@@ -69,7 +69,7 @@ index b356b8c..be1b671 100644
      /*
       * Change UID/GID here so that the following tests work over NFS.
       *
-@@ -643,9 +672,9 @@ int main(int argc, char *argv[])
+@@ -642,9 +671,9 @@ int main(int argc, char *argv[])
       * the name/group of the cwd or the program.
       */
      if ((uid != dir_info.st_uid) ||
