@@ -9,7 +9,7 @@ Subject: [PATCH 10/21] Update suexec to allow "trusted scripts"
  2 files changed, 43 insertions(+), 3 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index eb2d38a..3a1b8a4 100644
+index eb2d38a..85a6651 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
 @@ -146,11 +146,11 @@ static const char *const safe_env_lst[] =
@@ -39,9 +39,9 @@ index eb2d38a..3a1b8a4 100644
 +            (SUEXEC_TRUSTED_GROUP != prg_info.st_gid) ||
 +            ((strncmp(cwd, "/usr/local/cpanel/cgi-sys", 25) != 0) &&
 +             (strncmp(cwd, "/usr/local/bandmin", 18) != 0) )) {
-+            log_err("error: target uid/gid (%ld/%ld) mismatch "
-+                    "with directory (%ld/%ld) or program (%ld/%ld) "
-+                    "or trusted user (%d/%d)\n",
++            log_err("error: target uid/gid (%u/%u) mismatch "
++                    "with directory (%u/%u) or program (%u/%u) "
++                    "or trusted user (%u/%u)\n",
 +                    uid, gid,
 +                    dir_info.st_uid, dir_info.st_gid,
 +                    prg_info.st_uid, prg_info.st_gid,
