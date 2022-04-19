@@ -4,11 +4,11 @@ Date: Thu, 12 Jul 2018 15:45:12 -0500
 Subject: [PATCH 11/21] Update suexec to work with cPanel Mailman installations
 
 ---
- support/suexec.c | 74 +++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 60 insertions(+), 14 deletions(-)
+ support/suexec.c | 77 ++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 61 insertions(+), 16 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index 3a1b8a4..b356b8c 100644
+index 85a6651..803981c 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
 @@ -270,8 +270,11 @@ static void clean_env(void)
@@ -23,15 +23,7 @@ index 3a1b8a4..b356b8c 100644
      char *target_uname;     /* target user name          */
      char *target_gname;     /* target group name         */
      char *target_homedir;   /* target home directory     */
-@@ -284,6 +287,7 @@ int main(int argc, char *argv[])
-     struct group *gr;       /* group entry holder        */
-     struct stat dir_info;   /* directory info holder     */
-     struct stat prg_info;   /* program info holder       */
-+    char *cpanel_mailman_patch_ver = "CPANEL_MAILMAN_SUEXEC_PATCH_VERSION_2.0_END";
- 
-     /*
-      * Start with a "clean" environment
-@@ -294,7 +298,8 @@ int main(int argc, char *argv[])
+@@ -294,7 +297,8 @@ int main(int argc, char *argv[])
       * Check existence/validity of the UID of the user
       * running this program.  Error out if invalid.
       */
@@ -41,7 +33,7 @@ index 3a1b8a4..b356b8c 100644
      if ((pw = getpwuid(uid)) == NULL) {
          log_err("crit: invalid uid: (%lu)\n", (unsigned long)uid);
          exit(102);
-@@ -393,6 +398,20 @@ int main(int argc, char *argv[])
+@@ -393,6 +397,20 @@ int main(int argc, char *argv[])
          userdir = 1;
      }
  
@@ -62,7 +54,25 @@ index 3a1b8a4..b356b8c 100644
      /*
       * Error out if the target username is invalid.
       */
-@@ -501,19 +520,36 @@ int main(int argc, char *argv[])
+@@ -482,7 +500,7 @@ int main(int argc, char *argv[])
+      * a UID less than AP_UID_MIN.  Tsk tsk.
+      */
+     if ((uid == 0) || (uid < AP_UID_MIN)) {
+-        log_err("cannot run as forbidden uid (%lu/%s)\n", (unsigned long)uid, cmd);
++        log_err("cannot run as forbidden uid (%u/%s)\n", uid, cmd);
+         exit(107);
+     }
+ 
+@@ -491,7 +509,7 @@ int main(int argc, char *argv[])
+      * or as a GID less than AP_GID_MIN.  Tsk tsk.
+      */
+     if ((gid == 0) || (gid < AP_GID_MIN)) {
+-        log_err("cannot run as forbidden gid (%lu/%s)\n", (unsigned long)gid, cmd);
++        log_err("cannot run as forbidden gid (%u/%s)\n", gid, cmd);
+         exit(108);
+     }
+ 
+@@ -501,19 +519,36 @@ int main(int argc, char *argv[])
       * Initialize the group access list for the target user,
       * and setgid() to the target group. If unsuccessful, error out.
       */
@@ -77,12 +87,12 @@ index 3a1b8a4..b356b8c 100644
 +         * for the mailman user, but we want to run as the webserver user.
 +         */
 +        if (((setgid(httpgid)) != 0) || (initgroups(AP_HTTPD_USER, httpgid) != 0)) {
-+            log_err("failed to setgid (%ld: %s)\n", httpgid, cmd);
++            log_err("failed to setgid (%u: %s)\n", httpgid, cmd);
 +            exit(109);
 +        }
 +
 +        if ((setuid(httpuid)) != 0) {
-+            log_err("failed to setuid (%ld: %s)\n", uid, cmd);
++            log_err("failed to setuid (%u: %s)\n", uid, cmd);
 +            exit(110);
 +        }
      }
@@ -96,7 +106,7 @@ index 3a1b8a4..b356b8c 100644
 -                (unsigned long)uid, cmd, strerror(errno));
 -        exit(110);
 +        if (((setgid(gid)) != 0) || (initgroups(actual_uname, gid) != 0)) {
-+            log_err("failed to setgid (%ld: %s)\n", gid, cmd);
++            log_err("failed to setgid (%u: %s)\n", gid, cmd);
 +            exit(109);
 +        }
 +
@@ -104,13 +114,13 @@ index 3a1b8a4..b356b8c 100644
 +         * setuid() to the target user.  Error out on fail.
 +         */
 +        if ((setuid(uid)) != 0) {
-+            log_err("failed to setuid (%ld: %s)\n", uid, cmd);
++            log_err("failed to setuid (%u: %s)\n", uid, cmd);
 +            exit(110);
 +        }
      }
  
      /*
-@@ -563,7 +599,7 @@ int main(int argc, char *argv[])
+@@ -563,7 +598,7 @@ int main(int argc, char *argv[])
      /*
       * Error out if cwd is writable by others.
       */
@@ -119,7 +129,7 @@ index 3a1b8a4..b356b8c 100644
          log_err("directory is writable by others: (%s)\n", cwd);
          exit(116);
      }
-@@ -586,12 +622,22 @@ int main(int argc, char *argv[])
+@@ -586,12 +621,22 @@ int main(int argc, char *argv[])
  
      /*
       * Error out if the file is setuid or setgid.
