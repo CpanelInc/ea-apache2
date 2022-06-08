@@ -10,10 +10,10 @@ Subject: [PATCH 16/21] Downgrade loglevel for long lost pid warnings
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/server/mpm/event/event.c b/server/mpm/event/event.c
-index 5b1604d..6ed53b9 100644
+index 3672f44..f5b8751 100644
 --- a/server/mpm/event/event.c
 +++ b/server/mpm/event/event.c
-@@ -3097,7 +3097,7 @@ static void server_main_loop(int remaining_children_to_start)
+@@ -3129,7 +3129,7 @@ static void server_main_loop(int remaining_children_to_start)
                  /* Great, we've probably just lost a slot in the
                   * scoreboard.  Somehow we don't know about this child.
                   */
@@ -36,10 +36,10 @@ index b5adb57..057472e 100644
                              "long lost child came home! (pid %ld)", (long)pid.pid);
              }
 diff --git a/server/mpm/worker/worker.c b/server/mpm/worker/worker.c
-index 7e3a554..decc771 100644
+index 0907db3..258ba30 100644
 --- a/server/mpm/worker/worker.c
 +++ b/server/mpm/worker/worker.c
-@@ -1676,7 +1676,7 @@ static void server_main_loop(int remaining_children_to_start)
+@@ -1677,7 +1677,7 @@ static void server_main_loop(int remaining_children_to_start)
                  /* Great, we've probably just lost a slot in the
                   * scoreboard.  Somehow we don't know about this child.
                   */
