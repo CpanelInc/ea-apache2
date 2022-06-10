@@ -32,10 +32,10 @@ index 057472e..ed9ed3b 100644
                  (all_buckets[0].mutex)
                      ? apr_proc_mutex_name(all_buckets[0].mutex)
 diff --git a/server/mpm/worker/worker.c b/server/mpm/worker/worker.c
-index decc771..47fcbef 100644
+index 258ba30..749f9f0 100644
 --- a/server/mpm/worker/worker.c
 +++ b/server/mpm/worker/worker.c
-@@ -1777,7 +1777,7 @@ static int worker_run(apr_pool_t *_pconf, apr_pool_t *plog, server_rec *s)
+@@ -1797,7 +1797,7 @@ static int worker_run(apr_pool_t *_pconf, apr_pool_t *plog, server_rec *s)
                  "Server built: %s", ap_get_server_built());
      ap_log_command_line(plog, s);
      ap_log_mpm_common(s);
