@@ -9,10 +9,10 @@ Subject: [PATCH 08/21] BUG: r1556473 Avoid additional checks for
  1 file changed, 2 insertions(+), 13 deletions(-)
 
 diff --git a/modules/ssl/ssl_engine_config.c b/modules/ssl/ssl_engine_config.c
-index 0a59afd..81ae86d 100644
+index 7e95025..1f90559 100644
 --- a/modules/ssl/ssl_engine_config.c
 +++ b/modules/ssl/ssl_engine_config.c
-@@ -838,20 +838,9 @@ const char *ssl_cmd_SSLCompression(cmd_parms *cmd, void *dcfg, int flag)
+@@ -835,20 +835,9 @@ const char *ssl_cmd_SSLCompression(cmd_parms *cmd, void *dcfg, int flag)
  #ifndef SSL_OP_NO_COMPRESSION
      const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
      if (err)

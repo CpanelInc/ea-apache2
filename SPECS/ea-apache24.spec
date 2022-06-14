@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.53
+Version: 2.4.54
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -2094,6 +2094,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Jun 08 2022 Tim Mullin <tim@cpanel.net> - 2.4.54-1
+- EA-10756: Update ea-apache2 from v2.4.53 to v2.4.54
+  CVE-2022-26377: mod_proxy_ajp: Possible request smuggling
+  CVE-2022-28330: Read beyond bounds in mod_isapi
+  CVE-2022-28614: Read beyond bounds via ap_rwrite()
+  CVE-2022-28615: Read beyond bounds in ap_strcmp_match()
+  CVE-2022-29404: Denial of service in mod_lua r:parsebody
+  CVE-2022-30522: mod_sed: Denial of service
+  CVE-2022-30556: Information Disclosure in mod_lua with websockets
+  CVE-2022-31813: mod_proxy X-Forwarded-For dropped by hop-by-hop mechanism
+
 * Mon Apr 18 2022 Tim Mullin <tim@cpanel.net> - 2.4.53-2
 - EA-10538: Fix compiler warnings in suexec.c
 
