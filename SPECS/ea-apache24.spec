@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.54
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1792,7 +1792,7 @@ cat files.access_compat files.actions files.alias files.auth_basic \
   files.autoindex files.dir files.filter files.include \
   files.log_config files.logio files.mime files.negotiation \
   files.rewrite files.setenvif files.slotmem_shm files.socache_dbm \
-  files.socache_shmcb files.socache_redis files.status files.unixd \
+  files.socache_shmcb files.status files.unixd \
   files.userdir > files.httpd
 
 %if 0%{?rhel} >= 7
@@ -2094,6 +2094,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Jul 26 2022 Tim Mullin <tim@cpanel.net> - 2.4.54-2
+- EA-10825: Fix file ownership for ea-apache24-mod_socache_redis
+
 * Wed Jun 08 2022 Tim Mullin <tim@cpanel.net> - 2.4.54-1
 - EA-10756: Update ea-apache2 from v2.4.53 to v2.4.54
   CVE-2022-26377: mod_proxy_ajp: Possible request smuggling
