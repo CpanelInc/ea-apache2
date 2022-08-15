@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if test -x "/usr/bin/apt"; then
+
+    dpkg-maintscript-helper rm_conffile /etc/apache2/conf.modules.d/425_mod_socache_redis.conf 2.4.54-2~ -- "$@"
+fi
