@@ -5,6 +5,8 @@ if test -x "/usr/bin/apt"; then
     chown root:nobody /usr/sbin/suexec
     chmod 4755 /usr/sbin/suexec
     setcap cap_setgid,cap_setuid+ep /usr/sbin/suexec
+
+    dpkg-maintscript-helper rm_conffile /etc/apache2/conf.modules.d/425_mod_socache_redis.conf 2.4.54-2~ -- "$@"
 fi
 
 # We do not START these services here because we

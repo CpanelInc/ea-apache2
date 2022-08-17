@@ -239,7 +239,7 @@ cat files.access_compat files.actions files.alias files.auth_basic \
   files.autoindex files.dir files.filter files.include \
   files.log_config files.logio files.mime files.negotiation \
   files.rewrite files.setenvif files.slotmem_shm files.socache_dbm \
-  files.socache_shmcb files.socache_redis files.status files.unixd \
+  files.socache_shmcb files.status files.unixd \
   files.userdir > files.httpd
 cat files.systemd >> files.httpd
 # Remove unpackaged files
