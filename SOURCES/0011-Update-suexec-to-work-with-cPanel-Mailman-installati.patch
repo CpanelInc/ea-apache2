@@ -8,7 +8,7 @@ Subject: [PATCH 11/21] Update suexec to work with cPanel Mailman installations
  1 file changed, 61 insertions(+), 16 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index 85a6651..803981c 100644
+index 9c6a674..ab200fb 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
 @@ -270,8 +270,11 @@ static void clean_env(void)
