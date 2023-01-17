@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.54
+Version: 2.4.55
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -2094,6 +2094,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Jan 17 2023 Cory McIntire <cory@cpanel.net> - 2.4.55-1
+- EA-11157: Update ea-apache2 from v2.4.54 to v2.4.55
+
 * Tue Jul 26 2022 Tim Mullin <tim@cpanel.net> - 2.4.54-2
 - EA-10825: Fix file ownership for ea-apache24-mod_socache_redis
 
