@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Gary Stanley <gary@cpanel.net>
 Date: Sun, 31 Oct 2021 00:45:27 +0000
-Subject: [PATCH 21/21] Change "Accept mutex:" from DEBUG to INFO so techs can
+Subject: [PATCH 21/22] Change "Accept mutex:" from DEBUG to INFO so techs can
  help debug servers with apache issues, such as what was described in EA-8508
 
 Before, you needed to configure loglevel to DEBUG to see this message;
@@ -32,7 +32,7 @@ index 057472e..ed9ed3b 100644
                  (all_buckets[0].mutex)
                      ? apr_proc_mutex_name(all_buckets[0].mutex)
 diff --git a/server/mpm/worker/worker.c b/server/mpm/worker/worker.c
-index 258ba30..749f9f0 100644
+index 6355d9c..81e5f36 100644
 --- a/server/mpm/worker/worker.c
 +++ b/server/mpm/worker/worker.c
 @@ -1797,7 +1797,7 @@ static int worker_run(apr_pool_t *_pconf, apr_pool_t *plog, server_rec *s)

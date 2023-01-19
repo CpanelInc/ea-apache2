@@ -22,7 +22,7 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.54
+Version: 2.4.55
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
@@ -97,6 +97,9 @@ Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 Patch801: 0020-Add-instructions-to-install-elinks.patch
 
 Patch902: 0021-Change-Accept-mutex-from-DEBUG-to-INFO-so-techs-can-.patch
+
+# Fix 500 errors for 2.4.55
+Patch950: 0022-mod_http2-client-resets-of-HTTP-2-streams-led-to-unw.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1360,6 +1363,8 @@ mod_watchdog hooks.
 
 %patch902 -p1 -b .changeacceptmutexloglevel
 
+%patch950 -p1 -b .mod_http2_500_errors
+
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -2094,6 +2099,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Jan 19 2023 Tim Mullin <tim@cpanel.net> - 2.4.55-2
+- EA-11167: Patch to fix sporadic 500 errors with 2.4.55
+
+* Tue Jan 17 2023 Cory McIntire <cory@cpanel.net> - 2.4.55-1
+- EA-11157: Update ea-apache2 from v2.4.54 to v2.4.55
+- CVE-2022-37436: Apache HTTP Server: mod_proxy prior to 2.4.55 allows a backend to trigger HTTP response splitting
+- CVE-2022-36760: Apache HTTP Server: mod_proxy_ajp Possible request smuggling
+- CVE-2006-20001: Apache HTTP Server: mod_dav out of  bounds read, or write of zero byte
+
 * Tue Jul 26 2022 Tim Mullin <tim@cpanel.net> - 2.4.54-2
 - EA-10825: Fix file ownership for ea-apache24-mod_socache_redis
 

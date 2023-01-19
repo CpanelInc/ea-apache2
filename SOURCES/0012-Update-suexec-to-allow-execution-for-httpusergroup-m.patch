@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:46:51 -0500
-Subject: [PATCH 12/21] Update suexec to allow execution for httpusergroup
+Subject: [PATCH 12/22] Update suexec to allow execution for httpusergroup
  members
 
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 12/21] Update suexec to allow execution for httpusergroup
  1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/support/suexec.c b/support/suexec.c
-index 803981c..89ac7de 100644
+index ab200fb..04e6a08 100644
 --- a/support/suexec.c
 +++ b/support/suexec.c
 @@ -267,6 +267,25 @@ static void clean_env(void)

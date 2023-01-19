@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:52:51 -0500
-Subject: [PATCH 16/21] Downgrade loglevel for long lost pid warnings
+Subject: [PATCH 16/22] Downgrade loglevel for long lost pid warnings
 
 ---
  server/mpm/event/event.c     | 2 +-
@@ -36,7 +36,7 @@ index b5adb57..057472e 100644
                              "long lost child came home! (pid %ld)", (long)pid.pid);
              }
 diff --git a/server/mpm/worker/worker.c b/server/mpm/worker/worker.c
-index 0907db3..258ba30 100644
+index 7b572bd..6355d9c 100644
 --- a/server/mpm/worker/worker.c
 +++ b/server/mpm/worker/worker.c
 @@ -1677,7 +1677,7 @@ static void server_main_loop(int remaining_children_to_start)
