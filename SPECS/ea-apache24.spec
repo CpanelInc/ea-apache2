@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.55
+Version: 2.4.56
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -97,9 +97,6 @@ Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 Patch801: 0020-Add-instructions-to-install-elinks.patch
 
 Patch902: 0021-Change-Accept-mutex-from-DEBUG-to-INFO-so-techs-can-.patch
-
-# Fix 500 errors for 2.4.55
-Patch950: 0022-mod_http2-client-resets-of-HTTP-2-streams-led-to-unw.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1363,8 +1360,6 @@ mod_watchdog hooks.
 
 %patch902 -p1 -b .changeacceptmutexloglevel
 
-%patch950 -p1 -b .mod_http2_500_errors
-
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -2099,6 +2094,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Mar 07 2023 Tim Mullin <tim@cpanel.net> - 2.4.56-1
+- EA-11284: Update ea-apache2 from v2.4.55 to v2.4.56
+- CVE-2023-27522: Apache HTTP Server: mod_proxy_uwsgi HTTP response splitting
+- CVE-2023-25690: HTTP request splitting with mod_rewrite and mod_proxy
+
 * Thu Jan 19 2023 Tim Mullin <tim@cpanel.net> - 2.4.55-2
 - EA-11167: Patch to fix sporadic 500 errors with 2.4.55
 
