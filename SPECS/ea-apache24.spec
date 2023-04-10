@@ -22,7 +22,7 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.56
+Version: 2.4.57
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -2094,6 +2094,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Apr 07 2023 Cory McIntire <cory@cpanel.net> - 2.4.57-1
+- EA-11337: Update ea-apache2 from v2.4.56 to v2.4.57
+
 * Tue Mar 07 2023 Tim Mullin <tim@cpanel.net> - 2.4.56-1
 - EA-11284: Update ea-apache2 from v2.4.55 to v2.4.56
 - CVE-2023-27522: Apache HTTP Server: mod_proxy_uwsgi HTTP response splitting
