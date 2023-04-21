@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.57
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1857,20 +1857,20 @@ if [ -f %{sslkey} -o -f %{sslcert} ]; then
    exit 0
 fi
 
+%if 0%{?rhel} < 8
+    export OPENSSL_BIN=/opt/cpanel/ea-openssl11/bin/openssl
+%else
+    export OPENSSL_BIN=/usr/bin/openssl
+%endif
+
 if [ ! -f %{sslkey} ] ; then
-/opt/cpanel/ea-openssl11/bin/openssl genrsa -rand /dev/urandom:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/uptime 2048 > %{sslkey} 2> /dev/null
+$OPENSSL_BIN genrsa -rand /dev/urandom:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/uptime 2048 > %{sslkey} 2> /dev/null
 fi
 
 FQDN=`hostname`
 if [ "x${FQDN}" = "x" ]; then
    FQDN=localhost.localdomain
 fi
-
-%if 0%{?rhel} < 8
-    export OPENSSL_BIN=/opt/cpanel/ea-openssl11/bin/openssl
-%else
-    export OPENSSL_BIN=/usr/bin/openssl
-%endif
 
 if [ ! -f %{sslcert} ] ; then
 cat << EOF | $OPENSSL_BIN req -new -key %{sslkey} \
@@ -2094,6 +2094,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Apr 21 2023 Tim Mullin <tim@cpanel.net> - 2.4.57-2
+- EA-11296: Fix posttrans scriptlet failures on RHEL8+
+
 * Fri Apr 07 2023 Cory McIntire <cory@cpanel.net> - 2.4.57-1
 - EA-11337: Update ea-apache2 from v2.4.56 to v2.4.57
 
