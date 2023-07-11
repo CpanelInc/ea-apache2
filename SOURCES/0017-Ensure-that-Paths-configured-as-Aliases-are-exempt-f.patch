@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Rishwanth Yeddula <rish@cpanel.net>
 Date: Tue, 26 Mar 2019 13:52:34 -0500
-Subject: [PATCH 17/21] Ensure that Paths configured as Aliases are exempt from
+Subject: [PATCH 17/25] Ensure that Paths configured as Aliases are exempt from
  the symlink protection checks.
 
 Case CPANEL-22257: Paths that are configured via the "Alias" directive
