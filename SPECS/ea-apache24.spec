@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.57
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -2105,6 +2105,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Oct 11 2023 Cory McIntire <cory@cpanel.net> - 2.4.57-4
+- EA-11729: Rebuild against Updated ea-nghttp2 for CVE-2023-44487
+
 * Thu Jun 29 2023 Tim Mullin <tim@cpanel.net> - 2.4.57-3
 - EA-11526: Patch mod_http2 to fix issues with excessive CPU usage
 
