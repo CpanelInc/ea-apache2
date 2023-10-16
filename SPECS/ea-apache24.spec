@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.57
+Version: 2.4.58
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 4
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -97,12 +97,6 @@ Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 Patch801: 0020-Add-instructions-to-install-elinks.patch
 
 Patch902: 0021-Change-Accept-mutex-from-DEBUG-to-INFO-so-techs-can-.patch
-
-# Patches for mod_http2 cpu usage for cases UPS-510 & EA-11526
-Patch950: 0022-Merge-1907696-1907697-from-trunk.patch
-Patch951: 0023-Merge-r1909769-from-trunk-plus-sync-mod_http2.xml.patch
-Patch952: 0024-Merge-r1910157-from-trunk.patch
-Patch953: 0025-Merge-of-1910331-1910386-1910441-from-trunk.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1366,11 +1360,6 @@ mod_watchdog hooks.
 
 %patch902 -p1 -b .changeacceptmutexloglevel
 
-%patch950 -p1 -b .mod_http2_perf_one_of_four
-%patch951 -p1 -b .mod_http2_perf_two_of_four
-%patch952 -p1 -b .mod_http2_perf_three_of_four
-%patch953 -p1 -b .mod_http2_perf_four_of_four
-
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -2105,6 +2094,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Oct 16 2023 Tim Mullin <tim@cpanel.net> -  2.4.58-1
+- NO-CASE: Test building rc3 of 2.3.58
+
 * Wed Oct 11 2023 Cory McIntire <cory@cpanel.net> - 2.4.57-4
 - EA-11729: Rebuild against Updated ea-nghttp2 for CVE-2023-44487
 
