@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "J. Nick Koston" <nick@cpanel.net>
 Date: Fri, 13 Dec 2019 10:57:41 -0600
-Subject: [PATCH 18/25] Optimize finding a module. ap_find_linked_module was
+Subject: [PATCH 18/21] Optimize finding a module. ap_find_linked_module was
  not performing well when there a lot of IfModule statements in httpd.conf.
  This change uses a hash to keep track of modules which cut the startup time
  from 3s to 1.5s on a large configuration file. This also makes find_module
@@ -13,7 +13,7 @@ Subject: [PATCH 18/25] Optimize finding a module. ap_find_linked_module was
  2 files changed, 30 insertions(+), 49 deletions(-)
 
 diff --git a/server/config.c b/server/config.c
-index be889db..fc9010c 100644
+index 3d11ff5..62421b9 100644
 --- a/server/config.c
 +++ b/server/config.c
 @@ -229,6 +229,7 @@ AP_DECLARE_DATA module *ap_top_module = NULL;
@@ -109,10 +109,10 @@ index be889db..fc9010c 100644
  
  /*****************************************************************
 diff --git a/server/core.c b/server/core.c
-index a890adf..7372217 100644
+index 900606f..481da18 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -2800,47 +2800,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
+@@ -2811,47 +2811,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
  
  static module *find_module(server_rec *s, const char *name)
  {
