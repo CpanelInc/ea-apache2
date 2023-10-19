@@ -2096,6 +2096,9 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Thu Oct 19 2023 Cory McIntire <cory@cpanel.net> - 2.4.58-1
 - EA-11758: Update ea-apache2 from v2.4.57 to v2.4.58
+	- CVE-2023-31122: mod_macro buffer over-read
+	- CVE-2023-43622: Apache HTTP Server: DoS in HTTP/2 with initial windows size 0
+	- CVE-2023-45802: Apache HTTP Server: HTTP/2 stream memory not reclaimed right away on RST
 
 * Wed Oct 11 2023 Cory McIntire <cory@cpanel.net> - 2.4.57-4
 - EA-11729: Rebuild against Updated ea-nghttp2 for CVE-2023-44487
