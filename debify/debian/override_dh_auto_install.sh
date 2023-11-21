@@ -256,7 +256,7 @@ rm -rf $DEB_INSTALL_ROOT/etc/apache2/conf/{original,extra}
 
 # Some special debian things
 
-mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
+mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/$name/
 mkdir -p $DEB_INSTALL_ROOT/usr/share/man/man8
 mkdir -p $DEB_INSTALL_ROOT/usr/share/man/man1
 mkdir -p $DEB_INSTALL_ROOT/var/cache/apache2/proxy

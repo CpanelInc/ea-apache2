@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.58
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -97,6 +97,7 @@ Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 Patch801: 0020-Add-instructions-to-install-elinks.patch
 
 Patch902: 0021-Change-Accept-mutex-from-DEBUG-to-INFO-so-techs-can-.patch
+Patch903: 0022-Patch-to-build-with-the-latest-ea-libxml2.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1359,6 +1360,7 @@ mod_watchdog hooks.
 %endif
 
 %patch902 -p1 -b .changeacceptmutexloglevel
+%patch903 -p1 -b .libxml_includes
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -2073,6 +2075,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Nov 21 2023 Tim Mullin <tim@cpanel.net> - 2.4.58-3
+- EA-11820: Patch to build with the latest ea-libxml2
+
 * Mon Oct 23 2023 Chris Dillon <chris.dillon@cpanel.net> - 2.4.58-2
 - EK-21: Remove unused EA3-era localhost cert generation
 

@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tim Mullin <tim@cpanel.net>
+Date: Tue, 21 Nov 2023 18:47:06 +0000
+Subject: [PATCH 22/22] Patch to build with the latest ea-libxml2
+
+Case EA-11819: Version 2.12.0 of ea-libxml2 changed the
+include files causing the xmlChar type definition
+to no longer be seen by the Apache C file using it.
+The include file which defines this used to be included
+by the include file we are using. The Apache code is
+type-casting the first parameter pass into
+xmlDetectCharEncoding to be "const xmlChar *". However,
+the include file defines the first parameter to
+be passed into xmlDetectCharEncoding to be
+"const unsigned char *". (This has always worked because
+xmlChar is defined is "unsigned char".)
+Changing the type-cast to exactly match the function
+definition in the include file is more correct and
+eliminates the need for xmlChar to be defined in
+this file.
+---
+ modules/filters/mod_xml2enc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/filters/mod_xml2enc.c b/modules/filters/mod_xml2enc.c
+index 76046b4..8c2a315 100644
+--- a/modules/filters/mod_xml2enc.c
++++ b/modules/filters/mod_xml2enc.c
+@@ -209,7 +209,7 @@ static void sniff_encoding(request_rec* r, xml2ctx* ctx)
+   
+     /* to sniff, first we look for BOM */
+     if (ctx->xml2enc == XML_CHAR_ENCODING_NONE) {
+-        ctx->xml2enc = xmlDetectCharEncoding((const xmlChar*)ctx->buf,
++        ctx->xml2enc = xmlDetectCharEncoding((const unsigned char *)ctx->buf,
+                                              ctx->bytes); 
+         if (HAVE_ENCODING(ctx->xml2enc)) {
+             ap_log_rerror(APLOG_MARK, APLOG_INFO, 0, r, APLOGNO(01432)
