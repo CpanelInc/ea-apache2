@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.58
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -1848,44 +1848,6 @@ test -f /etc/sysconfig/httpd-disable-posttrans || \
   /sbin/service htcacheclean condrestart >/dev/null 2>&1 || :
 %endif
 
-%define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
-%define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
-
-umask 077
-
-if [ -f %{sslkey} -o -f %{sslcert} ]; then
-   exit 0
-fi
-
-%if 0%{?rhel} < 8
-    export OPENSSL_BIN=/opt/cpanel/ea-openssl11/bin/openssl
-%else
-    export OPENSSL_BIN=/usr/bin/openssl
-%endif
-
-if [ ! -f %{sslkey} ] ; then
-$OPENSSL_BIN genrsa -rand /dev/urandom:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/uptime 2048 > %{sslkey} 2> /dev/null
-fi
-
-FQDN=`hostname`
-if [ "x${FQDN}" = "x" ]; then
-   FQDN=localhost.localdomain
-fi
-
-if [ ! -f %{sslcert} ] ; then
-cat << EOF | $OPENSSL_BIN req -new -key %{sslkey} \
-         -x509 -sha256 -days 365 -set_serial $RANDOM -extensions v3_req \
-         -out %{sslcert} 2>/dev/null
---
-SomeState
-SomeCity
-SomeOrganization
-SomeOrganizationalUnit
-${FQDN}
-root@${FQDN}
-EOF
-fi
-
 %check
 # Check the built modules are all PIC
 if readelf -d $RPM_BUILD_ROOT%{_libdir}/apache2/modules/*.so | grep TEXTREL; then
@@ -2094,6 +2056,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Mon Oct 23 2023 Chris Dillon <chris.dillon@cpanel.net> - 2.4.58-2
+- EK-21: Remove unused EA3-era localhost cert generation
+
 * Thu Oct 19 2023 Cory McIntire <cory@cpanel.net> - 2.4.58-1
 - EA-11758: Update ea-apache2 from v2.4.57 to v2.4.58
 	- CVE-2023-31122: mod_macro buffer over-read
