@@ -1812,6 +1812,18 @@ rm -vf \
 
 rm -rf $RPM_BUILD_ROOT/etc/apache2/conf/{original,extra}
 
+# consistify for old to new %doc behavior
+mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ea-apache24
+mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ea-apache24/docs/conf/extra
+
+for f in ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE; do
+    cp ./$f $RPM_BUILD_ROOT/usr/share/doc/ea-apache24/
+done
+
+for fd in httpd-dav.conf httpd-default.conf httpd-languages.conf httpd-manual.conf httpd-mpm.conf httpd-multilang-errordoc.conf httpd-vhosts.conf proxy-html.conf; do
+    cp docs/conf/extra/$fd $RPM_BUILD_ROOT/usr/share/doc/ea-apache24/docs/conf/extra/$fd
+done
+
 %pre
 %include %{SOURCE46}
 
@@ -1861,15 +1873,20 @@ rm -rf $RPM_BUILD_ROOT
 %files -f files.httpd
 %defattr(-,root,root)
 
-%doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
-%doc docs/conf/extra/httpd-dav.conf
-%doc docs/conf/extra/httpd-default.conf
-%doc docs/conf/extra/httpd-languages.conf
-%doc docs/conf/extra/httpd-manual.conf
-%doc docs/conf/extra/httpd-mpm.conf
-%doc docs/conf/extra/httpd-multilang-errordoc.conf
-%doc docs/conf/extra/httpd-vhosts.conf
-%doc docs/conf/extra/proxy-html.conf
+%doc /usr/share/doc/ea-apache24/ABOUT_APACHE
+%doc /usr/share/doc/ea-apache24/README
+%doc /usr/share/doc/ea-apache24/CHANGES
+%doc /usr/share/doc/ea-apache24/LICENSE
+%doc /usr/share/doc/ea-apache24/VERSIONING
+%doc /usr/share/doc/ea-apache24/NOTICE
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-dav.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-default.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-languages.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-manual.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-mpm.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-multilang-errordoc.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-vhosts.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/proxy-html.conf
 
 %dir %{_sysconfdir}/apache2
 %{_sysconfdir}/apache2/modules
