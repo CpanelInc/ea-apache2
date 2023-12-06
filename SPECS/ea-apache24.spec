@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.58
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -97,6 +97,7 @@ Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 Patch801: 0020-Add-instructions-to-install-elinks.patch
 
 Patch902: 0021-Change-Accept-mutex-from-DEBUG-to-INFO-so-techs-can-.patch
+Patch903: 0022-Patch-to-build-with-the-latest-ea-libxml2.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1359,6 +1360,7 @@ mod_watchdog hooks.
 %endif
 
 %patch902 -p1 -b .changeacceptmutexloglevel
+%patch903 -p1 -b .libxml_includes
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -1812,6 +1814,18 @@ rm -vf \
 
 rm -rf $RPM_BUILD_ROOT/etc/apache2/conf/{original,extra}
 
+# consistify for old to new %doc behavior
+mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ea-apache24
+mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ea-apache24/docs/conf/extra
+
+for f in ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE; do
+    cp ./$f $RPM_BUILD_ROOT/usr/share/doc/ea-apache24/
+done
+
+for fd in httpd-dav.conf httpd-default.conf httpd-languages.conf httpd-manual.conf httpd-mpm.conf httpd-multilang-errordoc.conf httpd-vhosts.conf proxy-html.conf; do
+    cp docs/conf/extra/$fd $RPM_BUILD_ROOT/usr/share/doc/ea-apache24/docs/conf/extra/$fd
+done
+
 %pre
 %include %{SOURCE46}
 
@@ -1848,44 +1862,6 @@ test -f /etc/sysconfig/httpd-disable-posttrans || \
   /sbin/service htcacheclean condrestart >/dev/null 2>&1 || :
 %endif
 
-%define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
-%define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
-
-umask 077
-
-if [ -f %{sslkey} -o -f %{sslcert} ]; then
-   exit 0
-fi
-
-%if 0%{?rhel} < 8
-    export OPENSSL_BIN=/opt/cpanel/ea-openssl11/bin/openssl
-%else
-    export OPENSSL_BIN=/usr/bin/openssl
-%endif
-
-if [ ! -f %{sslkey} ] ; then
-$OPENSSL_BIN genrsa -rand /dev/urandom:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/uptime 2048 > %{sslkey} 2> /dev/null
-fi
-
-FQDN=`hostname`
-if [ "x${FQDN}" = "x" ]; then
-   FQDN=localhost.localdomain
-fi
-
-if [ ! -f %{sslcert} ] ; then
-cat << EOF | $OPENSSL_BIN req -new -key %{sslkey} \
-         -x509 -sha256 -days 365 -set_serial $RANDOM -extensions v3_req \
-         -out %{sslcert} 2>/dev/null
---
-SomeState
-SomeCity
-SomeOrganization
-SomeOrganizationalUnit
-${FQDN}
-root@${FQDN}
-EOF
-fi
-
 %check
 # Check the built modules are all PIC
 if readelf -d $RPM_BUILD_ROOT%{_libdir}/apache2/modules/*.so | grep TEXTREL; then
@@ -1899,15 +1875,20 @@ rm -rf $RPM_BUILD_ROOT
 %files -f files.httpd
 %defattr(-,root,root)
 
-%doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
-%doc docs/conf/extra/httpd-dav.conf
-%doc docs/conf/extra/httpd-default.conf
-%doc docs/conf/extra/httpd-languages.conf
-%doc docs/conf/extra/httpd-manual.conf
-%doc docs/conf/extra/httpd-mpm.conf
-%doc docs/conf/extra/httpd-multilang-errordoc.conf
-%doc docs/conf/extra/httpd-vhosts.conf
-%doc docs/conf/extra/proxy-html.conf
+%doc /usr/share/doc/ea-apache24/ABOUT_APACHE
+%doc /usr/share/doc/ea-apache24/README
+%doc /usr/share/doc/ea-apache24/CHANGES
+%doc /usr/share/doc/ea-apache24/LICENSE
+%doc /usr/share/doc/ea-apache24/VERSIONING
+%doc /usr/share/doc/ea-apache24/NOTICE
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-dav.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-default.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-languages.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-manual.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-mpm.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-multilang-errordoc.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/httpd-vhosts.conf
+%doc /usr/share/doc/ea-apache24/docs/conf/extra/proxy-html.conf
 
 %dir %{_sysconfdir}/apache2
 %{_sysconfdir}/apache2/modules
@@ -2094,6 +2075,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Tue Nov 21 2023 Tim Mullin <tim@cpanel.net> - 2.4.58-3
+- EA-11820: Patch to build with the latest ea-libxml2
+
+* Mon Oct 23 2023 Chris Dillon <chris.dillon@cpanel.net> - 2.4.58-2
+- EK-21: Remove unused EA3-era localhost cert generation
+
 * Thu Oct 19 2023 Cory McIntire <cory@cpanel.net> - 2.4.58-1
 - EA-11758: Update ea-apache2 from v2.4.57 to v2.4.58
 	- CVE-2023-31122: mod_macro buffer over-read

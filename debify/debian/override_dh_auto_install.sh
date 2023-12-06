@@ -256,29 +256,26 @@ rm -rf $DEB_INSTALL_ROOT/etc/apache2/conf/{original,extra}
 
 # Some special debian things
 
-mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
+mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/$name/
 mkdir -p $DEB_INSTALL_ROOT/usr/share/man/man8
 mkdir -p $DEB_INSTALL_ROOT/usr/share/man/man1
 mkdir -p $DEB_INSTALL_ROOT/var/cache/apache2/proxy
-mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/$name-mod_info-$version/
-mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/$name-tools-$version/
+mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/$name-mod_info/
+mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/$name-tools/
 
-cp $buildroot/ABOUT_APACHE $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/CHANGES $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/LICENSE $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/NOTICE $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/README $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/VERSIONING $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/docs/conf/extra/httpd-dav.conf $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/docs/conf/extra/httpd-default.conf $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/docs/conf/extra/httpd-languages.conf $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/docs/conf/extra/httpd-manual.conf $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/docs/conf/extra/httpd-mpm.conf $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/docs/conf/extra/httpd-multilang-errordoc.conf $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/docs/conf/extra/httpd-vhosts.conf $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
-cp $buildroot/docs/conf/extra/proxy-html.conf $DEB_INSTALL_ROOT/usr/share/doc/$full_package_name/
+# consistify for old to new %doc behavior
+mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/ea-apache24
+mkdir -p $DEB_INSTALL_ROOT/usr/share/doc/ea-apache24/docs/conf/extra
 
-cp $buildroot/docs/conf/extra/httpd-info.conf $DEB_INSTALL_ROOT/usr/share/doc/$name-mod_info-$version/
+for f in ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE; do
+    cp $buildroot//$f $DEB_INSTALL_ROOT/usr/share/doc/ea-apache24/
+done
+
+for fd in httpd-dav.conf httpd-default.conf httpd-languages.conf httpd-manual.conf httpd-mpm.conf httpd-multilang-errordoc.conf httpd-vhosts.conf proxy-html.conf; do
+    cp $buildroot/docs/conf/extra/$fd $DEB_INSTALL_ROOT/usr/share/doc/ea-apache24/docs/conf/extra/$fd
+done
+
+cp $buildroot/docs/conf/extra/httpd-info.conf $DEB_INSTALL_ROOT/usr/share/doc/$name-mod_info/
 
 gzip $buildroot/docs/man/*
 
@@ -297,8 +294,8 @@ cp $buildroot/docs/man/htpasswd.1.gz $DEB_INSTALL_ROOT/usr/share/man/man1
 cp $buildroot/docs/man/httxt2dbm.1.gz $DEB_INSTALL_ROOT/usr/share/man/man1
 cp $buildroot/docs/man/logresolve.1.gz $DEB_INSTALL_ROOT/usr/share/man/man1
 
-cp $buildroot/LICENSE $DEB_INSTALL_ROOT/usr/share/doc/$name-tools-$version/
-cp $buildroot/NOTICE $DEB_INSTALL_ROOT/usr/share/doc/$name-tools-$version/
+cp $buildroot/LICENSE $DEB_INSTALL_ROOT/usr/share/doc/$name-tools/
+cp $buildroot/NOTICE $DEB_INSTALL_ROOT/usr/share/doc/$name-tools/
 
 mkdir -p $DEB_INSTALL_ROOT/var/cache/apache2/ssl
 
