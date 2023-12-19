@@ -1,0 +1,16 @@
+#!/usr/local/cpanel/3rdparty/bin/perl
+# cpanel - find-eol                             Copyright(c) 2023 cPanel, L.L.C.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+# This code is subject to the cPanel license. Unauthorized copying is prohibited
+
+use strict;
+use warnings;
+use FindBin;
+
+use lib "../ea-tools/lib/ea4_tool";    # assumes ea-tools is checked out next to this repo
+use ea4_tool::util ();
+
+ea4_tool::util::find_eol( apache => 2.4 );
+
+1;
