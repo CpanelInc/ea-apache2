@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From bbbaa7fcf81d3c1f90f12f8f909ca133ddc0268d Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:34:24 -0500
-Subject: [PATCH 07/22] Update CacheMaxExpire to have a "hard" option
+Subject: [PATCH 07/20] Update CacheMaxExpire to have a "hard" option
 
 ---
  modules/cache/cache_util.h |  3 +++
@@ -90,3 +90,6 @@ index 3b4469e..2d6ce95 100644
                    "The maximum time in seconds to cache a document"),
      AP_INIT_TAKE1("CacheMinExpire", set_cache_minex, NULL, RSRC_CONF|ACCESS_CONF,
                    "The minimum time in seconds to cache a document"),
+-- 
+2.42.0
+
