@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From bd5a8977b8dd422e56271c98798a1296972965d6 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:49:32 -0500
-Subject: [PATCH 13/22] Update apxs to automatically generate module conf files
+Subject: [PATCH 12/20] Update apxs to automatically generate module conf files
 
 ---
  support/apxs.in | 98 ++++---------------------------------------------
@@ -123,3 +123,6 @@ index b2705fa..9c45f07 100644
              } else {
                  notice("unable to open configuration file");
              }
+-- 
+2.42.0
+

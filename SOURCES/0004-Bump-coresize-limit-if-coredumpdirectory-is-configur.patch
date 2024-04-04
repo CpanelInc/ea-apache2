@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From c35da0fe9a2c7544654c8484f1d75df5df23561f Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:20:28 -0500
-Subject: [PATCH 04/22] Bump coresize limit if coredumpdirectory is configured
+Subject: [PATCH 04/20] Bump coresize limit if coredumpdirectory is configured
 
 ---
  server/core.c | 19 +++++++++++++++++++
@@ -37,3 +37,6 @@ index e5e059e..30b317e 100644
      return OK;
  }
  
+-- 
+2.42.0
+

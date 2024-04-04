@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From fbd78bc32e8c06fb8d6eff1989bf524458b6836c Mon Sep 17 00:00:00 2001
 From: "J. Nick Koston" <nick@cpanel.net>
 Date: Fri, 13 Dec 2019 10:57:41 -0600
-Subject: [PATCH 18/22] Optimize finding a module. ap_find_linked_module was
+Subject: [PATCH 17/20] Optimize finding a module. ap_find_linked_module was
  not performing well when there a lot of IfModule statements in httpd.conf.
  This change uses a hash to keep track of modules which cut the startup time
  from 3s to 1.5s on a large configuration file. This also makes find_module
@@ -109,10 +109,10 @@ index 3d11ff5..62421b9 100644
  
  /*****************************************************************
 diff --git a/server/core.c b/server/core.c
-index 900606f..481da18 100644
+index 3167d44..3b429e8 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -2811,47 +2811,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
+@@ -2812,47 +2812,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
  
  static module *find_module(server_rec *s, const char *name)
  {
@@ -161,3 +161,6 @@ index 900606f..481da18 100644
  }
  
  /* Callback function type used by start_cond_section. */
+-- 
+2.42.0
+
