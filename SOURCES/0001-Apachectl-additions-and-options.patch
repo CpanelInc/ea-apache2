@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 0ea08242c3bf1750bdac805e41f53a21d95869a2 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:11:13 -0500
-Subject: [PATCH 01/22] Apachectl additions and options
+Subject: [PATCH 01/20] Apachectl additions and options
 
 ---
  support/apachectl.in | 43 ++++++++++++++++++++++++++++++++++---------
@@ -93,3 +93,6 @@ index 3281c2e..c6ac3ea 100644
      ERROR=$?
  esac
  
+-- 
+2.42.0
+
