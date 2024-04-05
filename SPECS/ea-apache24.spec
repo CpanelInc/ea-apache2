@@ -2069,7 +2069,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
-* Thu Apr 04 2024 Cory McIntire <cory@cpanel.net> - 2.4.59-1
+* Thu Apr 05 2024 Cory McIntire <cory@cpanel.net> - 2.4.59-1
 - EA-12070: Update ea-apache2 from v2.4.58 to v2.4.59
 	- low: Apache HTTP Server: HTTP Response Splitting in multiple modules (CVE-2024-24795)
 	- moderate: Apache HTTP Server: HTTP/2 DoS by memory exhaustion on endless continuation frames (CVE-2024-27316)
