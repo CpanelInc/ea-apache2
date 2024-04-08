@@ -22,9 +22,9 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.58
+Version: 2.4.59
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -71,33 +71,31 @@ Patch27: 0006-Update-Icon-configuration-in-autoindex.conf.patch
 Patch30: 0007-Update-CacheMaxExpire-to-have-a-hard-option.patch
 
 # Bug fixes
-Patch59: 0008-BUG-r1556473-Avoid-additional-checks-for-SSLCompress.patch
 
 # cPanel-specific patches
-Patch301: 0009-Update-Apachectl-to-reference-cpanel.config-Addition.patch
-Patch302: 0010-Update-suexec-to-allow-trusted-scripts.patch
-Patch303: 0011-Update-suexec-to-work-with-cPanel-Mailman-installati.patch
-Patch304: 0012-Update-suexec-to-allow-execution-for-httpusergroup-m.patch
-Patch305: 0013-Update-apxs-to-automatically-generate-module-conf-fi.patch
-Patch306: 0014-Add-SymlinkProtect-and-SymlinkProtectRoot-functional.patch
+Patch301: 0008-Update-Apachectl-to-reference-cpanel.config-Addition.patch
+Patch302: 0009-Update-suexec-to-allow-trusted-scripts.patch
+Patch303: 0010-Update-suexec-to-work-with-cPanel-Mailman-installati.patch
+Patch304: 0011-Update-suexec-to-allow-execution-for-httpusergroup-m.patch
+Patch305: 0012-Update-apxs-to-automatically-generate-module-conf-fi.patch
+Patch306: 0013-Add-SymlinkProtect-and-SymlinkProtectRoot-functional.patch
 
 # cPanel Performance Patches
-Patch401: 0015-Increase-random-seed-size.patch
-Patch403: 0016-Downgrade-loglevel-for-long-lost-pid-warnings.patch
+Patch401: 0014-Increase-random-seed-size.patch
+Patch403: 0015-Downgrade-loglevel-for-long-lost-pid-warnings.patch
 
 # cPanel Security Patches
 # removed: fixed upstream Patch500: 0017-Apply-mod_ratelimit-fix-from-trunk.patch
-Patch500: 0017-Ensure-that-Paths-configured-as-Aliases-are-exempt-f.patch
+Patch500: 0016-Ensure-that-Paths-configured-as-Aliases-are-exempt-f.patch
 
 # Performance Patches
-Patch601: 0018-Optimize-finding-a-module.-ap_find_linked_module-was.patch
+Patch601: 0017-Optimize-finding-a-module.-ap_find_linked_module-was.patch
 
-Patch701: 0019-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
+Patch701: 0018-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 
-Patch801: 0020-Add-instructions-to-install-elinks.patch
+Patch801: 0019-Add-instructions-to-install-elinks.patch
 
-Patch902: 0021-Change-Accept-mutex-from-DEBUG-to-INFO-so-techs-can-.patch
-Patch903: 0022-Patch-to-build-with-the-latest-ea-libxml2.patch
+Patch902: 0020-Change-Accept-mutex-from-DEBUG-to-INFO-so-techs-can-.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1338,7 +1336,6 @@ mod_watchdog hooks.
 
 %patch30 -p1 -b .cachehardmax
 
-%patch59 -p1 -b .r1556473
 
 %patch301 -p1 -b .cpapachectl
 %patch302 -p1 -b .cpsuexec1
@@ -1358,9 +1355,6 @@ mod_watchdog hooks.
 %if 0%{?rhel} >= 8
 %patch801 -p1 -b .instructaboutelinks
 %endif
-
-%patch902 -p1 -b .changeacceptmutexloglevel
-%patch903 -p1 -b .libxml_includes
 
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -2075,6 +2069,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Apr 05 2024 Cory McIntire <cory@cpanel.net> - 2.4.59-1
+- EA-12070: Update ea-apache2 from v2.4.58 to v2.4.59
+	- low: Apache HTTP Server: HTTP Response Splitting in multiple modules (CVE-2024-24795)
+	- moderate: Apache HTTP Server: HTTP/2 DoS by memory exhaustion on endless continuation frames (CVE-2024-27316)
+	- moderate: Apache HTTP Server: HTTP response splitting (CVE-2023-38709)
+
 * Tue Nov 21 2023 Tim Mullin <tim@cpanel.net> - 2.4.58-3
 - EA-11820: Patch to build with the latest ea-libxml2
 

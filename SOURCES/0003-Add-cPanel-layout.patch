@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 7a234eb1182a620834a0c49965315f0597ac1f5d Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Wed, 1 Apr 2020 11:24:22 -0500
-Subject: [PATCH 03/22] Add cPanel layout
+Subject: [PATCH 03/20] Add cPanel layout
 
 ---
  config.layout | 23 +++++++++++++++++++++++
@@ -38,3 +38,6 @@ index a29351e..e5ce758 100644
 +    logfiledir:    ${localstatedir}/log/apache2
 +    proxycachedir: ${localstatedir}/cache/apache2/proxy
 +</Layout>
+-- 
+2.42.0
+
