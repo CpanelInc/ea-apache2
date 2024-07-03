@@ -1,4 +1,4 @@
-From 0908a4724c4fc305f70898b87f8e30be9b463305 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:46:51 -0500
 Subject: [PATCH 11/20] Update suexec to allow execution for httpusergroup
@@ -81,6 +81,3 @@ index ab200fb..04e6a08 100644
  #ifdef TRUSTED_USERS_SCRIPTS
          /*
           * Check if we're using a "shared" script
--- 
-2.42.0
-
