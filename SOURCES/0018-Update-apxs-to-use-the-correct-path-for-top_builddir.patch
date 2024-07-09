@@ -1,4 +1,4 @@
-From 840bf428b378bac0e252a87d82c92e22cf8cb238 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tim Mullin <tim@cpanel.net>
 Date: Wed, 1 Apr 2020 12:38:04 -0500
 Subject: [PATCH 18/20] Update apxs to use the correct path for top_builddir
@@ -36,6 +36,3 @@ index 9c45f07..54de784 100644
  include %INSTALLBUILDDIR%/special.mk
  
  #   the used tools
--- 
-2.42.0
-

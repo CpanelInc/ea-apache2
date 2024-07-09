@@ -1,4 +1,4 @@
-From dfb1c769b3366c37672d7a158515639df2a8b833 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Julian Brown <julian.brown@cpanel.net>
 Date: Tue, 9 Jun 2020 13:07:33 -0500
 Subject: [PATCH 19/20] Add instructions to install elinks.
@@ -21,6 +21,3 @@ index 07c9912..21033a1 100644
     exit 8
  fi
  }
--- 
-2.42.0
-

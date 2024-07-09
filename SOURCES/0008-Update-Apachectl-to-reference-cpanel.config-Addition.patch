@@ -1,4 +1,4 @@
-From c3f89f1b310839df37705244c17b7d0ba446d22a Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cory McIntire <cory@cpanel.net>
 Date: Thu, 12 Jul 2018 15:41:19 -0500
 Subject: [PATCH 08/20] Update Apachectl to reference cpanel.config;
@@ -46,6 +46,3 @@ index c6ac3ea..07c9912 100644
  # --------------------                              --------------------
  # ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
  
--- 
-2.42.0
-
