@@ -1,4 +1,4 @@
-From fbd78bc32e8c06fb8d6eff1989bf524458b6836c Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: "J. Nick Koston" <nick@cpanel.net>
 Date: Fri, 13 Dec 2019 10:57:41 -0600
 Subject: [PATCH 17/20] Optimize finding a module. ap_find_linked_module was
@@ -13,7 +13,7 @@ Subject: [PATCH 17/20] Optimize finding a module. ap_find_linked_module was
  2 files changed, 30 insertions(+), 49 deletions(-)
 
 diff --git a/server/config.c b/server/config.c
-index 3d11ff5..62421b9 100644
+index 635b65d..24ca489 100644
 --- a/server/config.c
 +++ b/server/config.c
 @@ -229,6 +229,7 @@ AP_DECLARE_DATA module *ap_top_module = NULL;
@@ -109,7 +109,7 @@ index 3d11ff5..62421b9 100644
  
  /*****************************************************************
 diff --git a/server/core.c b/server/core.c
-index 3167d44..3b429e8 100644
+index 434e9d0..61aacbd 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -2812,47 +2812,7 @@ static const char *ifsection(cmd_parms *cmd, void *mconfig, const char *arg)
@@ -161,6 +161,3 @@ index 3167d44..3b429e8 100644
  }
  
  /* Callback function type used by start_cond_section. */
--- 
-2.42.0
-

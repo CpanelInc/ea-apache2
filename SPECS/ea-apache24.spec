@@ -22,7 +22,7 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.59
+Version: 2.4.61
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -2069,6 +2069,18 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Wed Jul 03 2024 Cory McIntire <cory@cpanel.net> - 2.4.61-1
+- EA-12261: Update ea-apache2 from v2.4.59 to v2.4.61
+	- important: Apache HTTP Server: source code disclosure with handlers configured via AddType (CVE-2024-39884)
+	- low: Apache HTTP Server: DoS by Null pointer in websocket over HTTP/2 (CVE-2024-36387)
+	- important: Apache HTTP Server on WIndows UNC SSRF (CVE-2024-38472)
+	- moderate: Apache HTTP Server proxy encoding problem (CVE-2024-38473)
+	- important: Apache HTTP Server weakness with encoded question marks in backreferences (CVE-2024-38474)
+	- important: Apache HTTP Server weakness in mod_rewrite when first segment of substitution matches filesystem path. (CVE-2024-38475)
+	- important: Apache HTTP Server may use exploitable/malicious backend application output to run local handlers via internal redirect (CVE-2024-38476)
+	- important: Apache HTTP Server: Crash resulting in Denial of Service in mod_proxy via a malicious request (CVE-2024-38477)
+	- moderate: Apache HTTP Server: mod_rewrite proxy handler substitution (CVE-2024-39573)
+
 * Thu Apr 05 2024 Cory McIntire <cory@cpanel.net> - 2.4.59-1
 - EA-12070: Update ea-apache2 from v2.4.58 to v2.4.59
 	- low: Apache HTTP Server: HTTP Response Splitting in multiple modules (CVE-2024-24795)
