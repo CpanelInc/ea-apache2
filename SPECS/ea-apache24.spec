@@ -22,7 +22,7 @@
 
 Summary: Apache HTTP Server
 Name: ea-apache24
-Version: 2.4.61
+Version: 2.4.62
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -2069,6 +2069,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Thu Jul 18 2024 Cory McIntire <cory@cpanel.net> - 2.4.62-1
+- EA-12288: Update ea-apache2 from v2.4.61 to v2.4.62
+	- important: Apache HTTP Server: source code disclosure with handlers configured via AddType (CVE-2024-40725)
+	- important: Apache HTTP Server: SSRF with mod_rewrite in server/vhost context on Windows (CVE-2024-40898)
+
 * Wed Jul 03 2024 Cory McIntire <cory@cpanel.net> - 2.4.61-1
 - EA-12261: Update ea-apache2 from v2.4.59 to v2.4.61
 	- important: Apache HTTP Server: source code disclosure with handlers configured via AddType (CVE-2024-39884)
