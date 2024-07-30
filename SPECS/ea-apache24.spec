@@ -24,7 +24,7 @@ Summary: Apache HTTP Server
 Name: ea-apache24
 Version: 2.4.62
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 URL: http://httpd.apache.org/
@@ -96,6 +96,9 @@ Patch701: 0018-Update-apxs-to-use-the-correct-path-for-top_builddir.patch
 Patch801: 0019-Add-instructions-to-install-elinks.patch
 
 Patch902: 0020-Change-Accept-mutex-from-DEBUG-to-INFO-so-techs-can-.patch
+
+# NOTE: This is a temporary patch until Apache adopts it officiall
+Patch9991:  9991-Proxy-FCGI-nocanon-from-SetHandler.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -1356,6 +1359,10 @@ mod_watchdog hooks.
 %patch801 -p1 -b .instructaboutelinks
 %endif
 
+
+# NOTE: This is a temporary patch until Apache adopts it officiall
+%patch9991 -p1 -b .proxy_fcgi-nocanon
+
 # Patch in the vendor string and the release string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 sed -i 's/@RELEASE@/%{release}/' server/core.c
@@ -2069,6 +2076,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.apache2
 
 %changelog
+* Fri Jul 26 2024 Julian Brown <julian.brown@cpanel.net> - 2.4.62-2
+- ZC-12009: Proxy FCGI nocanon from SetHandler
+
 * Thu Jul 18 2024 Cory McIntire <cory@cpanel.net> - 2.4.62-1
 - EA-12288: Update ea-apache2 from v2.4.61 to v2.4.62
 	- important: Apache HTTP Server: source code disclosure with handlers configured via AddType (CVE-2024-40725)
